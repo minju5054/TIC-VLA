@@ -2,6 +2,8 @@
 
 Inspection date: **2026-10-09 (Asia/Seoul)**. This document records this machine, not a generic claim that all upstream environments work.
 
+This is the historical **Isaac 5 official reproduction** record. A subsequent task explicitly authorized probing existing Isaac 6.0.1; its results and process-local launcher are in [ISAAC6_COMPATIBILITY.md](ISAAC6_COMPATIBILITY.md). Earlier statements below that Isaac 6 was out of scope describe the original setup task. Neither installation nor the original Isaac 5 local configuration was replaced. This fork now hosts the user's TIC-VLA-based research, as defined in [RESEARCH_CONTEXT.md](RESEARCH_CONTEXT.md).
+
 ## Repository
 
 | Item | Value |

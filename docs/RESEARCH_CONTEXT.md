@@ -2,11 +2,13 @@
 
 ## Main research
 
-The main repository is [minju5054/se-3-reconciliation](https://github.com/minju5054/se-3-reconciliation). It currently uses LightNav as an upstream navigation VLA.
+The current research repository is this [TIC-VLA fork](https://github.com/minju5054/TIC-VLA), tracking [official TIC-VLA](https://github.com/ucla-mobility/TIC-VLA). It hosts TIC-VLA reproduction, DynaNav experiments, future successive action chunk collection, hard-case analysis, and the future reconciliation method.
 
-The research asks whether successive navigation trajectory/action chunks can be reconciled with SE(2) graph optimization while preserving the already executed or committed OLD region, reducing geometric/temporal inconsistency, and retaining the navigation intent of editable FRESH future output.
+[minju5054/se-3-reconciliation](https://github.com/minju5054/se-3-reconciliation) contains earlier **LightNav-based** reconciliation research. It is not the destination for this fork's future method implementation and is not modified by this task.
 
-TIC-VLA is an **upstream navigation VLA and candidate hard-case source**, not a competing reconciliation-method baseline. This fork does not improve TIC-VLA navigation or architecture.
+The research asks whether explicit SE(2) reconciliation can reduce geometric and temporal inconsistency between successive navigation trajectory/action chunks while preserving new navigation intent. OLD is the preceding prediction still influencing execution; FRESH is a newer prediction from a more recent observation. The eventual method is not implemented in this stage.
+
+TIC-VLA is the **upstream navigation VLA**, not a competing reconciliation-method baseline. DynaNav supplies the simulation/benchmark environment. Keep research tooling and any future method separate from official upstream implementation; this compatibility task does not change navigation algorithms or model architecture.
 
 ## Current and future stages
 
@@ -14,20 +16,23 @@ Current scope:
 
 ```text
 official TIC-VLA reproduction
-    -> runtime/environment validation
-    -> native output semantics verification
+    -> Isaac 6.0.1 runtime/API compatibility investigation
+    -> verify RGB -> prediction -> controller -> robot motion
 ```
 
 Only on a separate explicit request:
 
 ```text
 successive action chunk logging
+    -> OLD/FRESH temporal metadata
     -> hard-case scanning
     -> qualified handoff selection
-    -> transfer selected data/provenance to se-3-reconciliation
+    -> reconciliation research in this TIC-VLA fork
 ```
 
 No logger, severity metric, OLD/FRESH correspondence, SE(2) conversion, graph optimization, reconciliation, training, fine-tuning, annotation, or performance modification is implemented in this setup.
+
+Current execution status: **NOT READY FOR CHUNK COLLECTION**. Isaac 6 simulator-only startup works with process-local environment isolation, but the unmodified DynaNav behavior and legacy human-scenario APIs are blocked. See [ISAAC6_COMPATIBILITY.md](ISAAC6_COMPATIBILITY.md). Isaac 5 and its original failure evidence remain preserved.
 
 ## Required distinctions
 

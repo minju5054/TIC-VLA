@@ -1,6 +1,6 @@
 # TIC-VLA research workspace rules
 
-This fork reproduces official TIC-VLA as a candidate source of successive navigation action chunks. The reconciliation method lives separately in `https://github.com/minju5054/se-3-reconciliation`.
+This fork is the home of the user's TIC-VLA-based research: official reproduction, DynaNav experiments, future successive chunk collection, hard-case analysis, and the future reconciliation method. `https://github.com/minju5054/se-3-reconciliation` contains prior LightNav-based research; do not modify it as part of this workspace's tasks. Keep official upstream code distinguishable from research additions.
 
 - Preserve official TIC-VLA behavior. Prefer environment configuration, ignored local environment files, and additive wrappers before minimal upstream patches.
 - Document every upstream source change: file, reason, behavior difference, and possible research impact. Do not refactor unrelated code.
@@ -15,8 +15,9 @@ This fork reproduces official TIC-VLA as a candidate source of successive naviga
 - Do not implement graph optimization, reconciliation, correspondence, hard-case metrics, a successive chunk logger, or trajectory conversion until explicitly requested.
 - Do not train or fine-tune TIC-VLA in this reproduction stage. Do not download training datasets for inference.
 - Record exact upstream Git SHA and local Git SHA for every experiment, plus dirty status/diff identity when applicable, checkpoint identity, dependency versions, and commands.
-- Use Isaac Sim **5.0.0** for this reproduction. Preserve existing Isaac Sim installations and other research environments. Do not modify system Python, global CUDA, NVIDIA drivers, or LightNav environments.
-- Install only inference dependencies into the separate TIC-VLA Isaac runtime. Preserve NumPy `<2` and the Isaac PyTorch/CUDA stack; never install `requirements-train.txt` there.
+- Preserve Isaac Sim **5.0.0** as the official reproduction baseline. The user's Isaac **6.0.1** compatibility investigation is authorized separately; do not represent it as an unchanged Isaac 5 reproduction. Preserve both installations and other research environments. Do not modify system Python, global CUDA, NVIDIA drivers, or LightNav environments.
+- Before using Isaac 6, read `docs/ISAAC6_COMPATIBILITY.md`. Gate DynaNav work on a successful simulator-only startup. Small API adaptations require explicit evidence of equivalent behavior; do not silently replace the human scenario system or controller.
+- Install only necessary inference dependencies after inspecting the selected runtime and a pip dry-run. Preserve the existing torch/torchvision/torchaudio, CUDA, USD, and Isaac/Kit binaries and NumPy major version. Isaac 5's NumPy `<2` requirement must not be applied blindly to Isaac 6. Never install `requirements-train.txt` in either inference runtime.
 - Follow each task with appropriate validation, diff review, an append-only `docs/WORK_LOG.md` entry, and a focused commit. Report PASS/FAIL/BLOCKED honestly; a process exit code alone does not prove inference or movement.
 
 See `docs/RESEARCH_CONTEXT.md`, `docs/ACTION_SEMANTICS.md`, and `docs/SETUP.md` before changing this workspace.
