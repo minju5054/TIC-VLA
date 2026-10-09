@@ -18,11 +18,21 @@ def main():
     parser.add_argument("--mode", choices=["wheel", "inference", "static", "dynamic"], required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--prerequisite-run")
+    parser.add_argument("--detour-freeze-receipt", help="Required preflight/config freeze receipt for static detour")
     args = parser.parse_args()
     if Path(args.run_id).name != args.run_id or args.run_id in (".", ".."):
         parser.error("run-id must be a single directory name")
     import yaml
     cfg = yaml.safe_load(Path(args.config).read_text())
+    if "static_detour" in cfg:
+        import hashlib
+        if args.mode != "static" or "pedestrian" in cfg or not args.detour_freeze_receipt:
+            parser.error("Static detour requires static mode, no pedestrian and a preflight freeze receipt")
+        receipt = json.loads(Path(args.detour_freeze_receipt).read_text())
+        if (receipt["config_sha256"] != hashlib.sha256(Path(args.config).read_bytes()).hexdigest()
+                or not receipt["preflight_geometry_pass"] or not receipt["front_rgb_visual_review_pass"]
+                or receipt["authorized_run_id"] != args.run_id):
+            parser.error("Static detour preflight/config/run ID does not match the frozen receipt")
     if args.mode != "wheel":
         expected = {"inference": "wheel", "static": "inference", "dynamic": "static"}[args.mode]
         if not args.prerequisite_run:
@@ -142,6 +152,9 @@ class Simulation:
                 self.cube("/World/"+name, obstacle["position"], obstacle["size"], obstacle.get("color", [.65, .35, .15]))
             if "route_switch" in cfg:
                 from research.route_scene import audit_scene
+                audit_scene(self, cfg, records)
+            if "static_detour" in cfg:
+                from research.preflight_static_detour import audit_scene
                 audit_scene(self, cfg, records)
         camcfg = cfg["camera"]
         camera = UsdGeom.Camera.Define(self.stage, camcfg["prim"])
