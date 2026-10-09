@@ -34,6 +34,8 @@ The user explicitly authorized minimal append-only raw prediction, event, image 
 
 Current execution status: **READY FOR HARD-CASE COLLECTION** within the controlled sequential simulation scope; see [MINIMAL_CLOSED_LOOP.md](MINIMAL_CLOSED_LOOP.md). The platform produces successive real predictions, four-wheel motion and measured scripted human motion. Physics pauses during inference, and the human translates in its authored rest pose. These are explicit scope limits; no hard case has been established. The unmodified DynaNav/legacy human-system blockers in [ISAAC6_COMPATIBILITY.md](ISAAC6_COMPATIBILITY.md) remain historical facts; neither Isaac installation was changed.
 
+The separately authorized continuous path is now **CONTINUOUS HANDOFF VALIDATED** with **MEASURABLE ACTUAL-LATENCY TRANSPORT**; see [CONTINUOUS_HANDOFF.md](CONTINUOUS_HANDOFF.md). It preserves the default frozen config and uses a separate config, one outstanding IPC future, main-thread physics, OLD command retention and measured clocks/poses. Static and dynamic runs each contain seven non-bootstrap handoffs; dynamic robot transport median/max is .099953/.199890 m. This is execution infrastructure evidence, not a pedestrian hard case, navigation result or reconciliation validation. [CHUNK_GEOMETRY_ANALYSIS.md](CHUNK_GEOMETRY_ANALYSIS.md) remains the separate saved frozen-run geometry result.
+
 ## Required distinctions
 
 ```text

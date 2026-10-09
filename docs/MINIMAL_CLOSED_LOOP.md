@@ -1,5 +1,7 @@
 # Controlled four-wheel TIC-VLA closed loop
 
+This report preserves the validated frozen implementation/results. The additive continuous execution path, actual latency/transport measurements and separate config are documented in [CONTINUOUS_HANDOFF.md](CONTINUOUS_HANDOFF.md).
+
 Date: **2026-10-09 (Asia/Seoul)**. This is a data-producing simulation platform, not a DynaNav reproduction, navigation benchmark, hard-case discovery result, or reconciliation implementation. The fork remains the home of future TIC-VLA research; no files from the prior LightNav repository were read, copied or changed for this task.
 
 ## Architecture and runtime

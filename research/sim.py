@@ -30,6 +30,11 @@ def main():
         prior = json.loads((REPO/"outputs"/args.prerequisite_run/"summary.json").read_text())
         if prior["mode"] != expected or prior["status"] != "PASS":
             parser.error(f"A PASS {expected} run is required")
+        if (not cfg["simulation"]["pause_physics_during_inference"] and args.mode == "dynamic"
+                and not prior.get("continuous_handoff_validated")):
+            parser.error("Continuous dynamic execution requires a PASS continuous static run")
+    if not cfg["simulation"]["pause_physics_during_inference"] and args.mode not in ("static", "dynamic"):
+        parser.error("Continuous execution is only supported for static/dynamic modes")
     from research.records import RunRecords, provenance, write_json
     records = RunRecords(REPO/"outputs"/args.run_id,
                          {"schema_version": 1, "mode": args.mode, "config": cfg,
@@ -50,7 +55,10 @@ def main():
         if args.mode == "wheel":
             result = sim.validate_wheels()
         else:
-            from research.loop import run_model_loop
+            if cfg["simulation"]["pause_physics_during_inference"]:
+                from research.loop import run_model_loop
+            else:
+                from research.continuous import run_model_loop
             result = run_model_loop(sim, cfg, records, args.mode)
         write_json(records.path/"summary.json", {"mode": args.mode, "status": "PASS", **result})
         print("RUN_PASS", json.dumps(result), flush=True)
@@ -141,12 +149,20 @@ class Simulation:
         self.tick = 0
         self.command = [0.0, 0.0]
         self.wheel_command = [0.0]*4
+        self.continuous = not cfg["simulation"]["pause_physics_during_inference"]
+        self.active_control_source_request_id = None
+        self.pending_request_id = None
+        self.physics_step_start_monotonic_ns = None
         self.pedestrian = None
         self.state_file = (records.path/"robot_state.csv").open("x")
-        self.writer = csv.DictWriter(self.state_file, fieldnames=["tick", "sim_time", "isaac_sim_time", "wall_time_ns",
+        fields = ["tick", "sim_time", "isaac_sim_time", "wall_time_ns",
             "x", "y", "z", "yaw", "qw", "qx", "qy", "qz", "vx_world", "vy_world", "vz_world",
             "wx_world", "wy_world", "wz_world", "wheel_fl", "wheel_rl", "wheel_fr", "wheel_rr",
-            "command_v", "command_w", "command_fl", "command_rl", "command_fr", "command_rr"])
+            "command_v", "command_w", "command_fl", "command_rl", "command_fr", "command_rr"]
+        if self.continuous:
+            fields += ["monotonic_ns", "physics_step_start_monotonic_ns",
+                       "active_control_source_request_id", "pending_request_id"]
+        self.writer = csv.DictWriter(self.state_file, fieldnames=fields)
         self.writer.writeheader()
         self.log_state()
         print("ROBOT_READY", self.robot.dof_names, flush=True)
@@ -182,6 +198,9 @@ class Simulation:
         values = [s["tick"], s["sim_time"], s["isaac_sim_time"], s["wall_time_ns"], *s["position"], s["pose"][2],
                   *s["quaternion_wxyz"], *s["linear_velocity_world"], *s["angular_velocity_world"],
                   *s["wheel_velocities"], *self.command, *self.wheel_command]
+        if self.continuous:
+            values += [s["monotonic_ns"], self.physics_step_start_monotonic_ns,
+                       self.active_control_source_request_id, self.pending_request_id]
         self.writer.writerow(dict(zip(self.writer.fieldnames, values)))
         return s
 
@@ -195,6 +214,9 @@ class Simulation:
         return self.wheel_command
 
     def step(self):
+        if self.continuous:
+            import time
+            self.physics_step_start_monotonic_ns = time.monotonic_ns()
         before = float(self.world.current_time)
         if self.pedestrian:
             self.pedestrian.update(self.state()["sim_time"] + self.dt)

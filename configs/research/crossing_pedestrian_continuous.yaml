@@ -1,0 +1,69 @@
+schema_version: 1
+scenario: crossing_pedestrian
+seed: 36
+simulation:
+  dt: 0.016666666666666666
+  control_hz: 60
+  inference_hz: 2
+  settle_steps: 120
+  predictions: 8
+  pause_physics_during_inference: false
+  real_time_pacing: true
+  target_real_time_factor: 1.0
+  headless: true
+robot:
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots/Clearpath/Jackal/jackal_basic.usd
+  prim: /World/Jackal
+  body: /World/Jackal/base_link
+  wheel_joints: [front_left_wheel, rear_left_wheel, front_right_wheel, rear_right_wheel]
+  joint_signs: [1, 1, 1, 1]
+  wheel_radius: 0.098 # USD wheel collision Cylinder.radius; visual mesh radius is 0.1.
+  track_width: 0.37559 # USD joint localPos0 y: +0.187795 and -0.187795.
+  start_position: [0.0, 0.0, 0.15]
+  start_yaw: 0.0
+camera:
+  prim: /World/Jackal/base_link/research_front_rgb
+  resolution: [640, 480]
+  translation: [0.26, 0.0, 0.5]
+  quaternion_wxyz: [0.5, 0.5, -0.5, -0.5] # USD -Z optical forward -> body +X; image up -> body +Z.
+  focal_length_mm: 10.4775
+  horizontal_aperture_mm: 20.955
+  vertical_aperture_mm: 15.71625
+  clipping_range: [0.05, 100.0]
+  capture_subframes: 4
+scene:
+  goal: [8.0, 0.0, 0.0]
+  corridor_half_width: 2.5
+  wall_height: 2.0
+pedestrian:
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/People/Characters/male_adult_construction_03/male_adult_construction_03.usd
+  start_position: [2.5, 2.0, 0.0]
+  velocity: [0.0, -1.0, 0.0]
+  start_time: 0.5
+  stop_time: 4.5
+  yaw: -1.5707963267948966
+  collider_radius: 0.25
+  collider_cylinder_height: 1.2
+instruction: Move straight ahead toward the green wall, avoiding obstacles.
+controller:
+  lookahead: 1.0
+  angular_gain: 0.8
+  filter_gain: 0.35
+  epsilon: 0.001
+  max_v: 1.5
+  max_w: 1.2
+inference:
+  python: /home/gpuadmin/isaacsim-ticvla-5.0.0/python.sh
+  base_model: /home/gpuadmin/Workspace/models/tic-vla/InternVL3-1B
+  checkpoint: /home/gpuadmin/Workspace/models/tic-vla/checkpoints/TIC-VLA-model.ckpt
+  device: cuda:0
+  startup_timeout_seconds: 180
+  request_timeout_seconds: 120
+  image_history_interval_seconds: 3.0
+validation:
+  straight_v: 0.4
+  straight_seconds: 2.0
+  turn_w: 0.6
+  turn_seconds: 2.0
+  minimum_forward_displacement: 0.2
+  minimum_yaw_change: 0.1

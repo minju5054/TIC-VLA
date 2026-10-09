@@ -88,5 +88,15 @@ class Pedestrian:
                 "displacement": float(np.linalg.norm(self.measured_current-self.measured_initial)),
                 "pose_measurement_type": "PhysX global rigid-body translation sampled after each physics step"}
 
+    def snapshot(self):
+        """Read actual PhysX on the main thread, without authoring or advancing time."""
+        import omni.physx
+        from research.records import clocks
+        pose = omni.physx.get_physx_interface().get_rigidbody_transformation("/World/Pedestrian")
+        if not pose["ret_val"]:
+            raise RuntimeError("Pedestrian rigid-body event pose is unavailable from PhysX")
+        return {"position": list(pose["position"]), "sim_time": self.sim.state()["sim_time"],
+                "event_source": "simulator_main_thread_PhysX", **clocks()}
+
     def close(self):
         self.file.close()
