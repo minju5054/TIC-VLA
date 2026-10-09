@@ -77,7 +77,7 @@ def next_observation_time(observation_time, application_time, interval):
     return max(nominal, application_time)
 
 
-def run_model_loop(sim, cfg, records, mode):
+def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
     settings = cfg["simulation"]
     if settings["pause_physics_during_inference"] or not settings["real_time_pacing"]:
         raise ValueError("Continuous mode requires physics enabled and real-time pacing")
@@ -171,8 +171,10 @@ def run_model_loop(sim, cfg, records, mode):
         sim.state_file.flush()
         if sim.pedestrian:
             sim.pedestrian.file.flush()
-        from research.analyze_handoffs import analyze
-        summary = analyze(records.path)
+        if evidence_analyzer is None:
+            from research.analyze_handoffs import analyze
+            evidence_analyzer = analyze
+        summary = evidence_analyzer(records.path)
         if not summary["continuous_handoff_validated"]:
             raise RuntimeError("Saved evidence did not validate at least three OLD handoff cycles")
         extra = {}

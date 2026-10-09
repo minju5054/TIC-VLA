@@ -44,7 +44,9 @@ def load_official_scene(sim, cfg, records):
         "source_root_world_transform": source_transform.tolist(), "composed_root_world_transform": world_transform.tolist(),
         "mesh_count": meshes, "authored_light_count": lights, "semantic_prim_paths": semantic_paths,
         "custom_ground_walls_goal_obstacles_created": False,
-        "official_start": source["episode"]["start"], "jackal_spawn_position": cfg["robot"]["start_position"],
+        "official_start": source["episode"]["start"],
+        **({"nova_spawn_position": cfg["robot"]["start_position"]} if cfg["robot"].get("type") == "nova_carter"
+           else {"jackal_spawn_position": cfg["robot"]["start_position"]}),
         "applied_yaw_radians": cfg["robot"]["start_yaw"], "goal_world_position": cfg["scene"]["goal"]}
     write_json(records.path/"hospital_scene.json", result)
 
