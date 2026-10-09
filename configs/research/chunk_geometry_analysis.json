@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "native_waypoint_dt": 0.1,
+  "expected_points": 30,
+  "expected_requests": 8,
+  "time_alignment_tolerance_s": 0.000001,
+  "pose_consistency_tolerance": 0.000001,
+  "tangent_zero_length_tolerance_m": 0.000000001
+}
