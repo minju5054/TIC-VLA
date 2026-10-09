@@ -10,7 +10,7 @@ from research.hospital_scene import HospitalDiagnostics, load_official_scene
 
 
 class NovaSimulation(Simulation):
-    def __init__(self, cfg, records, variant="direct"):
+    def __init__(self, cfg, records, variant="direct", actor_factory=None):
         import omni.replicator.core as rep
         from isaacsim.core.api import World
         from isaacsim.robot.wheeled_robots.robots import WheeledRobot
@@ -63,6 +63,9 @@ class NovaSimulation(Simulation):
         self.hospital_diagnostics = HospitalDiagnostics(self)
         self.product = rep.create.render_product(cfg["camera"]["prim"], tuple(cfg["camera"]["resolution"]))
         self.rgb = rep.AnnotatorRegistry.get_annotator("rgb"); self.rgb.attach([self.product])
+        # Optional actor is authored before reset/settling, so it exists from
+        # simulation start without an extra post-origin initialization tick.
+        actor = actor_factory(self) if actor_factory else None
         self.world.reset()
         self.adapter = NovaCarter(self.robot, r, source["constants"], variant)
         for _ in range(cfg["simulation"]["settle_steps"]):
@@ -70,7 +73,7 @@ class NovaSimulation(Simulation):
         for _ in range(8): self.world.render()
         self.origin_time = float(self.world.current_time); self.tick = 0
         self.command = [0., 0.]; self.wheel_command = [0., 0.]
-        self.continuous = True; self.pedestrian = None
+        self.continuous = True; self.pedestrian = actor
         self.active_control_source_request_id = None; self.pending_request_id = None
         self.physics_step_start_monotonic_ns = None
         self.source_tick = None; self.phase = "initial"; self.primary_window = False
@@ -84,6 +87,8 @@ class NovaSimulation(Simulation):
             "active_control_source_request_id", "pending_request_id", "source_tick", "phase", "primary_window"])
         self.writer.writeheader(); self.log_state()
         self.audit_spawn()
+        if self.pedestrian:
+            self.pedestrian.measure(self.state()["sim_time"])
 
     def state(self):
         return {**self.adapter.state(), "sim_time": float(self.world.current_time)-self.origin_time,
@@ -153,4 +158,6 @@ class NovaSimulation(Simulation):
 
     def close(self):
         self.adapter.stop()
+        if self.pedestrian:
+            self.pedestrian.close()
         self.hospital_diagnostics.close(); self.state_file.close(); self.world.stop()

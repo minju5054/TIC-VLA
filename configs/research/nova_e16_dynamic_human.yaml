@@ -1,0 +1,235 @@
+schema_version: 1
+scenario: nova_carter_hospital_episode16
+seed: 36
+simulation:
+  dt: 0.016666666666666666
+  control_hz: 60
+  inference_hz: 2
+  settle_steps: 120
+  predictions: 48
+  pause_physics_during_inference: false
+  real_time_pacing: true
+  target_real_time_factor: 1.0
+  headless: true
+robot:
+  type: nova_carter
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5/Isaac/Robots/Carter/nova_carter_sensors.usd
+  prim: /World/Robots/Nova_Carter
+  body: /World/Robots/Nova_Carter/chassis_link
+  wheel_joints:
+  - joint_wheel_left
+  - joint_wheel_right
+  wheel_radius: 0.14
+  wheel_base: 0.4132
+  wheel_collision_prims:
+  - /World/Robots/Nova_Carter/wheel_left/Cylinder
+  - /World/Robots/Nova_Carter/wheel_right/Cylinder_03
+  start_position:
+  - 7.38
+  - 1.49
+  - 0.11
+  start_yaw: 1.5707963267948966
+camera:
+  prim: /World/Robots/Nova_Carter/chassis_link/front_hawk/left/camera_left
+  resolution:
+  - 1920
+  - 1080
+  translation:
+  - 0.1003
+  - 0.074998
+  - 0.3459
+  capture_subframes: 4
+  note: Existing asset front Hawk camera; original transforms/intrinsics/projection
+    untouched
+scene:
+  mode: official_usd
+  usd: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+  goal:
+  - -12.23
+  - 10.19
+  - 0.01
+instruction: Move forward toward the staircase, then turn left to enter the hallway.
+  Continue straight ahead and stop in front of the blue hospital bed on the right
+  side of the hallway.
+controller:
+  lookahead: 1.0
+  angular_gain: 0.8
+  filter_gain: 0.35
+  epsilon: 0.001
+  max_v: 1.5
+  max_w: 1.2
+inference:
+  python: /home/gpuadmin/isaacsim-ticvla-5.0.0/python.sh
+  base_model: /home/gpuadmin/Workspace/models/tic-vla/InternVL3-1B
+  checkpoint: /home/gpuadmin/Workspace/models/tic-vla/checkpoints/TIC-VLA-model.ckpt
+  device: cuda:0
+  startup_timeout_seconds: 180
+  request_timeout_seconds: 120
+  image_history_interval_seconds: 3.0
+validation:
+  straight_v: 0.4
+  straight_seconds: 2.0
+  turn_w: 0.6
+  turn_seconds: 2.0
+  minimum_forward_displacement: 0.2
+  minimum_yaw_change: 0.1
+official_episode:
+  episode_id: episode_16
+  benchmark_source: DynaNav/configs/benchmark_full.yaml
+  benchmark_sha256: 62d8abec03dc793dad9da351c5c5652bcd854014f29a91880309bd70c128b08c
+  runner_source: DynaNav/benchmark.py
+  runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+  source_convention: USD RotateZ degrees
+  resolved_yaw_radians: 1.5707963267948966
+  episode:
+    scene: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+    start:
+    - 7.38
+    - 1.49
+    - 0.01
+    start_yaw: 90.0
+    goal:
+    - -12.23
+    - 10.19
+    - 0.01
+    instruction: Move forward toward the staircase, then turn left to enter the hallway.
+      Continue straight ahead and stop in front of the blue hospital bed on the right
+      side of the hallway.
+    timeout: 85
+    num_people: 0
+    robot_type: nova_carter
+hospital_validation:
+  first_primary_request_id: 4
+  minimum_consecutive_left_requests: 2
+  position_sign_tolerance_m: 1.0e-06
+  angle_sign_tolerance_rad: 1.0e-06
+  command_sign_tolerance_rad_s: 1.0e-06
+  minimum_segment_length_m: 1.0e-06
+  camera_probe_radius_m: 0.02
+  near_black_p95_0_255: 20.0
+  maximum_settling_xy_m: 0.02
+  native_waypoint_dt: 0.1
+  horizon_policy: 48 fixed predictions at 2 Hz target cadence; approximately 24 seconds
+    plus bootstrap/call overrun; never extend after output
+  stable_left_rule: 'Two consecutive primary requests: endpoint+mean left positive,
+    lookahead left+bearing positive, controller w positive, derived total heading
+    change positive; exclude degraded near-black observations'
+  forward_dominance_rule: Endpoint forward > abs(left), lookahead forward > abs(left),
+    not weak left (fewer than 3 of 4 left indicator groups)
+  execution_rule: Forward progress precedes stable predicted intent; later two consecutive
+    measured observation intervals each have positive yaw change and episode-local
+    left-dominant displacement (left component > abs(forward)); no degraded RGB, camera
+    proximity hit or non-floor contact during qualifying intervals. Non-floor contact
+    means measured environment contact with abs(normal.z) < 0.5, retained until CONTACT_LOST.
+    This is a conservative execution criterion, not a turn magnitude threshold chosen
+    from model results.
+nova_source:
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5/Isaac/Robots/Carter/nova_carter_sensors.usd
+  front_camera: /World/Robots/Nova_Carter/chassis_link/front_hawk/left/camera_left
+  constants:
+    _wheel_joints:
+    - joint_wheel_left
+    - joint_wheel_right
+    _wheel_radius: 0.152
+    _wheel_base: 0.413
+    _max_accel_lin: 2.0
+    _max_decel_lin: 2.5
+    _max_accel_ang: 3.0
+    _max_decel_ang: 3.5
+    _lin_deadband: 0.001
+    _ang_deadband: 0.0005
+  behavior_sha256: 6411d53e30fc7e2f376052bf4818d340dd22e9463e0e0541d562540b722f04d0
+  runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+  episode:
+    episode_id: episode_16
+    benchmark_source: DynaNav/configs/benchmark_full.yaml
+    benchmark_sha256: 62d8abec03dc793dad9da351c5c5652bcd854014f29a91880309bd70c128b08c
+    runner_source: DynaNav/benchmark.py
+    runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+    source_convention: USD RotateZ degrees
+    resolved_yaw_radians: 1.5707963267948966
+    episode:
+      scene: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+      start:
+      - 7.38
+      - 1.49
+      - 0.01
+      start_yaw: 90.0
+      goal:
+      - -12.23
+      - 10.19
+      - 0.01
+      instruction: Move forward toward the staircase, then turn left to enter the
+        hallway. Continue straight ahead and stop in front of the blue hospital bed
+        on the right side of the hallway.
+      timeout: 85
+      num_people: 0
+      robot_type: nova_carter
+  slew_note: accel/decel chosen by signed target-current, exactly as upstream
+nova_validation:
+  stationary_seconds: 2.0
+  straight_seconds: 2.0
+  straight_v: 0.4
+  stop_seconds: 1.0
+  turn_seconds: 2.0
+  turn_w: 0.6
+  minimum_forward_displacement_m: 0.2
+  minimum_constant_turn_rad: 0.1
+  numerical_zero_rad: 1.0e-06
+  noise_multiple: 10.0
+  stage_a_rule: A0 forward >0.2 m and positive 2s turn >0.1 rad (legacy sanity minima);
+    both replay positive yaw >10 times measured stationary yaw excursion plus 1e-6
+    rad; majority pose-rate sign agreement; no non-floor contact in primary replay
+    window
+  stage_b_rule: Existing stable positive-left geometry rule; two consecutive clean
+    positive-yaw episode-left-dominant displacement intervals; no environment non-floor
+    contact or degraded RGB; no forward-only prediction phase prerequisite
+  stage_b_predictions: 48
+  stage_b_command_variant: direct
+  cadence_hz: 2
+  replay_primary_ids:
+  - 4
+  - 5
+  - 6
+  - 7
+  replay_preroll: Exact source ticks before C4 application, from same official start/rest;
+    evaluate C4-C7 only
+  rgb_evidence_rule: Prespecified p95 <=20/255 excluded as degraded visibility; original
+    capture std<1 rejection unchanged; rejected image archived without model call
+dynamic_human:
+  start_position:
+  - 4.19126434040635
+  - 11.800201731784078
+  - 0.0
+  end_position:
+  - 3.158057144692274
+  - 9.955931884731335
+  - 0.0
+  speed_m_s: 1.0
+  yaw: -2.0814563797862067
+  trigger_request_id: 15
+  prim: /World/DynamicHuman
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/People/Characters/male_adult_construction_03/male_adult_construction_03.usd
+  radius_m: 0.25
+  capsule_cylinder_height_m: 1.2
+  source_note: Official Isaac People character family; source IRA default /Isaac/People/Characters/,
+    ~1m/s walking comment; scripted fixed speed, no crowd-policy reproduction
+dynamic_analysis:
+  primary_pair:
+  - 15
+  - 16
+  native_waypoint_dt: 0.1
+  robot_radius_m: 0.6069825421953869
+  human_radius_m: 0.25
+  executed_tangent_window_s: 0.1
+  minimum_tangent_displacement_m: 1.0e-06
+  numerical_position_tolerance_m: 1.0e-06
+  baseline_run: /home/gpuadmin/Workspace/TIC-VLA/outputs/nova-e16-closed-loop-20261010-01
+  preflight_dir: /home/gpuadmin/Workspace/TIC-VLA/outputs/nova-human-preflight-20261010-03
+  validity_rule: Finite usable nondegenerate native path; p95>20; no camera/static-contact
+    artifact; OLD initially outside human proxy. Conservative circumscribed proxy,
+    no exact static path oracle.
+  qualification_rule: Strong only if valid OLD becomes conflicting, valid FRESH avoids
+    proxy, measured OLD transport and RAW seam exceed numerical tolerance. Otherwise
+    descriptive revision with incomplete qualification, no severity threshold.
+  primary_fixed_before_model: true

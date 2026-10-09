@@ -88,7 +88,7 @@ def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
     interval = 1 / settings["inference_hz"]
     if abs(interval/sim.dt-round(interval/sim.dt)) > 1e-6:
         raise ValueError("Observation period must be an integer physics-step count")
-    if mode == "dynamic":
+    if mode == "dynamic" and sim.pedestrian is None:
         from research.pedestrian import Pedestrian
         sim.pedestrian = Pedestrian(sim, cfg["pedestrian"])
         # A runtime-created rigid body has no PhysX pose until the first step.
@@ -144,7 +144,7 @@ def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
             application["event_source"] = "simulator_main_thread_post_wheel_target_application"
             human_application = human()
             active.accept(rid, command, wheels)
-            if sim.pedestrian and "route_switch" in cfg:
+            if sim.pedestrian and ("route_switch" in cfg or "dynamic_human" in cfg):
                 sim.pedestrian.on_request_accepted(rid, application)
             sim.active_control_source_request_id = rid
             sim.pending_request_id = None
