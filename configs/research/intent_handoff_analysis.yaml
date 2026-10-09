@@ -1,0 +1,8 @@
+native_waypoint_dt: 0.1
+expected_points: 30
+executed_tangent_window_s: 0.1
+minimum_tangent_displacement_m: 0.000001
+numerical_position_tolerance_m: 0.000001
+controller_zero_tolerance_rad_s: 0.000001
+warmup_last_request_id: 4
+# Numerical tolerances are not hard-case severity thresholds.

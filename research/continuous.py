@@ -144,6 +144,8 @@ def run_model_loop(sim, cfg, records, mode):
             application["event_source"] = "simulator_main_thread_post_wheel_target_application"
             human_application = human()
             active.accept(rid, command, wheels)
+            if sim.pedestrian and "route_switch" in cfg:
+                sim.pedestrian.on_request_accepted(rid, application)
             sim.active_control_source_request_id = rid
             sim.pending_request_id = None
             metadata = {**request, **response, **old, "bootstrap": rid == 1,
@@ -173,7 +175,20 @@ def run_model_loop(sim, cfg, records, mode):
         summary = analyze(records.path)
         if not summary["continuous_handoff_validated"]:
             raise RuntimeError("Saved evidence did not validate at least three OLD handoff cycles")
-        return {"continuous_handoff_validated": True,
+        extra = {}
+        if "route_switch" in cfg and mode == "static":
+            import json
+            from research.route_geometry import chunk_context, static_route_gate
+            contexts = []
+            for path in sorted((records.path/"raw/requests").glob("*.json")):
+                event = json.loads(path.read_text())
+                _, context = chunk_context(np.load(path.with_suffix(".npy")), event, cfg,
+                                           cfg["route_switch"]["robot_footprint_radius_m"])
+                contexts.append(context)
+            gate = static_route_gate(contexts, cfg)
+            write_json(records.path/"derived/route_gate.json", gate)
+            extra = {"route_choice_validated": gate["valid"], "route_choice_decision": gate["decision"]}
+        return {"continuous_handoff_validated": True, **extra,
                 "successful_predictions": settings["predictions"],
                 "native_tensor_shape": [1, 30, 2], "stored_action_shape": [30, 2], "all_finite": True,
                 "transport_decision": summary["transport_decision"],

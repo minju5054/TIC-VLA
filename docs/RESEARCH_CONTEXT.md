@@ -36,6 +36,8 @@ Current execution status: **READY FOR HARD-CASE COLLECTION** within the controll
 
 The separately authorized continuous path is now **CONTINUOUS HANDOFF VALIDATED** with **MEASURABLE ACTUAL-LATENCY TRANSPORT**; see [CONTINUOUS_HANDOFF.md](CONTINUOUS_HANDOFF.md). It preserves the default frozen config and uses a separate config, one outstanding IPC future, main-thread physics, OLD command retention and measured clocks/poses. Static and dynamic runs each contain seven non-bootstrap handoffs; dynamic robot transport median/max is .099953/.199890 m. This is execution infrastructure evidence, not a pedestrian hard case, navigation result or reconciliation validation. [CHUNK_GEOMETRY_ANALYSIS.md](CHUNK_GEOMETRY_ANALYSIS.md) remains the separate saved frozen-run geometry result.
 
+The prespecified late-reveal route-switch attempt stopped at **NO VALID BASE ROUTE CHOICE**; see [ROUTE_SWITCH_HARD_CASE.md](ROUTE_SWITCH_HARD_CASE.md). The static two-gap run produced 12 real predictions but no valid LEFT/RIGHT route, so both mirrored dynamic variants were gated and geometry was not retuned. Saved-only temporal-interpolation/seam analysis is implemented with the easy continuous control. No reconciliation-relevant route-switch candidate has been established.
+
 ## Required distinctions
 
 ```text

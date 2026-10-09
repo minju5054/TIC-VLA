@@ -33,6 +33,13 @@ def main():
         if (not cfg["simulation"]["pause_physics_during_inference"] and args.mode == "dynamic"
                 and not prior.get("continuous_handoff_validated")):
             parser.error("Continuous dynamic execution requires a PASS continuous static run")
+        if "route_switch" in cfg and args.mode == "dynamic":
+            if not prior.get("route_choice_validated"):
+                parser.error("NO VALID BASE ROUTE CHOICE: dynamic route-switch run is gated")
+            prior_cfg = json.loads((REPO/"outputs"/args.prerequisite_run/"metadata.json").read_text())["config"]
+            for key in ("scene", "robot", "camera", "controller", "inference", "instruction", "seed", "route_switch"):
+                if prior_cfg.get(key) != cfg.get(key):
+                    parser.error("Route-switch static prerequisite has different parameters: "+key)
     if not cfg["simulation"]["pause_physics_during_inference"] and args.mode not in ("static", "dynamic"):
         parser.error("Continuous execution is only supported for static/dynamic modes")
     from research.records import RunRecords, provenance, write_json
@@ -128,6 +135,14 @@ class Simulation:
             self.cube("/World/RightWall", [4, -half, height/2], [10, .1, height], [.55, .55, .6])
             goal = cfg["scene"]["goal"]
             self.cube("/World/GoalWall", [goal[0], goal[1], goal[2]+height/2], [.1, 2, height], [.1, .65, .1])
+            for obstacle in cfg["scene"].get("obstacles", []):
+                name = obstacle["name"]
+                if not name.isidentifier() or name in ("Jackal", "LeftWall", "RightWall", "GoalWall", "Light"):
+                    raise ValueError("Obstacle needs a unique safe prim name")
+                self.cube("/World/"+name, obstacle["position"], obstacle["size"], obstacle.get("color", [.65, .35, .15]))
+            if "route_switch" in cfg:
+                from research.route_scene import audit_scene
+                audit_scene(self, cfg, records)
         camcfg = cfg["camera"]
         camera = UsdGeom.Camera.Define(self.stage, camcfg["prim"])
         camera.AddTranslateOp().Set(Gf.Vec3d(*camcfg["translation"]))

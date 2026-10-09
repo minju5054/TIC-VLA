@@ -10,10 +10,27 @@ def crossing_position(config, sim_time):
     return np.asarray(config["start_position"], dtype=float) + elapsed*np.asarray(config["velocity"])
 
 
+def reveal_position(config, sim_time, trigger_sim_time):
+    start = np.asarray(config["hidden_start_position"], dtype=float)
+    if trigger_sim_time is None:
+        return start
+    velocity = np.asarray(config["velocity"], dtype=float)
+    speed = np.linalg.norm(velocity)
+    if speed <= 0 or velocity[0] != 0 or velocity[2] != 0:
+        raise ValueError("Reveal requires a nonzero lateral-only velocity")
+    elapsed = np.clip(sim_time-trigger_sim_time-config["reveal_delay_s"], 0,
+                      config["max_displacement_m"]/speed)
+    return start+elapsed*velocity
+
+
 class Pedestrian:
     def __init__(self, sim, config):
         from pxr import Gf, Usd, UsdGeom, UsdPhysics
         self.config, self.sim = config, sim
+        self.motion_mode = config.get("motion_mode", "crossing")
+        self.trigger_sim_time = None
+        if self.motion_mode not in ("crossing", "triggered_lateral_reveal"):
+            raise ValueError("Unknown pedestrian motion mode")
         if not config["asset"]:
             raise ValueError("A human asset is required; no silent primitive substitution")
         source = Usd.Stage.Open(config["asset"])
@@ -54,7 +71,7 @@ class Pedestrian:
         self.file = (sim.records.path/"raw/pedestrian_state.csv").open("x")
         self.writer = csv.writer(self.file)
         self.writer.writerow(["sim_time", "target_x", "target_y", "target_z", "physx_x", "physx_y", "physx_z"])
-        self.initial = crossing_position(config, 0)
+        self.initial = self.position_at(0)
         self.current = self.initial.copy()
         self.measured_initial = self.measured_current = None
         write_json(sim.records.path/"pedestrian_asset.json", {"url": config["asset"], "source_units": unit,
@@ -68,8 +85,26 @@ class Pedestrian:
 
     def update(self, sim_time):
         from pxr import Gf
-        self.current = crossing_position(self.config, sim_time)
+        self.current = self.position_at(sim_time)
         self.translate.Set(Gf.Vec3d(*self.current))
+
+    def position_at(self, sim_time):
+        if self.motion_mode == "crossing":
+            return crossing_position(self.config, sim_time)
+        return reveal_position(self.config, sim_time, self.trigger_sim_time)
+
+    def on_request_accepted(self, request_id, application):
+        if self.motion_mode != "triggered_lateral_reveal" or request_id != self.config["reveal_after_request_id"]:
+            return
+        if self.trigger_sim_time is not None:
+            raise RuntimeError("Reveal trigger must occur exactly once")
+        from research.records import clocks
+        self.trigger_sim_time = application["sim_time"]
+        write_json(self.sim.records.path/"raw/reveal_event.json", {
+            "trigger_request_id": request_id, "trigger_sim_time": self.trigger_sim_time,
+            "event_source": "main_thread_after_prespecified_request_acceptance", **clocks(),
+            "application": application, "measured_human_at_trigger": self.snapshot(),
+            "depends_on_prediction_content": False, "motion_config": self.config})
 
     def measure(self, sim_time):
         import omni.physx
