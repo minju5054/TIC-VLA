@@ -8,7 +8,7 @@ The current research repository is this [TIC-VLA fork](https://github.com/minju5
 
 The research asks whether explicit SE(2) reconciliation can reduce geometric and temporal inconsistency between successive navigation trajectory/action chunks while preserving new navigation intent. OLD is the preceding prediction still influencing execution; FRESH is a newer prediction from a more recent observation. The eventual method is not implemented in this stage.
 
-TIC-VLA is the **upstream navigation VLA**, not a competing reconciliation-method baseline. DynaNav supplies the simulation/benchmark environment. Keep research tooling and any future method separate from official upstream implementation; this compatibility task does not change navigation algorithms or model architecture.
+TIC-VLA is the **upstream navigation VLA**, not a competing reconciliation-method baseline. The current platform is a controlled Isaac 6 environment with a four-wheel Jackal and one scripted human. It reuses official TIC-VLA inference and Nova Carter's lookahead formula; it does not reproduce or port the DynaNav benchmark. Keep research tooling and any future method separate from official implementation.
 
 ## Current and future stages
 
@@ -17,22 +17,22 @@ Current scope:
 ```text
 official TIC-VLA reproduction
     -> Isaac 6.0.1 runtime/API compatibility investigation
-    -> verify RGB -> prediction -> controller -> robot motion
+    -> separate Isaac 6 simulation / Isaac 5 Python inference
+    -> front RGB -> real native prediction -> four-wheel physics
+    -> successive raw records in one controlled crossing scenario
 ```
 
 Only on a separate explicit request:
 
 ```text
-successive action chunk logging
-    -> OLD/FRESH temporal metadata
-    -> hard-case scanning
+OLD/FRESH correspondence and hard-case scanning
     -> qualified handoff selection
     -> reconciliation research in this TIC-VLA fork
 ```
 
-No logger, severity metric, OLD/FRESH correspondence, SE(2) conversion, graph optimization, reconciliation, training, fine-tuning, annotation, or performance modification is implemented in this setup.
+The user explicitly authorized minimal append-only raw prediction, event, image and robot-state records to validate this closed loop. No severity metric, OLD/FRESH correspondence, SE(2) trajectory conversion, graph optimization, reconciliation, training, fine-tuning, or navigation-performance benchmark is implemented.
 
-Current execution status: **NOT READY FOR CHUNK COLLECTION**. Isaac 6 simulator-only startup works with process-local environment isolation, but the unmodified DynaNav behavior and legacy human-scenario APIs are blocked. See [ISAAC6_COMPATIBILITY.md](ISAAC6_COMPATIBILITY.md). Isaac 5 and its original failure evidence remain preserved.
+Current execution status: **READY FOR HARD-CASE COLLECTION** within the controlled sequential simulation scope; see [MINIMAL_CLOSED_LOOP.md](MINIMAL_CLOSED_LOOP.md). The platform produces successive real predictions, four-wheel motion and measured scripted human motion. Physics pauses during inference, and the human translates in its authored rest pose. These are explicit scope limits; no hard case has been established. The unmodified DynaNav/legacy human-system blockers in [ISAAC6_COMPATIBILITY.md](ISAAC6_COMPATIBILITY.md) remain historical facts; neither Isaac installation was changed.
 
 ## Required distinctions
 
@@ -52,9 +52,9 @@ Read [ACTION_SEMANTICS.md](ACTION_SEMANTICS.md) before designing a logger. The d
 
 Do not fabricate timestamps that are missing upstream. Do not derive yaw and label it as observed. Any later derived SE(2) representation requires an explicitly documented transform and yaw rule, with raw output preserved separately.
 
-## Future metadata schema (documentation only)
+## Upstream metadata audit and future schema
 
-The availability column describes the inspected upstream source, not an implemented logger. `null` means unknown/unobserved, never zero by default.
+The availability column below describes the inspected upstream source. The new minimal harness implements a subset with exact field mappings in [MINIMAL_CLOSED_LOOP.md](MINIMAL_CLOSED_LOOP.md); it does not retroactively change upstream availability. `null` means unknown/unobserved, never zero by default.
 
 | Proposed field | Availability and future collection requirement |
 |---|---|
@@ -79,4 +79,4 @@ The availability column describes the inspected upstream source, not an implemen
 | `upstream_git_sha`, `local_git_sha`, `dirty_diff_hash` | Available through Git; setup wrapper records run provenance. Upstream behavior does not automatically attach these to predictions. |
 | `checkpoint_id`, `base_model_revision`, `environment_id` | Available from setup manifest/version snapshot; not automatically prediction-linked. |
 
-No metadata collection code is added in this stage. Upstream periodic robot logs do not constitute an OLD/FRESH dataset.
+The harness's raw records validate execution and preserve future analysis inputs. They do not establish an OLD/FRESH correspondence or demonstrate a hard case. Upstream periodic robot logs alone do not constitute such a dataset either.

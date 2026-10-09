@@ -1,5 +1,7 @@
 # Native action semantics: source audit
 
+Later runtime evidence from the controlled four-wheel harness confirms real `(1,30,2)` finite BF16 predictions. See [MINIMAL_CLOSED_LOOP.md](MINIMAL_CLOSED_LOOP.md) for camera/robot frame checks and the adapter's exact state/timing differences. This document remains the audit of unchanged upstream source.
+
 Source baseline: `ucla-mobility/TIC-VLA@9fa6f8b66b9e121d5df5df071297bba8e5353ebb`. Line references below refer to this exact revision. Runtime evidence is separately reported in [SETUP.md](SETUP.md). Released-checkpoint inspection and strict DynaNav loading passed: chunk embedding `(30,512)`, final output weight `(2,256)`, consistent with the default `(1,30,2)` prediction contract.
 
 ## Confirmed from executable source

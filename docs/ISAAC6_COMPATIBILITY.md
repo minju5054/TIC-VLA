@@ -1,5 +1,7 @@
 # Isaac Sim 6.0.1 compatibility investigation
 
+Historical DynaNav compatibility result. The later, explicitly authorized **custom controlled platform** is documented in [MINIMAL_CLOSED_LOOP.md](MINIMAL_CLOSED_LOOP.md). It preserves the official model but replaces the simulator wrapper; its success is not a resolution of the DynaNav-port blockers below.
+
 Date: **2026-10-09, Asia/Seoul**. Outcome: **PARTIAL — core simulation works, but the official DynaNav model/navigation path remains blocked. NOT READY FOR CHUNK COLLECTION.**
 
 Isaac 6 RTX startup was recovered using process-local environment isolation. The remaining differences include replacement of the human behavior system and Replicator Agent configuration/lifecycle, not just import renames. A small patch with demonstrated preservation of the official human scenario was not established. No scene, robot, RGB observation, native prediction, applied command, or robot movement was observed in this task. No single episode was launched because its prerequisites failed.
