@@ -44,3 +44,16 @@ checkpoints/
 _isaac_sim*/
 _build/
 _repo/
+
+# Research machine-local configuration and artifacts
+.env.testing.local
+results/raw/
+results/derived/
+.cache/
+.venv/
+hf_cache/
+isaac_cache/
+/models/
+model_cache/
+recordings/
+*.log

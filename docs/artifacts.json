@@ -1,0 +1,175 @@
+{
+  "retrieved_at": "2026-10-09T05:39:25.612152+00:00",
+  "artifacts": [
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "README.md",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/README.md",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/README.md",
+      "size": 35849,
+      "sha256": "4290f64844cc9dec7e84eb1999824ebad0c74be6a84099940678ea70c37ac37d"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "added_tokens.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/added_tokens.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/added_tokens.json",
+      "size": 790,
+      "sha256": "e66b6bc948dec3421f01a8986f31632cf8d556aaa89f7b39c183b3dd4b5b2c83"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "config.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/config.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/config.json",
+      "size": 6326,
+      "sha256": "8a252be385dbef3abf1c58d028ea5116849a33dc7a1601c350c3ee28f202524c"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "configuration_intern_vit.py",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/configuration_intern_vit.py",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/configuration_intern_vit.py",
+      "size": 5548,
+      "sha256": "22dd687a5f142985407675fc6b1dc688c2ded93e54192543ecf28ef495a6efa8"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "configuration_internvl_chat.py",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/configuration_internvl_chat.py",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/configuration_internvl_chat.py",
+      "size": 4036,
+      "sha256": "6524e6deae6c318543d1022a599f011120f5a970eaa25f1118e7f5d0e346710c"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "conversation.py",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/conversation.py",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/conversation.py",
+      "size": 15309,
+      "sha256": "b1b9f280e9cb9211e519e2b8071002b57cc742aadb2f49b05fa674ee3c7d83ee"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "generation_config.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/generation_config.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/generation_config.json",
+      "size": 69,
+      "sha256": "6491445090a6da66e04609497396c9d18942e1f0962664d481e8e03e8ae8479b"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "merges.txt",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/merges.txt",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/merges.txt",
+      "size": 1671853,
+      "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "model.safetensors",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/model.safetensors",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/model.safetensors",
+      "size": 1876463472,
+      "sha256": "a8b67c54568417f3631723e6b3e120720eaa638e03e62dc25666c70e3ae3e484"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "modeling_intern_vit.py",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/modeling_intern_vit.py",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/modeling_intern_vit.py",
+      "size": 18099,
+      "sha256": "d3e0f68f29e86be1f3e6e101dc45303ec24e5115e0034de101665972576eb348"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "modeling_internvl_chat.py",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/modeling_internvl_chat.py",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/modeling_internvl_chat.py",
+      "size": 15971,
+      "sha256": "76fe595f04acd077d168f038a15c697d1c66093a0c000bffb0568dfa90095ba8"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "preprocessor_config.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/preprocessor_config.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/preprocessor_config.json",
+      "size": 287,
+      "sha256": "0658115064c561026539aeeead9ed3b1a8e0cc90967df8c142849199f955d2b4"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "special_tokens_map.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/special_tokens_map.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/special_tokens_map.json",
+      "size": 613,
+      "sha256": "76862e765266b85aa9459767e33cbaf13970f327a0e88d1c65846c2ddd3a1ecd"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "tokenizer.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/tokenizer.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/tokenizer.json",
+      "size": 7033297,
+      "sha256": "ff61d7c33ad80987e37bcbeeeae7457c8e77d14a43a954fcde7be656fc26d6a9"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "tokenizer_config.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/tokenizer_config.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/tokenizer_config.json",
+      "size": 7330,
+      "sha256": "705d8fbba57dae6bff1e6a1d695ba116fbf27761a4e8373bb68f5d4f0d88f19d"
+    },
+    {
+      "repo_id": "OpenGVLab/InternVL3-1B",
+      "repo_type": "model",
+      "revision": "4415a3b810e636d11dfa86b0e9ba40bb00535aa8",
+      "filename": "vocab.json",
+      "source": "https://huggingface.co/OpenGVLab/InternVL3-1B/resolve/4415a3b810e636d11dfa86b0e9ba40bb00535aa8/vocab.json",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/InternVL3-1B/vocab.json",
+      "size": 3383407,
+      "sha256": "87a257b04b17642a0688c98cd1df89c398bda4fee532d6f88b38a659ecb4ac8d"
+    },
+    {
+      "repo_id": "handsomeYun/TIC-VLA",
+      "repo_type": "dataset",
+      "revision": "671de608f39ccae41b66cbb24ab923c0275f8fb4",
+      "filename": "TIC-VLA-model.ckpt",
+      "source": "https://huggingface.co/datasets/handsomeYun/TIC-VLA/resolve/671de608f39ccae41b66cbb24ab923c0275f8fb4/TIC-VLA-model.ckpt",
+      "local_path": "${TICVLA_ARTIFACT_ROOT}/checkpoints/TIC-VLA-model.ckpt",
+      "size": 1938501547,
+      "sha256": "376263f89fad0f42c267d85655019232edc91d36e214e23424804dd4cd42e036"
+    }
+  ]
+}
