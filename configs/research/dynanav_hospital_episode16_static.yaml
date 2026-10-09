@@ -1,0 +1,134 @@
+schema_version: 1
+scenario: dynanav_hospital_episode16_static
+seed: 36
+simulation:
+  dt: 0.016666666666666666
+  control_hz: 60
+  inference_hz: 2
+  settle_steps: 120
+  predictions: 48
+  pause_physics_during_inference: false
+  real_time_pacing: true
+  target_real_time_factor: 1.0
+  headless: true
+robot:
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Robots/Clearpath/Jackal/jackal_basic.usd
+  prim: /World/Jackal
+  body: /World/Jackal/base_link
+  wheel_joints:
+  - front_left_wheel
+  - rear_left_wheel
+  - front_right_wheel
+  - rear_right_wheel
+  joint_signs:
+  - 1
+  - 1
+  - 1
+  - 1
+  wheel_radius: 0.098
+  track_width: 0.37559
+  start_position:
+  - 7.38
+  - 1.49
+  - 0.15
+  start_yaw: 1.5707963267948966
+camera:
+  prim: /World/Jackal/base_link/research_front_rgb
+  resolution:
+  - 640
+  - 480
+  translation:
+  - 0.26
+  - 0.0
+  - 0.5
+  quaternion_wxyz:
+  - 0.5
+  - 0.5
+  - -0.5
+  - -0.5
+  focal_length_mm: 10.4775
+  horizontal_aperture_mm: 20.955
+  vertical_aperture_mm: 15.71625
+  clipping_range:
+  - 0.05
+  - 100.0
+  capture_subframes: 4
+scene:
+  mode: official_usd
+  usd: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+  goal: &id001
+  - -12.23
+  - 10.19
+  - 0.01
+instruction: Move forward toward the staircase, then turn left to enter the hallway.
+  Continue straight ahead and stop in front of the blue hospital bed on the right
+  side of the hallway.
+controller:
+  lookahead: 1.0
+  angular_gain: 0.8
+  filter_gain: 0.35
+  epsilon: 0.001
+  max_v: 1.5
+  max_w: 1.2
+inference:
+  python: /home/gpuadmin/isaacsim-ticvla-5.0.0/python.sh
+  base_model: /home/gpuadmin/Workspace/models/tic-vla/InternVL3-1B
+  checkpoint: /home/gpuadmin/Workspace/models/tic-vla/checkpoints/TIC-VLA-model.ckpt
+  device: cuda:0
+  startup_timeout_seconds: 180
+  request_timeout_seconds: 120
+  image_history_interval_seconds: 3.0
+validation:
+  straight_v: 0.4
+  straight_seconds: 2.0
+  turn_w: 0.6
+  turn_seconds: 2.0
+  minimum_forward_displacement: 0.2
+  minimum_yaw_change: 0.1
+official_episode:
+  episode_id: episode_16
+  benchmark_source: DynaNav/configs/benchmark_full.yaml
+  benchmark_sha256: 62d8abec03dc793dad9da351c5c5652bcd854014f29a91880309bd70c128b08c
+  runner_source: DynaNav/benchmark.py
+  runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+  source_convention: USD RotateZ degrees
+  resolved_yaw_radians: 1.5707963267948966
+  episode:
+    scene: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+    start:
+    - 7.38
+    - 1.49
+    - 0.01
+    start_yaw: 90.0
+    goal: *id001
+    instruction: Move forward toward the staircase, then turn left to enter the hallway.
+      Continue straight ahead and stop in front of the blue hospital bed on the right
+      side of the hallway.
+    timeout: 85
+    num_people: 0
+    robot_type: nova_carter
+hospital_validation:
+  first_primary_request_id: 4
+  minimum_consecutive_left_requests: 2
+  position_sign_tolerance_m: 1.0e-06
+  angle_sign_tolerance_rad: 1.0e-06
+  command_sign_tolerance_rad_s: 1.0e-06
+  minimum_segment_length_m: 1.0e-06
+  camera_probe_radius_m: 0.02
+  near_black_p95_0_255: 2.0
+  maximum_settling_xy_m: 0.02
+  native_waypoint_dt: 0.1
+  horizon_policy: 48 fixed predictions at 2 Hz target cadence; approximately 24 seconds
+    plus bootstrap/call overrun; never extend after output
+  stable_left_rule: 'Two consecutive primary requests: endpoint+mean left positive,
+    lookahead left+bearing positive, controller w positive, derived total heading
+    change positive; exclude degraded near-black observations'
+  forward_dominance_rule: Endpoint forward > abs(left), lookahead forward > abs(left),
+    not weak left (fewer than 3 of 4 left indicator groups)
+  execution_rule: Forward progress precedes stable predicted intent; later two consecutive
+    measured observation intervals each have positive yaw change and episode-local
+    left-dominant displacement (left component > abs(forward)); no degraded RGB,
+    camera proximity hit or non-floor contact during qualifying intervals. Non-floor
+    contact means measured environment contact with abs(normal.z) < 0.5, retained
+    until CONTACT_LOST. This is a conservative execution criterion, not a turn
+    magnitude threshold chosen from model results.

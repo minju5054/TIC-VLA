@@ -19,11 +19,25 @@ def main():
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--prerequisite-run")
     parser.add_argument("--detour-freeze-receipt", help="Required preflight/config freeze receipt for static detour")
+    parser.add_argument("--official-freeze-receipt", help="Required official-scene preflight/source/config receipt")
     args = parser.parse_args()
     if Path(args.run_id).name != args.run_id or args.run_id in (".", ".."):
         parser.error("run-id must be a single directory name")
     import yaml
     cfg = yaml.safe_load(Path(args.config).read_text())
+    official_receipt = None
+    if cfg["scene"].get("mode") == "official_usd":
+        from research.hospital_episode import validate_config, digest
+        validate_config(cfg)
+        if args.mode != "static" or not args.official_freeze_receipt:
+            parser.error("Official Hospital requires static mode and its completed preflight freeze receipt")
+        receipt = json.loads(Path(args.official_freeze_receipt).read_text())
+        if (receipt["config_sha256"] != digest(args.config) or not receipt["preflight_pass"]
+                or not receipt["visual_semantic_review_pass"] or receipt["authorized_run_id"] != args.run_id):
+            parser.error("Official Hospital freeze receipt mismatch")
+        if any(digest(REPO/p) != h for p, h in receipt["frozen_code_sha256"].items()):
+            parser.error("Official Hospital code changed after pre-inference freeze")
+        official_receipt = receipt
     if "static_detour" in cfg:
         import hashlib
         if args.mode != "static" or "pedestrian" in cfg or not args.detour_freeze_receipt:
@@ -55,7 +69,8 @@ def main():
     from research.records import RunRecords, provenance, write_json
     records = RunRecords(REPO/"outputs"/args.run_id,
                          {"schema_version": 1, "mode": args.mode, "config": cfg,
-                          "command_argv": sys.argv, "prerequisite_run": args.prerequisite_run, **provenance(REPO)})
+                          "command_argv": sys.argv, "prerequisite_run": args.prerequisite_run,
+                          **({"official_freeze_receipt": official_receipt} if official_receipt else {}), **provenance(REPO)})
     from isaacsim import SimulationApp
     app = SimulationApp({"headless": cfg["simulation"]["headless"], "renderer": "RayTracedLighting",
                          "width": cfg["camera"]["resolution"][0], "height": cfg["camera"]["resolution"][1]})
@@ -101,9 +116,17 @@ class Simulation:
         self.dt = cfg["simulation"]["dt"]
         self.world = World(physics_dt=self.dt, rendering_dt=self.dt, stage_units_in_meters=1.0)
         self.stage = self.world.stage
-        self.world.scene.add_default_ground_plane()
-        light = UsdLux.DomeLight.Define(self.stage, "/World/Light")
-        light.CreateIntensityAttr(800)
+        self.hospital_diagnostics = None
+        scene_mode = cfg["scene"].get("mode", "custom")
+        if scene_mode == "official_usd":
+            from research.hospital_scene import load_official_scene
+            load_official_scene(self, cfg, records)
+        elif scene_mode == "custom":
+            self.world.scene.add_default_ground_plane()
+            light = UsdLux.DomeLight.Define(self.stage, "/World/Light")
+            light.CreateIntensityAttr(800)
+        else:
+            raise ValueError("Unknown explicit scene mode: "+scene_mode)
         r = cfg["robot"]
         q = np.array([math.cos(r["start_yaw"]/2), 0, 0, math.sin(r["start_yaw"]/2)])
         self.robot = self.world.scene.add(WheeledRobot(
@@ -138,7 +161,10 @@ class Simulation:
             raise RuntimeError("USD track width differs from configuration")
         write_json(records.path/"robot_asset.json", {"url": r["asset"], "wheels": geometries,
                    "track_width": track, "meters_per_unit": UsdGeom.GetStageMetersPerUnit(self.stage)})
-        if mode != "wheel":
+        if scene_mode == "official_usd":
+            from research.hospital_scene import HospitalDiagnostics
+            self.hospital_diagnostics = HospitalDiagnostics(self)
+        if mode != "wheel" and scene_mode == "custom":
             half = cfg["scene"]["corridor_half_width"]
             height = cfg["scene"]["wall_height"]
             self.cube("/World/LeftWall", [4, half, height/2], [10, .1, height], [.55, .55, .6])
@@ -193,6 +219,9 @@ class Simulation:
         self.writer = csv.DictWriter(self.state_file, fieldnames=fields)
         self.writer.writeheader()
         self.log_state()
+        if self.hospital_diagnostics:
+            from research.hospital_scene import audit_start
+            audit_start(self)
         print("ROBOT_READY", self.robot.dof_names, flush=True)
 
     def cube(self, path, position, scale, color):
@@ -277,6 +306,8 @@ class Simulation:
         path = self.records.path/"diagnostics"/name
         with path.open("xb") as f:
             Image.fromarray(data).save(f, format="PNG")
+        if self.hospital_diagnostics:
+            self.hospital_diagnostics.capture(after, data, name)
         return data, after, path
 
     def validate_wheels(self):
@@ -305,6 +336,8 @@ class Simulation:
 
     def close(self):
         self.apply(0, 0)
+        if self.hospital_diagnostics:
+            self.hospital_diagnostics.close()
         if self.pedestrian:
             self.pedestrian.close()
         self.state_file.close()
