@@ -191,3 +191,17 @@ All **43 Isaac-independent tests PASS** (previous 34 plus nine new), including a
 Independent saved-data audit: world projection error <=8.89e-16 m; gate interpolation error <=1.12e-16 m; independent temporal seam error <=3.68e-16 m. Dense signed-clearance sampling agrees within 9.93e-6 m and its segment-resolution error bound. All 88 analysis evidence hashes match; all prior experiment outputs, symmetric configs/report, official sources, model service/controller/continuous loop and selected Isaac installation files match the protected snapshot. The only existing code change is the additive static-detour CLI gate and USD-audit hook in `research/sim.py`; prior mode behavior is preserved.
 
 Generated outputs/RGB/figures are ignored and not committed. Delivery includes code, config, tests, this report and append-only WORK_LOG entry, with one focused commit and normal push to `origin/hardcase-probe`. The final SHA/remote/clean-status receipt is recorded after commit in `outputs/static-detour-setup-20261009/git-finalization.txt` and the user report, avoiding a self-referential commit hash.
+
+## Inspect the saved run in Isaac GUI
+
+The separate `research/view_static_detour.py` opens a visible Isaac 6 window using the saved config, native chunks and measured robot poses. It makes **zero model calls** and holds the physics timeline stopped. `C1`–`C12` selects a recorded observation (default C5), with the original saved front RGB in the viewer panel. `Replay recorded poses` places the robot at successive CSV poses; it does not rerun dynamics or animate recorded wheel rotation. `Overview` and `Robot camera` change the viewport camera.
+
+Orange is the selected prediction projected using its own observation pose; cyan is the recorded robot path; yellow is the inflated blocker; magenta is the decision gate. Guide curves are lifted 0.025 m for display only. The neutral floor and guides are viewer aids, so the rendered viewport is a reconstruction, not the archived RGB. The panel's original RGB remains tied to the selected observation during pose replay.
+
+```bash
+bash scripts/isaac6_python.sh research/view_static_detour.py \
+  --run-dir outputs/asymmetric-detour-static-20261009-01 \
+  --output-dir outputs/static-detour-gui-NEW-ID
+```
+
+The output directory must be new and outside the immutable source run. It receives viewer provenance, a USD snapshot, viewport screenshot and ready marker. The validated initial GUI session is `outputs/static-detour-gui-20261009-03`; earlier viewer initialization failures are retained. They were GUI API fixes only, not experimental reruns. All 80 source-run file hashes remained unchanged after GUI launch.
