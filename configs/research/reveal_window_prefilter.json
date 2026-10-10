@@ -1,0 +1,23 @@
+{
+  "protocol_amendment": "User requested pausing exhaustive rendering and adding render-free geometry/temporal/multi-ray gates. Original candidate IDs, source/base config, visibility thresholds and strict ranking remain unchanged.",
+  "source_search_dir": "outputs/nova-reveal-window-search-20261010-04",
+  "possible_pairs": "All adjacent saved requests C1-C2 through C47-C48; a candidate needs at least one pair passing all gates simultaneously.",
+  "physical_gate": "Reuse hash-verified floor/static-overlap/bypass queries for the identical candidate XYZ/yaw and frozen environment.",
+  "temporal_gate": "OLD remaining conflict exists, reveal lead >0, current saved robot-human clearance >0, and saved FRESH application strictly precedes nominal conflict.",
+  "sample_heights_m": {"leg": 0.35, "torso": 1.05, "head": 1.75},
+  "sample_xy_offsets_m": [[0.0,0.0],[-0.12,0.0],[0.12,0.0],[0.0,-0.12],[0.0,0.12]],
+  "auxiliary_arm_points_m": [[-0.7,0.0,1.45],[0.7,0.0,1.45]],
+  "sample_definition": "Fixed approximate upright-body samples in the human frame, transformed by the same fixed yaw. These are not mesh occupancy or semantic pixels.",
+  "camera_envelope_factor": 2.0,
+  "camera_envelope_note": "Broad possible-projection envelope: positive camera depth and twice the nominal aperture/focal half-angle slopes. Approximate lens envelope only; the frozen actual Hawk render decides visibility. Broad envelope retains uncertain border cases.",
+  "ray_geometry": "Actual frozen Hospital PhysX colliders, first hit along camera-to-sample segment, excluding Nova and candidate geometry. No RGB, segmentation, render products, timeline play or physics steps.",
+  "ray_transition_rule": "For each of the three prior observations at least one complete head/torso/leg group must be non-exposed (blocked or outside broad envelope); at FRESH at least one sample is exposed and at least one sample is newly exposed since immediate OLD. Partial old ray exposure is deliberately allowed to avoid treating rays as final pixel visibility. This is a permissive possibility screen, not HIDDEN-to-CLEAR proof.",
+  "minimum_prior_observations": 3,
+  "rejection_labels": ["physical_floor_or_overlap", "no_local_bypass", "no_remaining_conflict_at_any_pair", "no_positive_lead", "current_proxy_conflicts_at_all_conflicting_pairs", "no_post_application_conflict_window", "no_multi_ray_transition_at_temporally_valid_pair"],
+  "counting": "Record independent candidate/pair failure counts and a sequential funnel. A surviving candidate requires a single common adjacent pair satisfying every condition; passing different gates on different pairs is insufficient.",
+  "reuse_rule": "Reuse every completed 48-observation candidate with identical ID/XYZ/yaw, original base-config SHA and source evidence hashes. Validate image/mask dimensions and mask counts. Preserve all incomplete files, never resume inside their directories.",
+  "render_policy": "No new candidate rendering unless all cheap gates pass. Reuse validated complete evidence without re-rendering, including already-rendered rejected candidates as diagnostic evidence. First CLEAR still determined over all 48 observations; never replace it by the prefilter's favorable pair.",
+  "selection_and_visibility": "Unchanged original semantic criteria, strict hard filters and deterministic ranking.",
+  "model_calls": 0,
+  "navigation_physics_reexecuted": false
+}
