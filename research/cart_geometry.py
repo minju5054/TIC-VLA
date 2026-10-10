@@ -1,5 +1,6 @@
 """Oriented cart footprint proxies; native outputs remain forward/left points."""
 import numpy as np
+from copy import deepcopy
 
 
 def rotation(yaw):
@@ -19,6 +20,17 @@ def freeze_pose(events,bounds,floor_z):
     return {'center_world_xyz':center,'yaw_rad':yaw,'tangent_rad':tangent,'long_axis_local':axis,
             'footprint_half_m':((hi-lo)[:2]/2).tolist(),'height_m':float(hi[2]-lo[2]),
             'matrix_row_vector':matrix.tolist(),'local_bounds':np.asarray(bounds).tolist()}
+
+
+def plus_world_y(previous,events,floor_z):
+    """The single prescribed +0.40 world-Y intervention; no yaw recomputation."""
+    xy=events[18]['agent_pose_at_observation'][:2]
+    if events[18]['request_id']!=19 or previous['center_world_xyz'][:2]!=xy:
+        raise ValueError('Previous cart must be at exact saved C19')
+    cart=deepcopy(previous);center=[xy[0],xy[1]+.40,float(floor_z)]
+    matrix=np.array(previous['matrix_row_vector']);matrix[3,:3]+=np.array(center)-previous['center_world_xyz']
+    cart.update(center_world_xyz=center,matrix_row_vector=matrix.tolist())
+    return cart
 
 
 def clearance(points,cart,radius):

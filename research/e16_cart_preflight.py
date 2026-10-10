@@ -6,15 +6,17 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from research.records import write_json,provenance
 from research.reveal_window import evidence_hashes,verify_hashes,validate_destination
 from research.analyze_nova_dynamic_handoff import load_saved
-from research.cart_geometry import freeze_pose,rotation,outline,path_clearance
+from research.cart_geometry import freeze_pose,rotation,outline,path_clearance,plus_world_y
 from research.hospital_cart import SOURCE,COPY,signature,author,mask_stats
 BASELINE=ROOT/'outputs/nova-e16-hospital-lights-baseline-20261010-01'
 
 
-def physical(out):
+def physical(out,shift=False):
     run=load_saved(BASELINE);cfg=run['cfg'];out=validate_destination(out,[BASELINE]);out.mkdir(parents=True)
     hashes=evidence_hashes([BASELINE,ROOT/'outputs/e16-cart-audit-20261010-01/asset.json',
-        ROOT/'outputs/e16-c19-manual-20261010-01',ROOT/'outputs/e16-c19-south-20261010-01'])
+        ROOT/'outputs/e16-c19-manual-20261010-01',ROOT/'outputs/e16-c19-south-20261010-01']+
+        ([ROOT/'outputs/e16-cart-preflight-20261010-01',ROOT/'outputs/nova-e16-cart-20261010-01'] if shift else []))
+    previous=json.loads((ROOT/'outputs/e16-cart-preflight-20261010-01/freeze.json').read_text()) if shift else None
     from isaacsim import SimulationApp
     app=SimulationApp({'headless':True,'disable_viewport_updates':True});code=1
     try:
@@ -24,15 +26,21 @@ def physical(out):
         stage=omni.usd.get_context().get_stage();stage.GetRootLayer().subLayerPaths.append(cfg['scene']['usd'])
         UsdGeom.SetStageMetersPerUnit(stage,1.);UsdGeom.SetStageUpAxis(stage,'Z')
         query=Queries(stage);source=stage.GetPrimAtPath(SOURCE);bounds=UsdGeom.BBoxCache(0,['default','render','proxy']).ComputeUntransformedBound(source).ComputeAlignedRange()
-        xy=run['events'][18]['agent_pose_at_observation'][:2]
+        xy=list(run['events'][18]['agent_pose_at_observation'][:2])
+        if shift:xy[1]+=.40
         support=query.q.raycast_closest(query.carb.Float3(*xy,.3),query.carb.Float3(0,0,-1),.6)
         if not support['hit']:raise ValueError('No actual floor support')
         cart=freeze_pose(run['events'],[list(bounds.GetMin()),list(bounds.GetMax())],float(support['position'][2]))
+        if shift:
+            if cart['local_bounds']!=previous['cart']['local_bounds']:raise ValueError('Original bounds changed')
+            cart=plus_world_y(previous['cart'],run['events'],support['position'][2])
         radius=cfg['spatial_turn_gate']['robot_conservative_radius_m'];h=cart['footprint_half_m'];z=cart['height_m']/2
         floor_checks=[query.floor(p) for p in outline(cart,0.)[::17]]
         overlaps=query.overlap([*xy,cart['center_world_xyz'][2]+z+.001],extent=[*h,z-.001],yaw=cart['yaw_rad'])
         initial=path_clearance(run['xy'][:2],cart,radius)['minimum_clearance_m'];baseline=path_clearance(run['xy'],cart,radius,run['times'])
         f=np.array([np.cos(cart['tangent_rad']),np.sin(cart['tangent_rad'])]);n=np.array([-f[1],f[0]])
+        from research.hospital_spatial_gate import wall_inventory,bound_clearance
+        walls=wall_inventory(json.loads((ROOT/'outputs/hospital-native-light-audit-20261010-01/collision_geometry.json').read_text()))
         half_long=max(h);half_short=min(h);traces=[];bypass=None
         for side in [-1,1]:
             for extra in np.arange(.05,.501,.05):
@@ -40,7 +48,9 @@ def physical(out):
                 points=np.array(xy)+offset*n+np.linspace(-half_long-radius-.3,half_long+radius+.3,41)[:,None]*f
                 trace=query.robot_path(points,radius+.05);clear=path_clearance(points,cart,radius)['minimum_clearance_m']
                 ok=clear>0 and all(r['floor'] and not r['overlap'] for r in trace)
-                traces.append({'side':side,'offset_m':float(offset),'pass':ok,'trace':trace,'cart_clearance_m':clear})
+                wall=min((bound_clearance(p,walls,radius) for p in points),key=lambda r:r['wall_bound_clearance_m'])
+                traces.append({'side':side,'world_side':'north' if side*n[1]>0 else 'south','offset_m':float(offset),'pass':ok,
+                    'trace':trace,'cart_clearance_m':clear,**wall})
                 if ok and bypass is None:bypass={'side':side,'offset_m':float(offset),'world_xy':points.tolist(),'clearance_m':clear}
         assets={}
         asset_url=cfg['scene']['usd'].rsplit('/',1)[0]+'/Props/SM_SupplyCart_01e.usd'
@@ -57,6 +67,12 @@ def physical(out):
             'visibility_rules':json.loads((ROOT/'configs/research/reveal_window_search.json').read_text())['visibility'],
             'selection_rule':'Primary actual first CLEAR and immediate OLD; if first CLEAR=C1, first later OLD-conflict to FRESH-clear pair is secondary only; no severity ranking',
             'candidate_count':1,'source_evidence_sha256':hashes,'before_model_inference':True,**provenance(ROOT)}
+        if shift:
+            for key in ['source_prim','asset_url','scene_usd','asset_sha256','source_prim_signature','source_world_matrix_row_vector','visibility_rules','robot_radius_m']:
+                if frozen[key]!=previous[key]:raise ValueError('Changed frozen identity: '+key)
+            frozen.update(intervention='C19_PLUS_WORLD_Y_0.40',world_y_offset_m=.40,
+                previous_preflight=str(ROOT/'outputs/e16-cart-preflight-20261010-01'),
+                center_rule='Exact saved C19 X, C19 Y + 0.40 world metres; actual floor Z; identical previous yaw')
         write_json(out/'freeze.json',frozen)
         copied=author(stage,frozen);write_json(out/'copied_cart.json',copied)
         checks={'floor_support':all(r[0] for r in floor_checks),'no_static_overlap':not overlaps,'no_initial_collision':initial>0,
@@ -64,6 +80,14 @@ def physical(out):
         result={'checks':checks,'pass':all(checks.values()),'static_overlap_paths':overlaps,'floor_checks':floor_checks,
             'initial_clearance_m':initial,'baseline':baseline,'bypass':bypass,'bypass_checks':traces,
             'model_calls':0,'navigation_physics_reexecuted':False,'proxy':'Original oriented full cart bounds + unchanged enclosing Nova disk; local bypass uses an additional .05m static margin'}
+        result['bypass_by_world_side']={}
+        for side in ['north','south']:
+            rows=[r for r in traces if r['world_side']==side];passing=[r for r in rows if r['pass']]
+            chosen=passing[0] if passing else rows[0]
+            result['bypass_by_world_side'][side]={'pass':bool(passing),'tested_strips':len(rows),
+                'first_feasible_or_nearest_tested':{k:v for k,v in chosen.items() if k!='trace'},
+                'static_overlap_paths':sorted({p for r in rows for q in r['trace'] for p in q['overlap']})}
+        if shift:result['decision']='PHYSICAL PASS' if result['pass'] else 'C19_PLUS_Y_CART PHYSICALLY INVALID'
         write_json(out/'physical.json',result);verify_hashes(hashes)
         print('CART_PHYSICAL',json.dumps({k:v for k,v in result.items() if k!='bypass_checks'}),flush=True);code=0
     finally:app.close(exit_code=code)
@@ -101,4 +125,7 @@ def semantic(out):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--phase',choices=['physical','semantic'],required=True);p.add_argument('--output-dir',required=True)
-    a=p.parse_args();globals()[a.phase](Path(a.output_dir).resolve())
+    p.add_argument('--plus-world-y',action='store_true',help='Only fixed +0.40 world Y; preserve previous cart yaw/asset')
+    a=p.parse_args()
+    if a.phase=='physical':physical(Path(a.output_dir).resolve(),a.plus_world_y)
+    else:semantic(Path(a.output_dir).resolve())

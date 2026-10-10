@@ -107,6 +107,9 @@ def main():
         curve('Baseline',run['xy'],[0.,.95,1.])
         if is_cart:
             reference=load_saved(cfg['reference_baseline_run']);curve('NoCartReference',reference['xy'],[.7,.7,.7],.025)
+            if cfg.get('previous_cart_run'):
+                previous_cart=load_saved(cfg['previous_cart_run']);curve('PreviousCartPath',previous_cart['xy'],[.85,.55,.15],.035)
+                curve('PreviousCartFootprint',cfg['previous_cart_outline'],[.85,.55,.15],.025)
         old=curve('OLDRemaining',[[0,0],[0,0]],[1.,.4,0.])
         fresh_guide=curve('FRESH',[[0,0],[0,0]],[.2,.4,1.])
         UsdGeom.Imageable(fresh_guide).MakeInvisible()
@@ -141,6 +144,7 @@ def main():
         def overview():
             st['follow']=False;c=nav.current
             points=np.vstack([run['xy'],c['position'][:2]]) if c else run['xy']
+            if cfg.get('previous_cart_run'):points=np.vstack([points,reference['xy'],previous_cart['xy']])
             if c and c['bypass']['centerline_xy']:points=np.vstack([points,c['bypass']['centerline_xy']])
             if c and not c.get('remaining_world_xy'):
                 # First CLEAR can be C1: include the saved robot observation
@@ -156,6 +160,10 @@ def main():
         def follow():
             st['follow']=True;viewport.camera_path=str(follow_cam.GetPath())
         def jump(kind):
+            if kind in ['approach','closest','structural_contact']:
+                t=nav.current.get(kind+'_sim_time') if nav.current else None
+                if t is not None:st.update(time=float(t),playing=False)
+                return
             rid=((nav.current.get('first_visible_request_id') or 1) if kind=='visible' else nav.jump('fresh' if kind=='application' else kind))
             t=run['events'][rid-1]['application']['sim_time'] if kind=='application' else observation_times[rid-1]
             st.update(time=float(t),playing=False)
@@ -223,6 +231,11 @@ def main():
                     ui.Button('Jump OLD',clicked_fn=lambda:jump('old'));ui.Button('Jump FRESH' if is_cart else 'Jump first CLEAR',clicked_fn=lambda:jump('fresh'))
                     ui.Button('Jump switch/application',clicked_fn=lambda:jump('application'))
                 if is_cart:ui.Button('Jump first cart visibility',height=25,clicked_fn=lambda:jump('visible'))
+                if cfg.get('previous_cart_run'):
+                    with ui.HStack(height=25):
+                        ui.Button('Cart approach',clicked_fn=lambda:jump('approach'))
+                        ui.Button('Closest cart approach',clicked_fn=lambda:jump('closest'))
+                        ui.Button('First structural contact',enabled=nav.current.get('structural_contact_sim_time') is not None,clicked_fn=lambda:jump('structural_contact'))
                 with ui.HStack(height=28):
                     ui.Button('Restart from start',clicked_fn=restart);ui.Button('Play',clicked_fn=lambda:st.update(playing=True));ui.Button('Pause',clicked_fn=lambda:st.update(playing=False))
                 with ui.HStack(height=25):
@@ -235,7 +248,7 @@ def main():
                 ui.Button('Toggle saved semantic overlay',height=25,clicked_fn=lambda:st.update(overlay=not st['overlay'],last_rgb=None))
                 image_title=ui.Label('Actual archived preflight Hawk render',height=24)
                 rgb_panel=ui.Image('',height=260,fill_policy=ui.FillPolicy.PRESERVE_ASPECT_FIT)
-                ui.Label('Cart fixed throughout; grey no-cart reference, cyan actual path, orange OLD, blue FRESH.\nArchived RGB is the original model observation. No physics or model reexecution.' if is_cart else 'Stationary human is fixed during each saved replay. Candidate changes are independent alternatives.\nOverview clips the roof for inspection; original preflight RGB has no guides.\nA near miss is never a selected strict candidate.',height=70,word_wrap=True)
+                ui.Label('Cart fixed throughout; grey no-cart, cyan new path, gold previous cart run, orange OLD, blue FRESH.\nArchived RGB is the original model observation. No physics or model reexecution.' if is_cart else 'Stationary human is fixed during each saved replay. Candidate changes are independent alternatives.\nOverview clips the roof for inspection; original preflight RGB has no guides.\nA near miss is never a selected strict candidate.',height=70,word_wrap=True)
 
         def update_pose():
             c=nav.current;t=st['time'];i=max(0,int(np.searchsorted(run['times'],t+1e-9,side='right')-1));row=run['robot'][i]
@@ -285,6 +298,12 @@ def main():
             checks['jump_application']=st['time']==run['events'][(c.get('fresh_request_id') or 1)-1]['application']['sim_time']
             if is_cart:
                 jump('visible');checks['jump_first_cart_visibility']=update_pose()==(c.get('first_visible_request_id') or 1)
+            if cfg.get('previous_cart_run'):
+                for kind in ['approach','closest','structural_contact']:
+                    if c.get(kind+'_sim_time') is not None:
+                        jump(kind);update_pose();checks['jump_'+kind]=st['time']==c[kind+'_sim_time']
+                        if not checks['jump_'+kind]:raise RuntimeError('Cart event jump failed')
+                    else:checks['jump_'+kind]='N/A - no saved event'
             jump('fresh')
             obs_move(-1);update_pose();obs_move(1)
             checks['observation_navigation']=update_pose()==min(len(run['events']),max(1,(c.get('fresh_request_id') or 1)-1)+1)
