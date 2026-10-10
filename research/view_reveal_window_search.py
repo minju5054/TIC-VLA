@@ -1,7 +1,10 @@
 """Interactive stationary alternatives with saved Nova poses; no navigation execution."""
 import argparse
+import asyncio
 import hashlib
 import json
+import shutil
+import subprocess
 import sys
 import time
 import traceback
@@ -15,10 +18,25 @@ from research.analyze_nova_dynamic_handoff import load_saved
 from research.records import write_json, provenance
 
 
+def restart_state(times):
+    if float(times[0]) != 0.:raise ValueError('Saved replay must begin at simulation t=0')
+    return {'time':0.,'playing':False}
+
+
+def replay_frame_times(times, fps=10):
+    restart_state(times)
+    frames=np.arange(0.,float(times[-1]),1./fps).tolist()
+    if not frames or times[-1]-frames[-1]>1e-8:frames.append(float(times[-1]))
+    else:frames[-1]=float(times[-1])
+    return frames
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--search-dir',required=True);p.add_argument('--output-dir',required=True)
-    p.add_argument('--self-test',action='store_true');a=p.parse_args()
+    p.add_argument('--self-test',action='store_true')
+    p.add_argument('--export-full',action='store_true',help='Export complete saved drive at 10 fps; installed ffmpeg only')
+    a=p.parse_args()
     source=Path(a.search_dir).resolve();out=Path(a.output_dir).resolve()
     if out==source or source in out.parents or out.exists():raise ValueError('Fresh output outside source required')
     cfg=json.loads((source/'preregistered.json').read_text())['config']
@@ -41,10 +59,10 @@ def main():
         from omni.kit.viewport.utility import get_active_viewport,capture_viewport_to_file
         from research.hospital_lights import apply_hospital_lights
         from research.human_actor import author_human
-        from PIL import Image
+        from PIL import Image,ImageDraw,ImageFont
         # Viewport display only: no Hawk RGB/semantic product or recapture of
         # a completed/rejected candidate. The image panel reuses saved evidence.
-        timeline=omni.timeline.get_timeline_interface();timeline.stop()
+        timeline=omni.timeline.get_timeline_interface();timeline.stop();frozen_timeline_time=timeline.get_current_time()
         stage=omni.usd.get_context().get_stage();stage.GetRootLayer().subLayerPaths.append(run['cfg']['scene']['usd'])
         UsdGeom.SetStageMetersPerUnit(stage,1.);UsdGeom.SetStageUpAxis(stage,'Z')
         robot=UsdGeom.Xform.Define(stage,run['cfg']['robot']['prim']);robot.GetPrim().GetReferences().AddReference(run['cfg']['robot']['asset'])
@@ -71,7 +89,7 @@ def main():
         subscription=timeline.get_timeline_event_stream().create_subscription_to_pop(guard)
         human={'prim':'/World/SearchHuman','asset':asset['asset'],'radius_m':cfg['human_radius_m'],
                'capsule_cylinder_height_m':1.2,'yaw':cfg['human_yaw_rad']}
-        st={'time':0.,'playing':False,'follow':False,'overlay':False,'last_rgb':None,'sync':False}
+        st={**restart_state(run['times']),'speed':1.,'follow':False,'overlay':False,'last_rgb':None,'sync':False}
         observation_times=np.array([e['observation']['sim_time'] for e in run['events']])
         guide_root=UsdGeom.Xform.Define(stage,'/World/SearchGuides')
 
@@ -96,11 +114,26 @@ def main():
         follow_cam=UsdGeom.Camera.Define(stage,'/World/SearchFollow');follow_cam.CreateClippingRangeAttr(Gf.Vec2f(.05,100))
         follow_cam.CreateFocalLengthAttr(18.);follow_op=follow_cam.AddTransformOp()
         viewport=get_active_viewport()
+        def capture_file(target):
+            capture=capture_viewport_to_file(viewport,str(target))
+            completed=asyncio.ensure_future(capture.wait_for_result())
+            deadline=time.monotonic()+30.
+            while not completed.done() and app.is_running() and time.monotonic()<deadline:app.update()
+            if not completed.done():raise RuntimeError('Viewport capture timed out')
+            completed.result()
+            # Kit's result signals GPU capture scheduling; PNG encoding/writing
+            # can finish later on a worker. Require a fully decodable file.
+            while app.is_running() and time.monotonic()<deadline:
+                try:
+                    with Image.open(target) as captured:captured.load()
+                    return
+                except (FileNotFoundError,OSError):app.update();time.sleep(.005)
+            raise RuntimeError('Viewport PNG write did not finish')
         def look(op,eye,target,up=(0,0,1)):
             op.Set(Gf.Matrix4d().SetLookAt(Gf.Vec3d(*map(float,eye)),Gf.Vec3d(*map(float,target)),Gf.Vec3d(*up)).GetInverse())
         def overview():
             st['follow']=False;c=nav.current
-            points=np.vstack([c['position'][:2],c.get('remaining_world_xy') or [c['position'][:2]]]) if c else run['xy']
+            points=np.vstack([run['xy'],c['position'][:2]]) if c else run['xy']
             if c and c['bypass']['centerline_xy']:points=np.vstack([points,c['bypass']['centerline_xy']])
             if c and not c.get('remaining_world_xy'):
                 # First CLEAR can be C1: include the saved robot observation
@@ -116,7 +149,13 @@ def main():
         def follow():
             st['follow']=True;viewport.camera_path=str(follow_cam.GetPath())
         def jump(kind):
-            rid=nav.jump(kind);st.update(time=float(observation_times[rid-1]),playing=False)
+            rid=nav.jump('fresh' if kind=='application' else kind)
+            t=run['events'][rid-1]['application']['sim_time'] if kind=='application' else observation_times[rid-1]
+            st.update(time=float(t),playing=False)
+        def restart():
+            st.update(restart_state(run['times']));nav.request_id=1
+        def speed(value):
+            st['speed']=value;speed_label.text=f"Playback speed: {value:g}x"
         def obs_move(delta):
             rid=int(np.searchsorted(observation_times,st['time']+1e-9,side='right'))
             nav.request_id=max(1,min(48,rid+delta));st.update(time=float(observation_times[nav.request_id-1]),playing=False)
@@ -131,7 +170,8 @@ def main():
             for guide,points in [(old,c.get('remaining_world_xy',[])),(bypass,c['bypass']['centerline_xy']),
                                  (proxy,c['position'][:2]+circle*(cfg['robot_radius_m']+cfg['human_radius_m'])),
                                  (human_guide,c['position'][:2]+circle*cfg['human_radius_m'])]:
-                change(guide,points);UsdGeom.Imageable(guide).MakeVisible() if len(points)>1 else UsdGeom.Imageable(guide).MakeInvisible()
+                if len(points)>1:change(guide,points);UsdGeom.Imageable(guide).MakeVisible()
+                else:UsdGeom.Imageable(guide).MakeInvisible()
             hit=c.get('conflict')
             if hit:
                 conflict_pos.Set(Gf.Vec3d(*hit['point'],.15));UsdGeom.Imageable(conflict).MakeVisible()
@@ -142,7 +182,7 @@ def main():
                 lo,hi=np.array(box.GetMin()),np.array(box.GetMax())
                 change(occluder,[[lo[0],lo[1]],[hi[0],lo[1]],[hi[0],hi[1]],[lo[0],hi[1]],[lo[0],lo[1]]]);UsdGeom.Imageable(occluder).MakeVisible()
             else:UsdGeom.Imageable(occluder).MakeInvisible()
-            jump('old');overview()
+            restart();overview()
         def move(delta):nav.move(delta);select()
         def filter_mode(mode):nav.filter(mode);select()
         def top():
@@ -156,9 +196,9 @@ def main():
             with ui.VStack(spacing=4):
                 ui.Label('NO MODEL CALLS | NO NAVIGATION PHYSICS',height=25)
                 if summary.get('single_manual_placement'):
-                    ui.Label('ONE FROZEN C19 PLACEMENT | preflight only; human run not executed',height=32,word_wrap=True)
+                    ui.Label('PREFLIGHT ONLY — NO HUMAN NAVIGATION RUN',height=32,word_wrap=True)
                 ui.Label('Cyan path | Orange OLD | Magenta human | Red conflict | Green bypass',height=36,word_wrap=True)
-                info=ui.Label('',height=215,word_wrap=True)
+                info=ui.Label('',height=185,word_wrap=True)
                 with ui.HStack(height=28):
                     ui.Button('Previous candidate',clicked_fn=lambda:move(-1));ui.Button('Next candidate',clicked_fn=lambda:move(1))
                 ui.Button('Top / selected (diagnostic if none)',height=28,clicked_fn=top)
@@ -170,12 +210,16 @@ def main():
                     ui.Button('Previous observation',clicked_fn=lambda:obs_move(-1));ui.Button('Next observation',clicked_fn=lambda:obs_move(1))
                 with ui.HStack(height=28):
                     ui.Button('Jump OLD',clicked_fn=lambda:jump('old'));ui.Button('Jump first CLEAR',clicked_fn=lambda:jump('fresh'))
+                    ui.Button('Jump switch/application',clicked_fn=lambda:jump('application'))
                 with ui.HStack(height=28):
-                    ui.Button('Replay reveal',clicked_fn=replay);ui.Button('Play',clicked_fn=lambda:st.update(playing=True));ui.Button('Pause',clicked_fn=lambda:st.update(playing=False))
+                    ui.Button('Restart from start',clicked_fn=restart);ui.Button('Play',clicked_fn=lambda:st.update(playing=True));ui.Button('Pause',clicked_fn=lambda:st.update(playing=False))
+                with ui.HStack(height=25):
+                    speed_label=ui.Label('Playback speed: 1x')
+                    for value in [.25,.5,1.,2.]:ui.Button(f'{value:g}x',clicked_fn=lambda v=value:speed(v))
                 slider=ui.FloatSlider(min=float(run['times'][0]),max=float(run['times'][-1]),height=24)
                 slider.model.add_value_changed_fn(lambda m:None if st['sync'] else st.update(time=m.as_float,playing=False))
                 with ui.HStack(height=28):
-                    ui.Button('Overview',clicked_fn=overview);ui.Button('Nova front Hawk',clicked_fn=front);ui.Button('Follow baseline',clicked_fn=follow)
+                    ui.Button('Overview',clicked_fn=overview);ui.Button('Nova front Hawk',clicked_fn=front);ui.Button('Follow robot',clicked_fn=follow)
                 ui.Button('Toggle saved semantic overlay',height=25,clicked_fn=lambda:st.update(overlay=not st['overlay'],last_rgb=None))
                 image_title=ui.Label('Actual archived preflight Hawk render',height=24)
                 rgb_panel=ui.Image('',height=260,fill_policy=ui.FillPolicy.PRESERVE_ASPECT_FIT)
@@ -225,6 +269,9 @@ def main():
             top();c=nav.current
             jump('old');checks['jump_old']=update_pose()==(c.get('old_request_id') or 1)
             jump('fresh');checks['jump_first_clear']=update_pose()==(c.get('fresh_request_id') or 1)
+            jump('application');update_pose()
+            checks['jump_application']=st['time']==run['events'][(c.get('fresh_request_id') or 1)-1]['application']['sim_time']
+            jump('fresh')
             obs_move(-1);update_pose();obs_move(1)
             checks['observation_navigation']=update_pose()==min(len(run['events']),max(1,(c.get('fresh_request_id') or 1)-1)+1)
             human_transform=UsdGeom.Xformable(stage.GetPrimAtPath(human['prim'])).ComputeLocalToWorldTransform(0)
@@ -246,26 +293,68 @@ def main():
             for name,fn in [('overview',overview),('hawk',front),('follow',follow)]:
                 jump('fresh');fn();update_pose()
                 for _ in range(8):app.update()
-                capture_viewport_to_file(viewport,str(out/(name+'.png')))
-                for _ in range(8):app.update()
+                capture_file(out/(name+'.png'))
             checks.update(hospital_present=bool(stage.GetPrimAtPath('/Root')),robot_present=bool(stage.GetPrimAtPath(run['cfg']['robot']['prim'])),
                           human_present=bool(stage.GetPrimAtPath(human['prim'])),old_remaining_present=bool(c.get('remaining_world_xy')),
                           conflict_point_present=c.get('conflict') is not None,conflict_proxy_present=True,
                           physics_stopped=not timeline.is_playing(),model_calls=0,new_semantic_captures=0,
                           verification_mode='Archived masks/RGB plus display-only viewport; no preflight rerender')
-            if not all(checks[k] for k in ['candidate_next_previous','strict_filter','near_filter','jump_old','jump_first_clear','observation_navigation','saved_pose_replay_moves_robot','replay_keeps_human_fixed','archived_overlay_panel','hospital_present','robot_present','human_present','physics_stopped']):
+            if not all(checks[k] for k in ['candidate_next_previous','strict_filter','near_filter','jump_old','jump_first_clear','jump_application','observation_navigation','saved_pose_replay_moves_robot','replay_keeps_human_fixed','archived_overlay_panel','hospital_present','robot_present','human_present','physics_stopped']):
                 raise RuntimeError('GUI control verification failed')
             if not all(r['pass'] for r in checks['visibility_archived_masks']):raise RuntimeError('Archived mask differs from visibility log')
-        top();jump('fresh');overview();update_pose()
+        if a.export_full:
+            frames=out/'frames';frames.mkdir();manifest=[];follow();st.update(playing=False)
+            fixed_transform=UsdGeom.Xformable(stage.GetPrimAtPath(human['prim'])).ComputeLocalToWorldTransform(0)
+            font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',20)
+            times=replay_frame_times(run['times']);fps=10
+            for number,t in enumerate(times):
+                st['time']=t;rid=update_pose()
+                for _ in range(3):app.update()
+                target=frames/f'frame_{number:05d}.png'
+                capture_file(target)
+                assert not timeline.is_playing() and timeline.get_current_time()==frozen_timeline_time
+                assert fixed_transform==UsdGeom.Xformable(stage.GetPrimAtPath(human['prim'])).ComputeLocalToWorldTransform(0)
+                # Annotated display export only; the original saved Hawk files
+                # remain untouched and are explicitly timestamped sample-and-hold.
+                im=Image.open(target).convert('RGB');im.load();draw=ImageDraw.Draw(im)
+                draw.rectangle((0,0,im.width,92),fill='#14212b')
+                draw.text((14,8),'PREFLIGHT ONLY — NO HUMAN NAVIGATION RUN',font=font,fill='white')
+                draw.text((14,35),f'Saved baseline replay t={t:.3f}s | C{rid} | model calls 0 | physics reexecution false',font=font,fill='white')
+                v=nav.current['visibility'][rid-1] if nav.current['visibility'] else None
+                if v:
+                    rgb=Image.open(v['rgb']).convert('RGB');mask=np.asarray(Image.open(v['mask']))>0
+                    overlay=np.array(rgb);overlay[mask]=(overlay[mask]*.45+np.array([255,0,200])*.55).astype('uint8')
+                    thumb=Image.fromarray(overlay);thumb.thumbnail((480,270));im.paste(thumb,(im.width-thumb.width-10,102))
+                    draw.text((14,62),f"Archived Hawk C{rid} at t={observation_times[rid-1]:.3f}s: {v['state']} (held until next observation)",font=font,fill='#edc8ea')
+                im.save(target)
+                i=max(0,int(np.searchsorted(run['times'],t+1e-9,side='right')-1))
+                manifest.append({'frame':target.name,'replay_time_s':t,'saved_tick':int(run['robot'][i]['tick']),
+                    'saved_pose_time_s':float(run['times'][i]),'robot_position_world_m':list(render.position.Get()),
+                    'request_id':rid,'rgb':v['rgb'] if v else None,'mask':v['mask'] if v else None})
+                if number%25==0:print('FULL_REPLAY_EXPORT',number+1,'/',len(times),flush=True)
+            write_json(out/'frames.json',manifest)
+            video={'ffmpeg_installed':bool(shutil.which('ffmpeg')),'fps':fps,'frame_count':len(manifest),
+                'start_s':times[0],'end_s':times[-1],'complete_saved_run':True,'model_calls':0,'navigation_physics_reexecuted':False}
+            if video['ffmpeg_installed']:
+                result=subprocess.run(['ffmpeg','-nostdin','-n','-framerate',str(fps),'-i',str(frames/'frame_%05d.png'),
+                    '-c:v','libx264','-pix_fmt','yuv420p','-vf','scale=trunc(iw/2)*2:trunc(ih/2)*2',str(out/'full_run_replay.mp4')],capture_output=True,text=True)
+                (out/'ffmpeg.log').write_text(result.stderr);video['returncode']=result.returncode
+                if result.returncode:raise RuntimeError('Installed ffmpeg export failed')
+            write_json(out/'video.json',video);print('FULL_REPLAY_EXPORT_COMPLETE',len(times),flush=True)
+        top();restart();overview();update_pose()
+        checks['replay_starts_at_t0']=st['time']==0. and nav.request_id==1 and not st['playing']
+        speed(.25);checks['speed_controls']=st['speed']==.25;speed(1.)
+        if not checks['replay_starts_at_t0']:raise RuntimeError('Replay did not reset to t=0')
         verify_hashes(hashes)
         write_json(out/'GUI_READY.json',{'status':'GUI_READY','headless':False,'model_calls':0,'navigation_physics_reexecuted':False,
-                   'candidate_id':nav.current['id'] if nav.current else None,'checks':checks,'source_unchanged':True})
+                   'candidate_id':nav.current['id'] if nav.current else None,'initial_replay_time_s':st['time'],
+                   'initial_request_id':nav.request_id,'checks':checks,'source_unchanged':True})
         print('GUI_READY',out,flush=True)
         previous=time.monotonic()
         while app.is_running():
             now=time.monotonic()
             if st['playing']:
-                st['time']=min(float(run['times'][-1]),st['time']+(now-previous)*.5)
+                st['time']=min(float(run['times'][-1]),st['time']+(now-previous)*st['speed'])
                 if st['time']>=run['times'][-1]:st['playing']=False
             previous=now;update_pose();app.update();time.sleep(.01)
         verify_hashes(hashes)

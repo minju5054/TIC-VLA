@@ -40,25 +40,37 @@ def main():
     colors={'HIDDEN':'#23805b','MARGINAL':'#e1a11a','CLEAR':'#c84237','UNMEASURED':'#777777'}
     walls=wall_inventory(json.loads(Path(cfg['collision_inventory']).read_text()))
     human=np.array(frozen['human']['position']);radius=cfg['robot_radius_m']+cfg['human_radius_m'];figures={}
+    offset=frozen.get('world_y_offset_m',.40)
+    placement_label=f'C19 {offset:+.2f} m world Y'
+    old_points=np.array(candidate.get('remaining_world_xy',[])) if candidate else np.empty((0,2))
     for zoom in [False,True]:
         fig,markers,info=draw_map(rows,dense,walls,zoom);ax=fig.axes[0]
+        # C19 is only 0.40 m from the person; move its label, never its marker.
+        for label in ax.texts:
+            if label.get_text()=='C19':label.set_position((0,34))
         markers.set_facecolors([colors[visibility[i-1]['state']] if visibility else colors['UNMEASURED'] for i in info['request_ids']])
         expected=np.array([[rows[i-1]['x_world_m'],rows[i-1]['y_world_m']] for i in info['request_ids']])
         np.testing.assert_array_equal(markers.get_offsets(),expected)
+        if len(old_points):ax.plot(*old_points.T,color='#e07419',lw=2.5,zorder=4)
+        if first:
+            obs=rows[first-1];ax.scatter(obs['x_world_m'],obs['y_world_m'],s=150,marker='D',facecolors='none',edgecolors='#b22723',lw=1.5,zorder=8)
         ax.scatter(*human[:2],marker='*',s=180,c='#ac2580',edgecolors='white',lw=.7,zorder=10)
         proxy=Circle(human[:2],radius,fill=False,color='#ac2580',ls='--',lw=1.4,zorder=3);ax.add_patch(proxy)
         np.testing.assert_array_equal(proxy.center,human[:2])
         yaw=frozen['human']['yaw'];ax.annotate('',human[:2]+.55*np.array([np.cos(yaw),np.sin(yaw)]),human[:2],
             arrowprops=dict(arrowstyle='->',color='#ac2580',lw=1.5),zorder=9)
-        if zoom:ax.annotate('Frozen human\nC19 + 0.40 m world Y',human[:2],xytext=(0,45),textcoords='offset points',
+        if zoom:ax.annotate('Frozen human\n'+placement_label,human[:2],xytext=(0,-65),textcoords='offset points',
             ha='center',fontsize=10,color='#8e1b68',bbox=dict(fc='white',ec='none',pad=2),arrowprops=dict(arrowstyle='-',color='#8e1b68'))
         for legend in fig.legends:legend.remove()
         handles=[Line2D([],[],color='#216e9d',label='No-human baseline path')]
+        offview=bool(first and zoom and not (ax.get_xlim()[0]<=rows[first-1]['x_world_m']<=ax.get_xlim()[1] and ax.get_ylim()[0]<=rows[first-1]['y_world_m']<=ax.get_ylim()[1]))
+        if len(old_points):handles.append(Line2D([],[],color='#e07419',lw=2.5,label=f"OLD C{candidate['old_request_id']} remaining nominal future"+(' (full map)' if offview else '')))
+        if first:handles.append(Line2D([],[],marker='D',ls='',mfc='none',mec='#b22723',label=f'First CLEAR C{first}'+(' (outside zoom)' if offview else '')))
         handles += [Line2D([],[],marker='o',ls='',color=color,label=state+' observation') for state,color in colors.items() if state in {v['state'] for v in visibility} or not visibility and state=='UNMEASURED']
         handles += [Line2D([],[],marker='*',ls='',color='#ac2580',ms=10,label='Frozen stationary human'),
                     Line2D([],[],color='#ac2580',ls='--',label='Combined conflict proxy'),Patch(fc='#e1e5e9',label='Structural collider XY bounds')]
-        fig.legend(handles=handles,loc='upper center',bbox_to_anchor=(.5,.90),ncol=3,frameon=False,fontsize=10)
-        fig.suptitle('E16 | C19 + 0.40 m world Y | STRICT PREFLIGHT FAIL'+(' | turn zoom' if zoom else ''),fontsize=16,y=.98)
+        fig.legend(handles=handles,loc='upper center',bbox_to_anchor=(.5,.90),ncol=4,frameon=False,fontsize=9)
+        fig.suptitle('E16 | '+placement_label+' | STRICT PREFLIGHT FAIL'+(' | turn zoom' if zoom else ''),fontsize=16,y=.98)
         for t in fig.texts:
             if t.get_position()[1]==.93:t.set_text('Semantic visibility at saved baseline observations; C# markers remain exact observation poses')
             if t.get_position()[1]==.03:t.set_text(failure+'\nHuman model run NOT EXECUTED; no FRESH response or revision is inferred.');t.set_color('#923329')
@@ -67,6 +79,7 @@ def main():
     write_json(out/'trajectory_coordinates.json',{'observations':rows,'dense_baseline_world_xy':run['xy'].tolist(),
         'dense_baseline_sim_times':run['times'].tolist(),'dense_source':str(run['path']/'robot_state.csv'),
         'frozen_human':frozen['human'],'combined_proxy_radius_m':radius,'visibility':visibility,'figures':figures,
+        'old_remaining_world_xy':old_points.tolist(),'first_clear_request_id':first,
         'coordinate_rule':'All measured coordinates unchanged in Hospital world metres; human-run path and FRESH response absent.'})
     if visibility:
         from PIL import Image

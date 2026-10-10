@@ -13,24 +13,25 @@ BASELINE=ROOT/'outputs/nova-e16-hospital-lights-baseline-20261010-01'
 RULES=ROOT/'configs/research/reveal_window_search.json'
 
 
-def placement(event):
+def placement(event, world_y_offset=.40):
     if event['request_id']!=19:raise ValueError('Only C19 is authorized')
+    if world_y_offset not in (-.40,.40):raise ValueError('Only the two user-specified offsets are supported')
     x,y,yaw=event['agent_pose_at_observation']
-    return {'position':[x,y+.40,0.], 'yaw':float((yaw+2*np.pi)%(2*np.pi)-np.pi)}
+    return {'position':[x,y+world_y_offset,0.], 'yaw':float((yaw+2*np.pi)%(2*np.pi)-np.pi)}
 
 
 def check_frozen(out):
     frozen=json.loads((out/'freeze.json').read_text())
     event=json.loads((BASELINE/'raw/requests/request_000019.json').read_text())
-    if frozen['human']!=placement(event):raise ValueError('Frozen placement changed')
+    if frozen['human']!=placement(event,frozen.get('world_y_offset_m',.40)):raise ValueError('Frozen placement changed')
     verify_hashes(frozen['source_evidence_sha256'])
     return frozen,load_saved(BASELINE)
 
 
-def freeze(out):
+def freeze(out, world_y_offset=.40):
     out=validate_destination(out,[BASELINE]);run=load_saved(BASELINE)
     if not run['complete'] or len(run['events'])!=48:raise ValueError('Complete baseline required')
-    cfg=json.loads(RULES.read_text());event=run['events'][18];human=placement(event)
+    cfg=json.loads(RULES.read_text());event=run['events'][18];human=placement(event,world_y_offset)
     cfg.update(human_yaw_rad=human['yaw'],human_orientation_rule='wrap(saved C19 yaw + pi)',
                ranking=['Single user-fixed candidate only; no ranking or replacement'],
                candidate_positions=[human['position']],render_policy='Exactly one frozen human; all 48 saved observations, semantics authoritative')
@@ -39,7 +40,8 @@ def freeze(out):
     hashes=evidence_hashes(sources)
     out.mkdir(parents=True,exist_ok=False)
     write_json(out/'freeze.json',{'human':human,'C19_observation':event['observation'],'source_evidence_sha256':hashes,
-        'formula':'x=C19.x; y=C19.y+0.40 world metres; z=0; yaw=wrap(C19.yaw+pi)',
+        'world_y_offset_m':world_y_offset,
+        'formula':f'x=C19.x; y=C19.y{world_y_offset:+.2f} world metres; z=0; yaw=wrap(C19.yaw+pi)',
         'coordinate_convention':'Hospital world metres, +Z up; yaw CCW from +X, radians; no local-frame offset',
         'candidate_count':1,'retuning_permitted':False,'before_any_human_render':True,
         'visibility':cfg['visibility'],'code_sha256':evidence_hashes([Path(__file__)]),**clocks(),**provenance(ROOT)})
@@ -133,4 +135,9 @@ def semantic(out):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--phase',choices=['freeze','physical','semantic'],required=True)
-    p.add_argument('--output-dir',required=True);a=p.parse_args();globals()[a.phase](Path(a.output_dir).resolve())
+    p.add_argument('--output-dir',required=True)
+    p.add_argument('--world-y-offset',type=float,choices=[-.40,.40],help='Freeze only; later phases read the immutable receipt')
+    a=p.parse_args();out=Path(a.output_dir).resolve()
+    if a.phase=='freeze':freeze(out,.40 if a.world_y_offset is None else a.world_y_offset)
+    elif a.world_y_offset is not None:p.error('Offset is allowed only when freezing a new experiment')
+    else:globals()[a.phase](out)
