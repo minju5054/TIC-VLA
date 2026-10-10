@@ -40,8 +40,12 @@ def main():
         stage=omni.usd.get_context().get_stage()
         stage.GetRootLayer().subLayerPaths.append(cfg["scene"]["usd"])
         UsdGeom.SetStageMetersPerUnit(stage,1.);UsdGeom.SetStageUpAxis(stage,UsdGeom.Tokens.z)
-        from research.nova_bright import apply_profile
-        apply_profile(cfg['bright_profile'],stage)
+        if 'hospital_lighting' in cfg:
+            from research.hospital_lights import apply_hospital_lights
+            apply_hospital_lights(stage,cfg['hospital_lighting'])
+        else:
+            from research.nova_bright import apply_profile
+            apply_profile(cfg['bright_profile'],stage)
         robot=UsdGeom.Xform.Define(stage,cfg["robot"]["prim"]);robot.GetPrim().GetReferences().AddReference(cfg["robot"]["asset"])
         robot.ClearXformOpOrder()
         position=robot.AddTranslateOp(UsdGeom.XformOp.PrecisionDouble,"recorded")
@@ -77,6 +81,9 @@ def main():
             s=UsdGeom.Sphere.Define(stage,"/World/ReplayGuides/"+name);s.CreateRadiusAttr(.075)
             s.CreateDisplayColorAttr([Gf.Vec3f(*color)]);return s.AddTranslateOp()
         boundary_marker=marker("SwitchBoundary",[1,1,1]);observation_marker=marker("Observation",[1,1,0])
+        if data.first_contact_pose:
+            contact_marker=marker('FirstContact',[1.,.05,.05])
+            contact_marker.Set(Gf.Vec3d(data.first_contact_pose['x'],data.first_contact_pose['y'],.12))
         circle=curve("HumanConflictProxy",np.zeros((65,2)),[1.,.05,.05],.025,z=.06) if data.human else None
         if data.human:
             human_marker=marker("StationaryHuman",[1.,.05,.8]);human_marker.Set(Gf.Vec3d(*hxy[0],.10))
@@ -122,6 +129,10 @@ def main():
         def change_request(delta):
             latest=data.sample(state["time"])["latest_request"] or 1
             rid=max(1,min(len(data.events),latest+delta));set_time(data.events[rid-1]["observation"]["sim_time"])
+        def jump_contact():
+            t=data.contact_jump_time()
+            if t is not None:
+                set_time(t);state.update(playing=True,speed=.5);follow()
         window=ui.Window("TIC-VLA | Bright Hospital recorded reveal",width=475,height=790)
         window.setPosition(15,55)
         with window.frame:
@@ -153,6 +164,8 @@ def main():
                 with ui.HStack(height=28):
                     ui.Button(("Primary reveal pair" if data.is_reveal and data.has_event else "Baseline inspection pair"),clicked_fn=jump)
                     ui.Button("Jump to first reveal" if data.is_reveal and data.has_event else "Jump to baseline turn",clicked_fn=jump)
+                if data.first_contact:
+                    ui.Button('Jump to first contact (red marker)',height=25,clicked_fn=jump_contact)
                 with ui.HStack(height=28):
                     ui.Button("Overview camera",clicked_fn=overview)
                     ui.Button("Follow robot camera",clicked_fn=follow)
@@ -177,6 +190,8 @@ def main():
                 phase.text=f"RAW SWITCH C{sample['active_request']-1} → C{sample['active_request']}"
             else:phase.text=f"Accepted command C{sample['active_request']} active"
             phase.text+=f" | {sample['visibility_state']} | pixels {sample['human_pixels']}"
+            if data.first_contact and sample['time']>=data.first_contact['start_sim_time']:
+                phase.text+=' | AFTER FIRST CONTACT'
             metric=data.metrics[state["fresh"]-1];gap=metric["raw_boundary_position_gap_m"];tangent=metric["raw_executed_to_fresh_tangent_gap_deg"]
             info.text=(f"Replay sim {sample['time']:.3f}s | saved tick {sample['recorded_tick']} | latest C{rid}\n"
                 f"Robot XY {sample['robot_position'][0]:.3f}, {sample['robot_position'][1]:.3f} | yaw {np.degrees(sample['robot_yaw']):.2f}°\n"
@@ -198,7 +213,10 @@ def main():
             if data.human:np.testing.assert_array_equal(after["human_position"],before["human_position"])
             assert np.linalg.norm(np.array(after["robot_position"])-before["robot_position"])>0
             selected();follow();render_pose();app.update();front();app.update();jump();state["playing"]=False;render_pose()
+            if data.first_contact:
+                jump_contact();assert state['time']==data.contact_jump_time();render_pose();app.update();jump();state['playing']=False;render_pose()
             checks={"recorded_robot_replay":True,"stationary_human_unchanged":bool(data.human),"baseline_human_absent":not bool(data.human),"primary_jump":True,"camera_controls":True,
+                    "first_contact_jump":True if data.first_contact else None,
                     "old_fresh_guides_fixed":True,"rgb_source_exists":Path(state["last_rgb"]).is_file(),"timeline_stopped":not timeline.is_playing()}
         overview();render_pose()
         for _ in range(15):app.update()

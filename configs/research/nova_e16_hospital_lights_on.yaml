@@ -1,0 +1,3148 @@
+schema_version: 1
+scenario: nova_carter_hospital_episode16
+seed: 36
+simulation:
+  dt: 0.016666666666666666
+  control_hz: 60
+  inference_hz: 2
+  settle_steps: 120
+  predictions: 48
+  pause_physics_during_inference: false
+  real_time_pacing: true
+  target_real_time_factor: 1.0
+  headless: true
+robot:
+  type: nova_carter
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5/Isaac/Robots/Carter/nova_carter_sensors.usd
+  prim: /World/Robots/Nova_Carter
+  body: /World/Robots/Nova_Carter/chassis_link
+  wheel_joints:
+  - joint_wheel_left
+  - joint_wheel_right
+  wheel_radius: 0.14
+  wheel_base: 0.4132
+  wheel_collision_prims:
+  - /World/Robots/Nova_Carter/wheel_left/Cylinder
+  - /World/Robots/Nova_Carter/wheel_right/Cylinder_03
+  start_position: [7.38, 1.49, 0.11]
+  start_yaw: 1.5707963267948966
+camera:
+  prim: /World/Robots/Nova_Carter/chassis_link/front_hawk/left/camera_left
+  resolution: [1920, 1080]
+  translation: [0.1003, 0.074998, 0.3459]
+  capture_subframes: 4
+  note: Existing asset front Hawk camera; original transforms/intrinsics/projection untouched
+scene:
+  mode: official_usd
+  usd: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+  goal: [-12.23, 10.19, 0.01]
+instruction: Move forward toward the staircase, then turn left to enter the hallway. Continue straight ahead and stop in front
+  of the blue hospital bed on the right side of the hallway.
+controller:
+  lookahead: 1.0
+  angular_gain: 0.8
+  filter_gain: 0.35
+  epsilon: 0.001
+  max_v: 1.5
+  max_w: 1.2
+inference:
+  python: /home/gpuadmin/isaacsim-ticvla-5.0.0/python.sh
+  base_model: /home/gpuadmin/Workspace/models/tic-vla/InternVL3-1B
+  checkpoint: /home/gpuadmin/Workspace/models/tic-vla/checkpoints/TIC-VLA-model.ckpt
+  device: cuda:0
+  startup_timeout_seconds: 180
+  request_timeout_seconds: 120
+  image_history_interval_seconds: 3.0
+validation:
+  straight_v: 0.4
+  straight_seconds: 2.0
+  turn_w: 0.6
+  turn_seconds: 2.0
+  minimum_forward_displacement: 0.2
+  minimum_yaw_change: 0.1
+official_episode:
+  episode_id: episode_16
+  benchmark_source: DynaNav/configs/benchmark_full.yaml
+  benchmark_sha256: 62d8abec03dc793dad9da351c5c5652bcd854014f29a91880309bd70c128b08c
+  runner_source: DynaNav/benchmark.py
+  runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+  source_convention: USD RotateZ degrees
+  resolved_yaw_radians: 1.5707963267948966
+  episode:
+    scene: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+    start: [7.38, 1.49, 0.01]
+    start_yaw: 90.0
+    goal: [-12.23, 10.19, 0.01]
+    instruction: Move forward toward the staircase, then turn left to enter the hallway. Continue straight ahead and stop
+      in front of the blue hospital bed on the right side of the hallway.
+    timeout: 85
+    num_people: 0
+    robot_type: nova_carter
+hospital_validation:
+  first_primary_request_id: 4
+  minimum_consecutive_left_requests: 2
+  position_sign_tolerance_m: 1.0e-06
+  angle_sign_tolerance_rad: 1.0e-06
+  command_sign_tolerance_rad_s: 1.0e-06
+  minimum_segment_length_m: 1.0e-06
+  camera_probe_radius_m: 0.02
+  near_black_p95_0_255: 20.0
+  maximum_settling_xy_m: 0.02
+  native_waypoint_dt: 0.1
+  horizon_policy: 48 fixed predictions at 2 Hz target cadence; approximately 24 seconds plus bootstrap/call overrun; never
+    extend after output
+  stable_left_rule: 'Two consecutive primary requests: endpoint+mean left positive, lookahead left+bearing positive, controller
+    w positive, derived total heading change positive; exclude degraded near-black observations'
+  forward_dominance_rule: Endpoint forward > abs(left), lookahead forward > abs(left), not weak left (fewer than 3 of 4 left
+    indicator groups)
+  execution_rule: Forward progress precedes stable predicted intent; later two consecutive measured observation intervals
+    each have positive yaw change and episode-local left-dominant displacement (left component > abs(forward)); no degraded
+    RGB, camera proximity hit or non-floor contact during qualifying intervals. Non-floor contact means measured environment
+    contact with abs(normal.z) < 0.5, retained until CONTACT_LOST. This is a conservative execution criterion, not a turn
+    magnitude threshold chosen from model results.
+nova_source:
+  asset: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/4.5/Isaac/Robots/Carter/nova_carter_sensors.usd
+  front_camera: /World/Robots/Nova_Carter/chassis_link/front_hawk/left/camera_left
+  constants:
+    _wheel_joints:
+    - joint_wheel_left
+    - joint_wheel_right
+    _wheel_radius: 0.152
+    _wheel_base: 0.413
+    _max_accel_lin: 2.0
+    _max_decel_lin: 2.5
+    _max_accel_ang: 3.0
+    _max_decel_ang: 3.5
+    _lin_deadband: 0.001
+    _ang_deadband: 0.0005
+  behavior_sha256: 6411d53e30fc7e2f376052bf4818d340dd22e9463e0e0541d562540b722f04d0
+  runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+  episode:
+    episode_id: episode_16
+    benchmark_source: DynaNav/configs/benchmark_full.yaml
+    benchmark_sha256: 62d8abec03dc793dad9da351c5c5652bcd854014f29a91880309bd70c128b08c
+    runner_source: DynaNav/benchmark.py
+    runner_sha256: e0f9aeb78ce0b523e0ca8f11ff7da6f794b8b0aae63d722398d3ecc6d1fe01aa
+    source_convention: USD RotateZ degrees
+    resolved_yaw_radians: 1.5707963267948966
+    episode:
+      scene: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd
+      start: [7.38, 1.49, 0.01]
+      start_yaw: 90.0
+      goal: [-12.23, 10.19, 0.01]
+      instruction: Move forward toward the staircase, then turn left to enter the hallway. Continue straight ahead and stop
+        in front of the blue hospital bed on the right side of the hallway.
+      timeout: 85
+      num_people: 0
+      robot_type: nova_carter
+  slew_note: accel/decel chosen by signed target-current, exactly as upstream
+nova_validation:
+  stationary_seconds: 2.0
+  straight_seconds: 2.0
+  straight_v: 0.4
+  stop_seconds: 1.0
+  turn_seconds: 2.0
+  turn_w: 0.6
+  minimum_forward_displacement_m: 0.2
+  minimum_constant_turn_rad: 0.1
+  numerical_zero_rad: 1.0e-06
+  noise_multiple: 10.0
+  stage_a_rule: A0 forward >0.2 m and positive 2s turn >0.1 rad (legacy sanity minima); both replay positive yaw >10 times
+    measured stationary yaw excursion plus 1e-6 rad; majority pose-rate sign agreement; no non-floor contact in primary replay
+    window
+  stage_b_rule: Existing stable positive-left geometry rule; two consecutive clean positive-yaw episode-left-dominant displacement
+    intervals; no environment non-floor contact or degraded RGB; no forward-only prediction phase prerequisite
+  stage_b_predictions: 48
+  stage_b_command_variant: direct
+  cadence_hz: 2
+  replay_primary_ids: [4, 5, 6, 7]
+  replay_preroll: Exact source ticks before C4 application, from same official start/rest; evaluate C4-C7 only
+  rgb_evidence_rule: Prespecified p95 <=20/255 excluded as degraded visibility; original capture std<1 rejection unchanged;
+    rejected image archived without model call
+hospital_lighting:
+  lighting_mode: hospital_fixture_lights
+  native_multiplier: 1.0
+  native_lights:
+  - path: /Root/BP_DrinksMachine_2/PointLight
+    type: SphereLight
+    base_intensity: 10000.0
+  - path: /Root/BP_DrinksMachine_2/PointLight1
+    type: SphereLight
+    base_intensity: 10000.0
+  - path: /Root/BP_DrinksMachine2/PointLight
+    type: SphereLight
+    base_intensity: 10000.0
+  - path: /Root/BP_DrinksMachine2/PointLight1
+    type: SphereLight
+    base_intensity: 10000.0
+  fallback_fixture_lights:
+  - path: /World/HospitalFixtureLights/Light000
+    source_mesh: /Root/Geo_M_Light2_low165/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-12.9841552734375, 3.4924023437500002, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-12.984155292510986, 3.492402329444886, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369713
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light001
+    source_mesh: /Root/Geo_M_Light2_low168/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-15.750360107421875, 3.4924023437500002, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-15.75036012649536, 3.492402329444886, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369713
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light002
+    source_mesh: /Root/Geo_M_Light2_low171/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-18.56341552734375, 3.4924023437500002, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-18.563415546417236, 3.492402329444886, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369713
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light003
+    source_mesh: /Root/Geo_M_Light2_low174/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-21.2012548828125, 3.4924023437500002, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-21.201254901885985, 3.492402329444886, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369713
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light004
+    source_mesh: /Root/Geo_M_Light2_low177/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-23.960576171875, 3.4924023437500002, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-23.960576190948487, 3.492402329444886, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369713
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light005
+    source_mesh: /Root/Geo_M_Light2_low193/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [2.7010919189453126, 10.910364608764649, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [2.7010918998718267, 10.910364594459534, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light006
+    source_mesh: /Root/Geo_M_Light2_low194_650/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-5.5689239501953125, 10.910364608764649, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-5.568923969268798, 10.910364594459534, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light007
+    source_mesh: /Root/Geo_M_Light2_low196/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-0.1209405517578125, 10.910363693237304, 3.012677856445313, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-0.12094057083129839, 10.910363678932189, 2.9720333714755798, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light008
+    source_mesh: /Root/Geo_M_Light2_low197_651/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-8.270082397460937, 10.910363693237304, 3.0126836547851568, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-8.270082416534423, 10.910363678932189, 2.9720391698154236, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light009
+    source_mesh: /Root/Geo_M_Light2_low198/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-2.834263610839844, 10.91036491394043, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-2.83426362991333, 10.910364899635315, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light010
+    source_mesh: /Root/Geo_M_Light2_low199_652/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-12.996085205078126, 10.91036491394043, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-12.996085224151612, 10.910364899635315, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light011
+    source_mesh: /Root/Geo_M_Light2_low200_655/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-14.834642333984375, 10.91036491394043, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-14.83464235305786, 10.910364899635315, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light012
+    source_mesh: /Root/Geo_M_Light2_low201_657/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-17.485435791015625, 10.91036491394043, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-17.48543581008911, 10.910364899635315, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light013
+    source_mesh: /Root/Geo_M_Light2_low202_653/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-11.08667236328125, 10.910363693237304, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-11.086672382354736, 10.910363678932189, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519
+    width_m: 0.21100148683038
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light014
+    source_mesh: /Root/Geo_M_Light2_low203_659/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-20.232938232421876, 10.91036491394043, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-20.232938251495362, 10.910364899635315, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light015
+    source_mesh: /Root/Geo_M_Light2_low204_661/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-23.009521484375, 10.91036491394043, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-23.009521503448486, 10.910364899635315, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light016
+    source_mesh: /Root/Geo_M_Light2_low264_446/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-34.93791015625, 12.705673828125, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-34.93791017532348, 12.705673813819885, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light017
+    source_mesh: /Root/Geo_M_Light2_low265_571/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-32.18154052734375, 12.705673370361328, 3.0126766357421877, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-32.18154054641724, 12.705673356056213, 2.9720321507724545, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light018
+    source_mesh: /Root/Geo_M_Light2_low269/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-31.2366650390625, 22.854859619140626, 3.0126772460937503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-31.236665058135987, 22.85485960483551, 2.972032761124017, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light019
+    source_mesh: /Root/Geo_M_Light2_low272/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-37.678984375, 12.70567596435547, 3.012662292480469, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-37.67898439407348, 12.705675950050356, 2.9720178075107357, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light020
+    source_mesh: /Root/Geo_M_Light2_low273/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-33.06671142578125, 6.351585693359375, 3.012662292480469, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-33.06671144485473, 6.351585679054261, 2.9720178075107357, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light021
+    source_mesh: /Root/Geo_M_Light2_low274/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 12.70567596435547, 3.0126592407226567, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 12.705675950050356, 2.9720147557529235, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light022
+    source_mesh: /Root/Geo_M_Light2_low275/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-33.06671142578125, 4.460475463867188, 3.012662292480469, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-33.06671144485473, 4.4604754495620735, 2.9720178075107357, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light023
+    source_mesh: /Root/Geo_M_Light2_low276/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-33.06671142578125, 2.6320416259765627, 3.012662292480469, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-33.06671144485473, 2.6320416116714482, 2.9720178075107357, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369713
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light024
+    source_mesh: /Root/Geo_M_Light2_low277/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 10.005314941406251, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 10.005314927101136, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light025
+    source_mesh: /Root/Geo_M_Light2_low280/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 15.479599304199219, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 15.479599289894104, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light026
+    source_mesh: /Root/Geo_M_Light2_low283/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 18.16348815917969, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 18.163488144874574, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light027
+    source_mesh: /Root/Geo_M_Light2_low286/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 20.879503173828127, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 20.87950315952301, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light028
+    source_mesh: /Root/Geo_M_Light2_low289/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 23.699681396484376, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 23.69968138217926, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light029
+    source_mesh: /Root/Geo_M_Light2_low292/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 26.42620361328125, 3.0126592407226567, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 26.426203598976134, 2.9720147557529235, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light030
+    source_mesh: /Root/Geo_M_Light2_low295/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 29.212457275390626, 3.0126592407226567, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 29.21245726108551, 2.9720147557529235, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light031
+    source_mesh: /Root/Geo_M_Light2_low298/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 32.07849609375, 3.0126592407226567, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 32.07849607944488, 2.9720147557529235, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.2110017740636998
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light032
+    source_mesh: /Root/Geo_M_Light2_low299_480/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-44.1724755859375, 20.02679931640625, 3.0126519165039065, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-44.17247560501099, 20.026799302101136, 2.9720074315341733, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light033
+    source_mesh: /Root/Geo_M_Light2_low30/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 14.762005920410157, 3.0126687011718754, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 14.762005906105042, 2.972024216202142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light034
+    source_mesh: /Root/Geo_M_Light2_low303/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-46.92912109375, 20.02679931640625, 3.0126519165039065, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-46.92912111282348, 20.026799302101136, 2.9720074315341733, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light035
+    source_mesh: /Root/Geo_M_Light2_low306/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 7.159109497070313, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 7.159109482765198, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light036
+    source_mesh: /Root/Geo_M_Light2_low309/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-40.3726953125, 4.383135375976563, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-40.37269533157348, 4.383135361671449, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light037
+    source_mesh: /Root/Geo_M_Light2_low31/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 16.417584228515626, 3.0126687011718754, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 16.41758421421051, 2.972024216202142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light038
+    source_mesh: /Root/Geo_M_Light2_low312/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-43.20875, 4.383135375976563, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-43.20875001907349, 4.383135361671449, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light039
+    source_mesh: /Root/Geo_M_Light2_low315/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [-45.9134912109375, 4.383135375976563, 3.012658935546875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [-45.91349123001099, 4.383135361671449, 2.972014450577142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341518823
+    width_m: 0.21100148683037645
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light040
+    source_mesh: /Root/Geo_M_Light2_low32/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 18.44061279296875, 3.0126683959960943, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 18.440612778663635, 2.972023911026361, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light041
+    source_mesh: /Root/Geo_M_Light2_low33/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 20.096192016601563, 3.0126683959960943, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 20.096192002296448, 2.972023911026361, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light042
+    source_mesh: /Root/Geo_M_Light2_low34/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 22.065953369140626, 3.0126680908203127, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 22.06595335483551, 2.9720236058505796, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light043
+    source_mesh: /Root/Geo_M_Light2_low35/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 23.91076416015625, 3.0126687011718754, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 23.910764145851136, 2.972024216202142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light044
+    source_mesh: /Root/Geo_M_Light2_low36/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 25.78942138671875, 3.0126680908203127, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 25.789421372413635, 2.9720236058505796, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light045
+    source_mesh: /Root/Geo_M_Light2_low37/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 27.634232177734376, 3.0126687011718754, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 27.63423216342926, 2.972024216202142, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light046
+    source_mesh: /Root/Geo_M_Light2_low38/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 29.404455566406252, 3.0126680908203127, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 29.404455552101137, 2.9720236058505796, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369625
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light047
+    source_mesh: /Root/Geo_M_Light2_low4/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 11.136665649414063, 3.0126690063476564, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 11.136665635108947, 2.9720245213779233, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light048
+    source_mesh: /Root/Geo_M_Light2_low5/Geo_M_Light2_low/Geo_M_Light2_low
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, -0.00999999977643455, -3.099441459359058e-08, 0.0]
+    - [0.0, 3.099441459359058e-08, -0.00999999977643455, 0.0]
+    - [19.208873291015625, 12.792244415283204, 3.0126690063476564, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [-0.0, 0.9999999999951967, 3.0994415286369745e-06, 0.0]
+    - [-0.0, -3.0994415286369745e-06, 0.9999999999951967, 0.0]
+    - [19.20887327194214, 12.792244400978088, 2.9720245213779233, 1.0]
+    type: DiskLight
+    radius_m: 0.10550074341519178
+    width_m: 0.21100148683038356
+    height_m: 0.21100177406369802
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light049
+    source_mesh: /Root/Light_test10/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.03645751953125, 19.053323974609377, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.597172861352256, 19.489147023950004, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light050
+    source_mesh: /Root/Light_test100/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-43.5234375, 8.363154296875, 2.971521240234375, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-43.96272215817899, 8.798977346215628, 2.9695212402343754, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light051
+    source_mesh: /Root/Light_test101/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-46.28853515625, 8.363154296875, 2.971521240234375, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-46.727819814429, 8.798977346215628, 2.9695212402343754, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light052
+    source_mesh: /Root/Light_test102/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [8.230865478515625, 14.164556884765625, 5.952853637695313, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [7.79158082033663, 14.600379934106252, 5.950853637695313, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light053
+    source_mesh: /Root/Light_test103/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [8.230865478515625, 11.444371032714844, 5.959123779296875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [7.79158082033663, 11.880194082055471, 5.957123779296875, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light054
+    source_mesh: /Root/Light_test104/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [8.230865478515625, 16.968304443359376, 5.952853637695313, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [7.79158082033663, 17.404127492700002, 5.950853637695313, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light055
+    source_mesh: /Root/Light_test11/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [15.814862060546876, 15.333289794921875, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [15.375577402367881, 15.769112844262501, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light056
+    source_mesh: /Root/Light_test12/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.03645751953125, 15.333289794921875, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.597172861352256, 15.769112844262501, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light057
+    source_mesh: /Root/Light_test13/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [15.814862060546876, 11.648670043945312, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [15.375577402367881, 12.08449309328594, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light058
+    source_mesh: /Root/Light_test14/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.03645751953125, 11.648670043945312, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.597172861352256, 12.08449309328594, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light059
+    source_mesh: /Root/Light_test15_552/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.201947021484376, 6.955126953125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.762662363305381, 7.390950002465627, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light060
+    source_mesh: /Root/Light_test16/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [18.697330322265625, 6.955126953125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [18.25804566408663, 7.390950002465627, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light061
+    source_mesh: /Root/Light_test17/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [17.785316162109375, 2.351236572265625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [17.34603150393038, 2.787059621606252, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light062
+    source_mesh: /Root/Light_test18/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [17.785316162109375, -0.390543212890625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [17.34603150393038, 0.045279836450001776, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light063
+    source_mesh: /Root/Light_test19/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [17.785316162109375, -3.14816650390625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [17.34603150393038, -2.712343454565623, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light064
+    source_mesh: /Root/Light_test2/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [16.86971435546875, 29.876419677734376, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [16.430429697289757, 30.312242727075002, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light065
+    source_mesh: /Root/Light_test20/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [10.46164306640625, 6.780892028808594, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [10.022358408227255, 7.216715078149221, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light066
+    source_mesh: /Root/Light_test21/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [7.7016357421875, 6.780892028808594, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [7.262351084008506, 7.216715078149221, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light067
+    source_mesh: /Root/Light_test22/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [7.7016357421875, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [7.262351084008506, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light068
+    source_mesh: /Root/Light_test23/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [10.46164306640625, 0.3388671875, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [10.022358408227255, 0.7746902368406268, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light069
+    source_mesh: /Root/Light_test24/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [4.97165771484375, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [4.532373056664755, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light070
+    source_mesh: /Root/Light_test25/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [2.206153564453125, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [1.7668689062741307, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.8785694688297885
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light071
+    source_mesh: /Root/Light_test26/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-0.5447692489624023, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-0.9840539071413967, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.8785694688297884
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light072
+    source_mesh: /Root/Light_test27/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-3.288858642578125, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-3.72814330075712, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.8785694688297885
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light073
+    source_mesh: /Root/Light_test28/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-6.045755615234375, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-6.48504027341337, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light074
+    source_mesh: /Root/Light_test29/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-8.80875732421875, 0.32811767578125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-9.248041982397744, 0.7639407251218768, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light075
+    source_mesh: /Root/Light_test3/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [16.86971435546875, 32.5966064453125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [16.430429697289757, 33.03242949465313, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light076
+    source_mesh: /Root/Light_test30/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 3.0845452880859376, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 3.5203683374265644, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light077
+    source_mesh: /Root/Light_test31/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 5.834398803710938, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 6.270221853051565, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light078
+    source_mesh: /Root/Light_test32/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 8.575541381835938, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 9.011364431176565, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light079
+    source_mesh: /Root/Light_test33/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 11.345737915039063, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 11.78156096437969, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light080
+    source_mesh: /Root/Light_test34/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 14.092459716796876, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 14.528282766137503, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light081
+    source_mesh: /Root/Light_test35/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 16.820040893554687, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 17.255863942895314, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light082
+    source_mesh: /Root/Light_test36/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-26.228935546875, 22.330428466796874, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.668220205053995, 22.7662515161375, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light083
+    source_mesh: /Root/Light_test37/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010360159642394784, 0.0, 0.0, 0.0]
+    - [0.0, 0.010360159642394784, 0.0, 0.0]
+    - [0.0, 0.0, 0.010360159642394784, 0.0]
+    - [-26.228935546875, 19.578101806640625, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-26.684041475766332, 20.029621453433293, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.4515196467926703
+    width_m: 0.9102120157458842
+    height_m: 0.9030392935853406
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light084
+    source_mesh: /Root/Light_test38/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-29.56024169921875, 17.341397705078126, 5.952853637695313, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-29.999526357397745, 17.777220754418753, 5.950853637695313, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light085
+    source_mesh: /Root/Light_test39/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-29.56024169921875, 14.621211853027344, 5.959123779296875, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-29.999526357397745, 15.05703490236797, 5.957123779296875, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light086
+    source_mesh: /Root/Light_test4/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [16.86971435546875, 35.4003515625, 2.971538024902344, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [16.430429697289757, 35.836174611840626, 2.969538024902344, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light087
+    source_mesh: /Root/Light_test40/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-29.56024169921875, 20.145145263671875, 5.952853637695313, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-29.999526357397745, 20.5809683130125, 5.950853637695313, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light088
+    source_mesh: /Root/Light_test41/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-29.56024169921875, 22.730499267578125, 5.952853637695313, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-29.999526357397745, 23.16632231691875, 5.950853637695313, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light089
+    source_mesh: /Root/Light_test42/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-21.362741699218752, 13.934456787109376, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-21.802026357397747, 14.370279836450003, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light090
+    source_mesh: /Root/Light_test43/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-17.861016845703126, 13.934456787109376, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-18.30030150388212, 14.370279836450003, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light091
+    source_mesh: /Root/Light_test44/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-14.880560302734375, 13.661632080078125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-15.31984496091337, 14.097455129418751, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light092
+    source_mesh: /Root/Light_test45/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-12.234964599609375, 13.661632080078125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-12.67424925778837, 14.097455129418751, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light093
+    source_mesh: /Root/Light_test46/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-9.610733032226562, 13.661632080078125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-10.050017690405557, 14.097455129418751, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light094
+    source_mesh: /Root/Light_test47/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-6.991205444335938, 13.661632080078125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-7.430490102514932, 14.097455129418751, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light095
+    source_mesh: /Root/Light_test48/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-3.8708770751953128, 13.652153930664063, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-4.324333920809571, 14.102037489127563, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193569
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light096
+    source_mesh: /Root/Light_test49/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-0.37833465576171876, 13.652153930664063, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-0.8317915013759773, 14.102037489127563, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193569
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light097
+    source_mesh: /Root/Light_test5/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [15.81486328125, 26.44182861328125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [15.375578623071005, 26.877651662621876, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light098
+    source_mesh: /Root/Light_test50/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [3.1172943115234375, 13.652153930664063, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [2.663837465909179, 14.102037489127563, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193569
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light099
+    source_mesh: /Root/Light_test51/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [1.408790283203125, 6.689581298828125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [0.9553334375888662, 7.139464857291625, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193568
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light100
+    source_mesh: /Root/Light_test52/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-1.0802072143554688, 6.689581298828125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-1.5336640599697275, 7.139464857291625, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193569
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light101
+    source_mesh: /Root/Light_test53/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-5.573536987304688, 6.689584655761719, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-6.026993832918946, 7.139468214225218, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193573
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light102
+    source_mesh: /Root/Light_test54/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-8.0801708984375, 6.689584655761719, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-8.533627744051758, 7.139468214225218, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193573
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light103
+    source_mesh: /Root/Light_test55/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-12.1943994140625, 6.653514099121094, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-12.64785625967676, 7.103397657584593, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193573
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light104
+    source_mesh: /Root/Light_test56/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-15.29393798828125, 6.653514099121094, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-15.747394833895509, 7.103397657584593, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193555
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light105
+    source_mesh: /Root/Light_test57/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-17.91347900390625, 6.653514099121094, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-18.36693584952051, 7.103397657584593, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193538
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light106
+    source_mesh: /Root/Light_test58/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-20.53769775390625, 6.653516845703125, 2.9917962036132817, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-20.99115459952051, 7.103400404166624, 2.989796203613282, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193538
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light107
+    source_mesh: /Root/Light_test59/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.010322619445861436, 0.0, 0.0, 0.0]
+    - [0.0, 0.010322619445861436, 0.0, 0.0]
+    - [0.0, 0.0, 0.010322619445861436, 0.0]
+    - [-23.18329345703125, 6.6535144042968755, 3.001002136230469, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-23.63675030264551, 7.103397962760375, 2.999002136230469, 1.0]
+    type: RectLight
+    radius_m: 0.44988355846349926
+    width_m: 0.9069138486193538
+    height_m: 0.8997671169269985
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light108
+    source_mesh: /Root/Light_test6/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.036458740234375, 26.44182861328125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.59717408205538, 26.877651662621876, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light109
+    source_mesh: /Root/Light_test60/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.0753466796875, 1.9649212646484375, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.636062021508506, 2.4007443139890645, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.4358230493406269
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812538
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light110
+    source_mesh: /Root/Light_test61/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.0753466796875, -1.540047607421875, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.636062021508506, -1.1042245580812482, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light111
+    source_mesh: /Root/Light_test62/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.72701904296875, -2.894871826171875, 2.987978759765625, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.287734384789754, -2.4590487768312483, 2.9859787597656253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light112
+    source_mesh: /Root/Light_test63/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [24.51781005859375, -2.894871826171875, 2.987978759765625, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.078525400414755, -2.4590487768312483, 2.9859787597656253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light113
+    source_mesh: /Root/Light_test64/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [24.51781005859375, 0.62385498046875, 2.987978759765625, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.078525400414755, 1.0596780298093766, 2.9859787597656253, 1.0]
+    type: RectLight
+    radius_m: 0.4358230493406267
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812534
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light114
+    source_mesh: /Root/Light_test65/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.72701904296875, 0.62385498046875, 2.9879802856445314, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.287734384789754, 1.0596780298093766, 2.9859802856445317, 1.0]
+    type: RectLight
+    radius_m: 0.4358230493406267
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812534
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light115
+    source_mesh: /Root/Light_test66/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.606767578125, 4.274136962890625, 2.9715398559570314, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.167482919946007, 4.709960012231252, 2.9695398559570316, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light116
+    source_mesh: /Root/Light_test67/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 4.274136962890625, 2.9715398559570314, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 4.709960012231252, 2.9695398559570316, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light117
+    source_mesh: /Root/Light_test68/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 7.923771362304688, 2.9715398559570314, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 8.359594411645315, 2.9695398559570316, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light118
+    source_mesh: /Root/Light_test69/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.620068359375, 7.923771362304688, 2.9715398559570314, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.180783701196006, 8.359594411645315, 2.9695398559570316, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light119
+    source_mesh: /Root/Light_test7/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [15.814862060546876, 22.753719482421875, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [15.375577402367881, 23.189542531762502, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light120
+    source_mesh: /Root/Light_test70/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 11.6561865234375, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 12.092009572778126, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light121
+    source_mesh: /Root/Light_test71/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.620068359375, 11.6561865234375, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.180783701196006, 12.092009572778126, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light122
+    source_mesh: /Root/Light_test72/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 15.346243286132813, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 15.782066335473438, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.4358230493406259
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812518
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light123
+    source_mesh: /Root/Light_test73/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.620068359375, 15.346243286132813, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.180783701196006, 15.782066335473438, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.4358230493406259
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812518
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light124
+    source_mesh: /Root/Light_test74/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 19.051246337890625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 19.48706938723125, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light125
+    source_mesh: /Root/Light_test75/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.620068359375, 19.051246337890625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.180783701196006, 19.48706938723125, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light126
+    source_mesh: /Root/Light_test76/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 22.74169677734375, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 23.177519826684378, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light127
+    source_mesh: /Root/Light_test77/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.620068359375, 22.74169677734375, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.180783701196006, 23.177519826684378, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light128
+    source_mesh: /Root/Light_test78/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [25.38517333984375, 26.4370947265625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [24.945888681664755, 26.872917775903126, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light129
+    source_mesh: /Root/Light_test79/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [22.620068359375, 26.4370947265625, 2.9715395507812503, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [22.180783701196006, 26.872917775903126, 2.9695395507812505, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light130
+    source_mesh: /Root/Light_test8/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [13.03645751953125, 22.753719482421875, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [12.597172861352256, 23.189542531762502, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light131
+    source_mesh: /Root/Light_test80/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-33.90527587890625, 26.849913330078124, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-34.34456053708524, 27.28573637941875, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light132
+    source_mesh: /Root/Light_test81/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-36.67037353515625, 26.849913330078124, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-37.10965819333525, 27.28573637941875, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light133
+    source_mesh: /Root/Light_test82/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-33.90527587890625, 23.16271728515625, 2.9715413818359377, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-34.34456053708524, 23.598540334496878, 2.969541381835938, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light134
+    source_mesh: /Root/Light_test83/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-36.67037353515625, 23.16271728515625, 2.9715413818359377, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-37.10965819333525, 23.598540334496878, 2.969541381835938, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light135
+    source_mesh: /Root/Light_test84/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-33.90527587890625, 19.436121826171874, 2.9715422973632815, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-34.34456053708524, 19.8719448755125, 2.9695422973632817, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light136
+    source_mesh: /Root/Light_test85/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-36.67037353515625, 19.436121826171874, 2.9715422973632815, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-37.10965819333525, 19.8719448755125, 2.9695422973632817, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light137
+    source_mesh: /Root/Light_test86/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-33.90527587890625, 15.745171508789063, 2.971542602539063, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-34.34456053708524, 16.18099455812969, 2.969542602539063, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light138
+    source_mesh: /Root/Light_test87/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-36.67037353515625, 15.745171508789063, 2.971542602539063, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-37.10965819333525, 16.18099455812969, 2.969542602539063, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light139
+    source_mesh: /Root/Light_test88/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-33.90527587890625, 30.543564453125, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-34.34456053708524, 30.979387502465627, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light140
+    source_mesh: /Root/Light_test89/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-36.67037353515625, 30.543564453125, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-37.10965819333525, 30.979387502465627, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light141
+    source_mesh: /Root/Light_test9/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [15.814862060546876, 19.053323974609377, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [15.375577402367881, 19.489147023950004, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light142
+    source_mesh: /Root/Light_test90/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-43.50607421875, 30.553966064453125, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-43.94535887692899, 30.98978911379375, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light143
+    source_mesh: /Root/Light_test91/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-46.271171875, 30.553966064453125, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-46.710456533179, 30.98978911379375, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light144
+    source_mesh: /Root/Light_test92/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-43.5234375, 26.853355712890625, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-43.96272215817899, 27.289178762231252, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light145
+    source_mesh: /Root/Light_test93/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-46.28853515625, 26.853355712890625, 2.971537719726563, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-46.727819814429, 27.289178762231252, 2.969537719726563, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light146
+    source_mesh: /Root/Light_test94/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-43.5234375, 23.153309326171875, 2.971531616210938, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-43.96272215817899, 23.589132375512502, 2.969531616210938, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light147
+    source_mesh: /Root/Light_test95/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-46.28853515625, 23.153309326171875, 2.971531616210938, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-46.727819814429, 23.589132375512502, 2.969531616210938, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light148
+    source_mesh: /Root/Light_test96/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-43.5234375, 15.760217895507813, 2.9715227661132815, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-43.96272215817899, 16.19604094484844, 2.9695227661132817, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062766
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812553
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light149
+    source_mesh: /Root/Light_test97/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-46.28853515625, 15.760217895507813, 2.9715227661132815, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-46.727819814429, 16.19604094484844, 2.9695227661132817, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062766
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812553
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light150
+    source_mesh: /Root/Light_test98/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-43.5234375, 12.04290512084961, 2.9715239868164067, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-43.96272215817899, 12.478728170190237, 2.969523986816407, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light151
+    source_mesh: /Root/Light_test99/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-46.28853515625, 12.04290512084961, 2.9715239868164067, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [-46.727819814429, 12.478728170190237, 2.969523986816407, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  - path: /World/HospitalFixtureLights/Light152
+    source_mesh: /Root/Light_test_532/Light_test/Light_test
+    fixture_world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [15.949105224609376, 6.955126953125, 2.971538330078125, 1.0]
+    light_world_matrix_row_vector:
+    - [1.0, 0.0, 0.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [15.509820566430381, 7.390950002465627, 2.9695383300781253, 1.0]
+    type: RectLight
+    radius_m: 0.43582304934062677
+    width_m: 0.878569468829788
+    height_m: 0.8716460986812535
+    emitter_rule: Center of audited fixture footprint, 2 mm below lower face to avoid self-shadow; orientation uses fixture
+      axes with local -Z down
+    intensity: 180000.0
+  renderer_settings:
+    /rtx/post/tonemap/op: 6
+    /rtx/post/tonemap/filmIso: 100.0
+    /rtx/post/tonemap/exposureTime: 0.019999999552965164
+    /rtx/post/tonemap/fNumber: 5.0
+    /rtx/post/tonemap/responsivity: 1.1026709079742432
+    /rtx/post/tonemap/enableSrgbToGamma: true
+    /rtx/post/tonemap/whitepoint: [1.0, 1.0, 1.0]
+    /rtx/post/tonemap/colorMode: 0
+    /rtx/post/tonemap/dither: 0.0
+    /rtx/post/histogram/enabled: false
+    /rtx/post/motionblur/enabled: false
+  camera_exposure_unchanged: true
+  policy: All audited round and panel ceiling fixtures, no trajectory filtering; same radiance family, original native lights/exposure
+    unchanged
+bright_validation:
+  min_mean: 40.0
+  max_mean: 215.0
+  min_std: 15.0
+  min_p50: 25.0
+  min_p95: 100.0
+  max_dark_fraction: 0.35
+  max_saturated_fraction: 0.05
+  dark_cutoff: 15.0
+  saturated_cutoff: 250.0
+spatial_turn_gate:
+  exit_center_x_max_m: 2.5521036832844546
+  center_y_min_m: 9.457836118855571
+  center_y_max_m: 11.74124347098822
+  robot_conservative_radius_m: 0.6069825421953869
+  source_south_corner:
+    path: /Root/Geo_M2_BaseWallCorner2_578/Geo_M2_BaseWallCorner/Geo_M2_BaseWallCorner/Section0
+    type: Mesh
+    enabled: true
+    world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [-0.3409136962890625, 8.850854797363281, 0.0010006103515625142, 1.0]
+    world_xyz: [-0.3409136962890625, 8.850854797363281, 0.0010006103515625142]
+    world_aabb_min: [-0.3409136962890625, 8.693353580180583, 0.0010006103515625142]
+    world_aabb_max: [3.1590862254798413, 8.850853576660183, 3.001000543296337]
+  source_north_wall:
+    path: /Root/Geo_M2_DoorWall2Corner2_656/Geo_M2_DoorWall2Corner/Geo_M2_DoorWall2Corner/Section0
+    type: Mesh
+    enabled: true
+    world_matrix_row_vector:
+    - [0.009999999776482582, 0.0, 0.0, 0.0]
+    - [0.0, 0.009999999776482582, 0.0, 0.0]
+    - [0.0, 0.0, 0.009999999776482582, 0.0]
+    - [0.96, 12.348226623535156, 0.0010000000000000143, 1.0]
+    world_xyz: [0.96, 12.348226623535156, 0.0010000000000000143]
+    world_aabb_min: [0.96, 12.348226013183607, 0.0009999999999998452]
+    world_aabb_max: [4.459999921768904, 12.505726009663208, 3.0009999329447745]
+  source_inventory_sha256: e8e3b5729ff3c08870cab40e2e2498913d5221c12cf6854aaf5e1bde3b7fa559
+  rule: Entire circumscribed robot disk west of inner corner end; center inside corridor band; require one subsequent observation.
+    Freeze before new inference.
+  scope: Source geometry plus original successful E16 trace validate physical region, not human placement.
+  contact_rule: No relevant non-floor contact from start through subsequent observation application. No later contact permits
+    human stage in this task.
+  camera_rule: All required RGB pass frozen brightness criteria and no camera proximity hits; manually review containment/black
+    obstruction.
+hospital_lighting_source_sha256: 83e5d606fbb2de873314379e0ff74900930735eb3ae99b312c9bf17db0033383

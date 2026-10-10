@@ -31,6 +31,10 @@ class OcclusionReplayData:
             p=self.source/'raw/visibility'/(Path(e['rgb_observation_reference']).name+'.json')
             if p.exists():self.visibility[e['request_id']]=json.loads(p.read_text())
         self.metrics=json.loads((self.analysis/'request_metrics.json').read_text())
+        summary_path=self.analysis/'summary.json'
+        self.summary=json.loads(summary_path.read_text()) if summary_path.exists() else {}
+        self.first_contact=self.summary.get('first_contact')
+        self.first_contact_pose=self.summary.get('first_contact_nearest_robot_tick')
         self.hashes={str(p):digest(p) for p in self.source.rglob('*') if p.is_file()}
 
     def sample(self,sim_time):
@@ -52,6 +56,9 @@ class OcclusionReplayData:
             'visibility_state':state,'human_pixels':visibility.get('human_visible_pixel_count')}
 
     def jump_time(self):return max(float(self.times[0]),self.events[self.old-1]['observation']['sim_time']-.25)
+
+    def contact_jump_time(self):
+        return max(float(self.times[0]),self.first_contact['start_sim_time']-.5) if self.first_contact else None
 
     def verify_immutable(self):
         if any(digest(p)!=h for p,h in self.hashes.items()):raise RuntimeError('Source modified')
