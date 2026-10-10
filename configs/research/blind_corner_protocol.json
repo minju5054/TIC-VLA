@@ -1,0 +1,130 @@
+{
+  "base_config": "configs/research/nova_e16_hospital_lights_on.yaml",
+  "official_episode_id": "episode_21",
+  "official_route_screen": {
+    "episode_1": "Straight lobby route, no requested blind turn",
+    "episode_6": "Straight corridor route",
+    "episode_11": "Straight lobby return",
+    "episode_16": "Previous failed route, excluded",
+    "episode_21": "Initial broad lane/nearby-human proposals leak before turn. Final bounded screen uses three tighter exit arcs and north-corridor positions with fixed approach-facing orientation; no model-based selection."
+  },
+  "reference_lanes_x_m": [
+    19.25,
+    19.5,
+    19.75
+  ],
+  "reference_turn_radius_m": 1.2,
+  "reference_speed_m_s": 1.0,
+  "reference_dt_s": 0.5,
+  "reference_end_y_m": 5.0,
+  "human_y_m": [
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5
+  ],
+  "human_yaw_rad": -1.5707963267948966,
+  "robot_radius_m": 0.6069825421953869,
+  "human_radius_m": 0.25,
+  "ranking": [
+    "largest newly exposed sample count",
+    "reveal distance closest to 2m (preference only)",
+    "reference variant then human XYZ ascending"
+  ],
+  "baseline_gate": {
+    "exit_x_max_m": 20.0,
+    "exit_y_min_m": 0.5,
+    "exit_y_max_m": 5.0,
+    "yaw_min_rad": 0.7853981633974483,
+    "yaw_max_rad": 2.356194490192345,
+    "require_next_observation": true,
+    "use_frozen_brightness": true,
+    "no_nonfloor_contact_through_next_application": true
+  },
+  "stage_c": {
+    "local_offsets_m": [
+      -0.25,
+      0.0,
+      0.25
+    ],
+    "maximum_candidates": 9,
+    "render_all_saved_observations_for_cheap_pass_only": true,
+    "selection": "existing strict first-CLEAR filters and saved switch-margin ranking"
+  },
+  "model_budget": {
+    "baseline_runs": 1,
+    "human_runs_if_strict_preflight_passes": 1,
+    "retry": false
+  },
+  "note": "Reference paths are model-free geometric proposals, not executed robot paths or model predictions. Stage B freezes the unchanged official start/goal/instruction; reference lanes are not controller waypoints. Stage C uses only the new real baseline.",
+  "route_clearance_proxy": {
+    "source": "outputs/nova-human-preflight-20261010-02/nova_footprint.json",
+    "method": "Yaw-oriented all-source-shape XY bounds + .03m margin, z=.05..1.25m. Conservative bounding box, not a navigation guarantee. Circumcircle remains unchanged for human conflict.",
+    "reference_body_z_m": 0.0,
+    "audited_door_sill": "Existing Geo_M_DoorFloor23 has maximum inspected height .0253609m and upward normal >=.9038. Route floor support permits DoorFloor surfaces below .03m; ordinary support/human placement remains .02m. Actual baseline collision/turn gate remains mandatory."
+  },
+  "custom_route": {
+    "scene": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.0/Isaac/Environments/Hospital/hospital.usd",
+    "start": [
+      19.25,
+      1.5,
+      0.01
+    ],
+    "start_yaw": 90.0,
+    "goal": [
+      25.5,
+      4.690400101345425,
+      0.01
+    ],
+    "instruction": "Go forward along the hallway, then turn right through the first doorway on your right into the patient room. Continue into the room and stop in front of the window.",
+    "num_people": 0,
+    "timeout": 85,
+    "robot_type": "nova_carter",
+    "reference_turn_y": 4.690400101345425,
+    "reference_end_x": 25.5,
+    "occluder_prim": "/Root/Geo_M_DoorFrame27_36/Geo_M_DoorFrame/Geo_M_DoorFrame"
+  },
+  "selected_route_source": "official_episode_21",
+  "custom_reference_radii_m": [
+    1.0,
+    1.2,
+    1.4
+  ],
+  "custom_human_positions": [
+    [
+      22.0,
+      4.690400101345425,
+      0.0
+    ],
+    [
+      22.5,
+      4.690400101345425,
+      0.0
+    ],
+    [
+      23.0,
+      4.690400101345425,
+      0.0
+    ]
+  ],
+  "official_human_positions": [
+    [
+      20.0,
+      2.5,
+      0.0
+    ],
+    [
+      20.0,
+      3.0,
+      0.0
+    ],
+    [
+      20.0,
+      3.5,
+      0.0
+    ]
+  ],
+  "orientation_rule": "All proposals face toward the southbound approach direction, fixed world yaw -pi/2; no per-candidate yaw search.",
+  "custom_proposal_rejection": "DoorFrame27 room-entry proposal rejected before route freeze: actual existing door panel and bed block path/bypass. No model or custom route execution."
+}

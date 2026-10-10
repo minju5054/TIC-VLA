@@ -21,7 +21,7 @@ class NovaSimulation(Simulation):
         self.world = World(physics_dt=self.dt, rendering_dt=self.dt, stage_units_in_meters=1.)
         self.stage = self.world.stage
         load_official_scene(self, cfg, records)
-        r = cfg["robot"]; source = source_audit()
+        r = cfg["robot"]; source = source_audit(cfg.get("blind_corner_episode_id", "episode_16"))
         if r["asset"] != source["asset"] or r["wheel_joints"] != source["constants"]["_wheel_joints"]:
             raise ValueError("Nova config does not match audited source")
         self.robot = self.world.scene.add(WheeledRobot(prim_path=r["prim"], name="research_nova",

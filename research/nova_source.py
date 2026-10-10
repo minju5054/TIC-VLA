@@ -7,7 +7,7 @@ BEHAVIOR = ROOT/"DynaNav/behavior/nova_carter_test_ticvla.py"
 RUNNER = ROOT/"DynaNav/benchmark.py"
 
 
-def source_audit():
+def source_audit(episode_id="episode_16"):
     tree = ast.parse(BEHAVIOR.read_text())
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "NovaCarterTICVLA")
     names = ["_wheel_joints", "_wheel_radius", "_wheel_base", "_max_accel_lin", "_max_decel_lin",
@@ -23,7 +23,7 @@ def source_audit():
         raise ValueError("Official Nova source changed; inspect before selecting asset/controller")
     return {"asset": assets[0], "front_camera": cameras[0], "constants": constants,
             "behavior_sha256": digest(BEHAVIOR), "runner_sha256": digest(RUNNER),
-            "episode": official_episode(), "slew_note": "accel/decel chosen by signed target-current, exactly as upstream"}
+            "episode": official_episode(episode_id), "slew_note": "accel/decel chosen by signed target-current, exactly as upstream"}
 
 
 def slew(cur, tgt, accel, decel, dt, deadband):
