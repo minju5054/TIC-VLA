@@ -56,8 +56,13 @@ class HospitalLightsSimulation(NovaSimulation):
         if self.segmentation is not None:
             from PIL import Image
             from research.nova_occlusion import segmentation_stats,visibility_state
-            packed=self.segmentation.get_data();stats,mask=segmentation_stats(packed['data'],packed['info']['idToLabels'])
-            write_json(self.records.path/'raw/visibility'/(name+'.json'),{**stats,'state':visibility_state(stats,self.cfg['occlusion']['visibility_rule']),
+            packed=self.segmentation.get_data()
+            if 'stationary_cart' in self.cfg:
+                from research.hospital_cart import mask_stats
+                stats,mask=mask_stats(packed,self.cfg['stationary_cart']['visibility_rules']);state=stats['state']
+            else:
+                stats,mask=segmentation_stats(packed['data'],packed['info']['idToLabels']);state=visibility_state(stats,self.cfg['occlusion']['visibility_rule'])
+            write_json(self.records.path/'raw/visibility'/(name+'.json'),{**stats,'state':state,
                 'observation_sim_time':obs['sim_time'],'model_input':False})
             Image.fromarray((mask*255).astype('uint8')).save(self.records.path/'raw/visibility'/(name+'.mask.png'))
         return data,obs,path
