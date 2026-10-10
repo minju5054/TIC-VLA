@@ -102,6 +102,11 @@ def main():
             st['follow']=False;c=nav.current
             points=np.vstack([c['position'][:2],c.get('remaining_world_xy') or [c['position'][:2]]]) if c else run['xy']
             if c and c['bypass']['centerline_xy']:points=np.vstack([points,c['bypass']['centerline_xy']])
+            if c and not c.get('remaining_world_xy'):
+                # First CLEAR can be C1: include the saved robot observation
+                # without inventing an OLD curve or a later reveal pair.
+                rid=c.get('fresh_request_id') or 1
+                points=np.vstack([points,run['events'][rid-1]['agent_pose_at_observation'][:2]])
             lo,hi=points.min(0)-1.7,points.max(0)+1.7;center=(lo+hi)/2
             width=max(hi[0]-lo[0],(hi[1]-lo[1])*1.65,6.)
             overview_cam.CreateHorizontalApertureAttr(float(width*10));overview_cam.CreateVerticalApertureAttr(float(width/1.65*10))
@@ -150,6 +155,8 @@ def main():
         with window.frame:
             with ui.VStack(spacing=4):
                 ui.Label('NO MODEL CALLS | NO NAVIGATION PHYSICS',height=25)
+                if summary.get('single_manual_placement'):
+                    ui.Label('ONE FROZEN C19 PLACEMENT | preflight only; human run not executed',height=32,word_wrap=True)
                 ui.Label('Cyan path | Orange OLD | Magenta human | Red conflict | Green bypass',height=36,word_wrap=True)
                 info=ui.Label('',height=215,word_wrap=True)
                 with ui.HStack(height=28):
@@ -218,7 +225,8 @@ def main():
             top();c=nav.current
             jump('old');checks['jump_old']=update_pose()==(c.get('old_request_id') or 1)
             jump('fresh');checks['jump_first_clear']=update_pose()==(c.get('fresh_request_id') or 1)
-            obs_move(-1);update_pose();obs_move(1);checks['observation_navigation']=update_pose()==(c.get('fresh_request_id') or 1)
+            obs_move(-1);update_pose();obs_move(1)
+            checks['observation_navigation']=update_pose()==min(len(run['events']),max(1,(c.get('fresh_request_id') or 1)-1)+1)
             human_transform=UsdGeom.Xformable(stage.GetPrimAtPath(human['prim'])).ComputeLocalToWorldTransform(0)
             jump('old');update_pose();before=render.position.Get()
             replay();update_pose();st['time']=min(st['time']+.5,float(run['times'][-1]));update_pose()
