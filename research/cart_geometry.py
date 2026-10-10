@@ -8,13 +8,15 @@ def rotation(yaw):
     return np.array([[c,-s],[s,c]])
 
 
-def freeze_pose(events,bounds,floor_z):
-    if [e['request_id'] for e in events[17:20]]!=[18,19,20]:raise ValueError('C18–C20 required')
-    lo,hi=np.asarray(bounds,float);delta=np.asarray(events[19]['agent_pose_at_observation'][:2])-events[17]['agent_pose_at_observation'][:2]
+def freeze_pose(events,bounds,floor_z,request_id=19):
+    if request_id not in (19,26):raise ValueError('Only the prescribed C19 or C26 placement is supported')
+    index=request_id-1
+    if [e['request_id'] for e in events[index-1:index+2]]!=[request_id-1,request_id,request_id+1]:raise ValueError('Adjacent saved observations required')
+    lo,hi=np.asarray(bounds,float);delta=np.asarray(events[index+1]['agent_pose_at_observation'][:2])-events[index-1]['agent_pose_at_observation'][:2]
     if np.linalg.norm(delta)<1e-9:raise ValueError('Undefined measured tangent')
     tangent=float(np.arctan2(delta[1],delta[0]));axis=int(np.argmax((hi-lo)[:2]))
     yaw=float((tangent-axis*np.pi/2+np.pi)%(2*np.pi)-np.pi)
-    center=[*events[18]['agent_pose_at_observation'][:2],float(floor_z)]
+    center=[*events[index]['agent_pose_at_observation'][:2],float(floor_z)]
     pivot=np.array([(lo[0]+hi[0])/2,(lo[1]+hi[1])/2,lo[2]])
     matrix=np.eye(4);matrix[:2,:2]=rotation(yaw).T;matrix[3,:3]=np.asarray(center)-pivot@matrix[:3,:3]
     return {'center_world_xyz':center,'yaw_rad':yaw,'tangent_rad':tangent,'long_axis_local':axis,

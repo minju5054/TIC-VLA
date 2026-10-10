@@ -11,7 +11,9 @@ from research.hospital_cart import SOURCE,COPY,signature,author,mask_stats
 BASELINE=ROOT/'outputs/nova-e16-hospital-lights-baseline-20261010-01'
 
 
-def physical(out,shift=False):
+def physical(out,shift=False,c26=False):
+    if shift and c26:raise ValueError('C26 cannot be shifted')
+    rid=26 if c26 else 19
     run=load_saved(BASELINE);cfg=run['cfg'];out=validate_destination(out,[BASELINE]);out.mkdir(parents=True)
     hashes=evidence_hashes([BASELINE,ROOT/'outputs/e16-cart-audit-20261010-01/asset.json',
         ROOT/'outputs/e16-c19-manual-20261010-01',ROOT/'outputs/e16-c19-south-20261010-01']+
@@ -26,11 +28,11 @@ def physical(out,shift=False):
         stage=omni.usd.get_context().get_stage();stage.GetRootLayer().subLayerPaths.append(cfg['scene']['usd'])
         UsdGeom.SetStageMetersPerUnit(stage,1.);UsdGeom.SetStageUpAxis(stage,'Z')
         query=Queries(stage);source=stage.GetPrimAtPath(SOURCE);bounds=UsdGeom.BBoxCache(0,['default','render','proxy']).ComputeUntransformedBound(source).ComputeAlignedRange()
-        xy=list(run['events'][18]['agent_pose_at_observation'][:2])
+        xy=list(run['events'][rid-1]['agent_pose_at_observation'][:2])
         if shift:xy[1]+=.40
         support=query.q.raycast_closest(query.carb.Float3(*xy,.3),query.carb.Float3(0,0,-1),.6)
         if not support['hit']:raise ValueError('No actual floor support')
-        cart=freeze_pose(run['events'],[list(bounds.GetMin()),list(bounds.GetMax())],float(support['position'][2]))
+        cart=freeze_pose(run['events'],[list(bounds.GetMin()),list(bounds.GetMax())],float(support['position'][2]),rid)
         if shift:
             if cart['local_bounds']!=previous['cart']['local_bounds']:raise ValueError('Original bounds changed')
             cart=plus_world_y(previous['cart'],run['events'],support['position'][2])
@@ -60,13 +62,15 @@ def physical(out,shift=False):
             assets[url]=hashlib.sha256(bytes(data)).hexdigest()
         frozen={'source_prim':SOURCE,'asset_url':asset_url,'scene_usd':cfg['scene']['usd'],'copy_prim':COPY,
             'asset_sha256':assets,'source_prim_signature':signature(stage,SOURCE),'source_world_matrix_row_vector':np.asarray(UsdGeom.Xformable(source).ComputeLocalToWorldTransform(0)).tolist(),
-            'cart':cart,'C19_observation':run['events'][18]['observation'],'robot_radius_m':radius,
-            'orientation_rule':'Longest local horizontal bound axis parallel to measured C18->C20 tangent; local +axis points with tangent',
-            'center_rule':'Exact saved C19 XY = footprint centre; Z = support floor, not source pivot',
+            'cart':cart,f'C{rid}_observation':run['events'][rid-1]['observation'],'robot_radius_m':radius,
+            'orientation_rule':f'Longest local horizontal bound axis parallel to measured C{rid-1}->C{rid+1} tangent; local +axis points with tangent',
+            'center_rule':f'Exact saved C{rid} XY = footprint centre; Z = support floor, not source pivot',
             'coordinate_convention':'World metres, +Z up, yaw CCW from +X; USD matrices act on row vectors',
             'visibility_rules':json.loads((ROOT/'configs/research/reveal_window_search.json').read_text())['visibility'],
             'selection_rule':'Primary actual first CLEAR and immediate OLD; if first CLEAR=C1, first later OLD-conflict to FRESH-clear pair is secondary only; no severity ranking',
             'candidate_count':1,'source_evidence_sha256':hashes,'before_model_inference':True,**provenance(ROOT)}
+        if c26:frozen.update(intervention='EXACT_C26',strict_visibility_gate=True,
+            selection_rule='First visible and first CLEAR separately; largest pre-contact approach lateral revision; first pre-contact OLD conflict to FRESH improvement separately. No post-contact substitution.')
         if shift:
             for key in ['source_prim','asset_url','scene_usd','asset_sha256','source_prim_signature','source_world_matrix_row_vector','visibility_rules','robot_radius_m']:
                 if frozen[key]!=previous[key]:raise ValueError('Changed frozen identity: '+key)
@@ -95,7 +99,10 @@ def physical(out,shift=False):
 
 def semantic(out):
     frozen=json.loads((out/'freeze.json').read_text());verify_hashes(frozen['source_evidence_sha256']);run=load_saved(BASELINE)
-    if not json.loads((out/'physical.json').read_text())['pass']:raise ValueError('Physical gate failed; no model run')
+    physical_result=json.loads((out/'physical.json').read_text())
+    # C26 requires diagnostic visibility even when the physical bypass gate fails.
+    # This only permits stopped-physics rendering; the strict inference gate stays closed.
+    if not physical_result['pass'] and not frozen.get('strict_visibility_gate'):raise ValueError('Physical gate failed; no model run')
     folder=out/'visibility';folder.mkdir(exist_ok=False)
     from isaacsim import SimulationApp
     app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
@@ -116,9 +123,13 @@ def semantic(out):
             Image.fromarray(rgb).save(folder/f'C{rid:02d}.png');Image.fromarray((mask*255).astype('uint8')).save(folder/f'C{rid:02d}.mask.png')
             overlay=rgb.copy();overlay[mask]=(overlay[mask]*.45+np.array([255,20,150])*.55).astype('uint8');Image.fromarray(overlay).save(folder/f'C{rid:02d}.overlay.png')
             print('CART_VISIBILITY',rid,stats['state'],stats['cart_visible_pixel_count'],flush=True)
-        write_json(out/'visibility.json',rows);write_json(out/'summary.json',{'physical_pass':True,'first_visible_request_id':next((r['request_id'] for r in rows if r['visible']),None),
+        summary={'physical_pass':physical_result['pass'],'first_visible_request_id':next((r['request_id'] for r in rows if r['visible']),None),
             'first_clear_request_id':next((r['request_id'] for r in rows if r['state']=='CLEAR'),None),'cart_visible_at_C1':rows[0]['visible'],
-            'model_run_permitted':True,'visibility_diagnostic_only':True,'model_calls':0,'navigation_physics_reexecuted':False})
+            'model_run_permitted':True,'visibility_diagnostic_only':True,'model_calls':0,'navigation_physics_reexecuted':False}
+        if frozen.get('strict_visibility_gate'):
+            from research.e16_c26_tools import preflight_gate
+            summary.update(preflight_gate(json.loads((out/'physical.json').read_text()),rows,run))
+        write_json(out/'visibility.json',rows);write_json(out/'summary.json',summary)
         verify_hashes(frozen['source_evidence_sha256']);code=0
     finally:app.close(exit_code=code)
 
@@ -126,6 +137,7 @@ def semantic(out):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--phase',choices=['physical','semantic'],required=True);p.add_argument('--output-dir',required=True)
     p.add_argument('--plus-world-y',action='store_true',help='Only fixed +0.40 world Y; preserve previous cart yaw/asset')
+    p.add_argument('--c26',action='store_true',help='Exact C26 centre, C25->C27 tangent, strict start-hidden/reveal gate')
     a=p.parse_args()
-    if a.phase=='physical':physical(Path(a.output_dir).resolve(),a.plus_world_y)
+    if a.phase=='physical':physical(Path(a.output_dir).resolve(),a.plus_world_y,a.c26)
     else:semantic(Path(a.output_dir).resolve())

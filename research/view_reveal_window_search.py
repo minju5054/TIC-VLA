@@ -44,12 +44,14 @@ def main():
     run=load_saved(cfg['baseline_run']);summary=json.loads((source/'summary.json').read_text())
     candidates=json.loads((source/'candidates.json').read_text());nav=CandidateNavigation(candidates)
     is_cart=summary.get('obstacle_type')=='cart'
+    preflight_only=bool(summary.get('preflight_only'))
+    cart_title='C26 PREFLIGHT ONLY | NO CART-CONDITIONED RUN' if preflight_only else 'STATIONARY HOSPITAL CART | SAVED REAL MODEL RUN'
     asset=None if is_cart else json.loads((source/'human_asset.json').read_text())
     hashes=evidence_hashes([source,run['path']])
     hashes.update(json.loads((source/'source_evidence_sha256.json').read_text()))
     verify_hashes(hashes)
     out.mkdir(parents=True,exist_ok=False)
-    write_json(out/'metadata.json',{'mode':'saved_cart_run_GUI' if is_cart else 'saved_baseline_stationary_alternative_GUI','search':str(source),
+    write_json(out/'metadata.json',{'mode':'cart_preflight_baseline_GUI' if preflight_only else 'saved_cart_run_GUI' if is_cart else 'saved_baseline_stationary_alternative_GUI','search':str(source),
                'model_calls':0,'navigation_physics_reexecuted':False,'source_evidence_sha256':hashes,**provenance(ROOT)})
     from isaacsim import SimulationApp
     app=SimulationApp({'headless':False,'renderer':'RayTracedLighting','width':1600,'height':1000})
@@ -110,8 +112,11 @@ def main():
             if cfg.get('previous_cart_run'):
                 previous_cart=load_saved(cfg['previous_cart_run']);curve('PreviousCartPath',previous_cart['xy'],[.85,.55,.15],.035)
                 curve('PreviousCartFootprint',cfg['previous_cart_outline'],[.85,.55,.15],.025)
+            for i,path in enumerate(cfg.get('secondary_cart_runs',[])):
+                secondary=load_saved(path);curve(f'SecondaryCartPath{i}',secondary['xy'],[.7,.55+i*.15,.3],.02)
+        old_full=curve('OLDFull',[[0,0],[0,0]],[.7,.45,.2],.025)
         old=curve('OLDRemaining',[[0,0],[0,0]],[1.,.4,0.])
-        fresh_guide=curve('FRESH',[[0,0],[0,0]],[.2,.4,1.])
+        fresh_guide=curve('FRESH',[[0,0],[0,0]],[.5,.2,.8])
         UsdGeom.Imageable(fresh_guide).MakeInvisible()
         bypass=curve('LocalBypass',[[0,0],[0,0]],[0.,1.,.15])
         proxy=curve('ConflictProxy',[[0,0],[0,0]],[1.,0.,0.],.02)
@@ -164,7 +169,8 @@ def main():
                 t=nav.current.get(kind+'_sim_time') if nav.current else None
                 if t is not None:st.update(time=float(t),playing=False)
                 return
-            rid=((nav.current.get('first_visible_request_id') or 1) if kind=='visible' else nav.jump('fresh' if kind=='application' else kind))
+            rid=((nav.current.get('first_visible_request_id') or 1) if kind=='visible' else
+                 (nav.current.get('first_clear_request_id') or nav.current.get('fresh_request_id') or 1) if kind=='clear' else nav.jump('fresh' if kind=='application' else kind))
             t=run['events'][rid-1]['application']['sim_time'] if kind=='application' else observation_times[rid-1]
             st.update(time=float(t),playing=False)
         def restart():
@@ -178,12 +184,20 @@ def main():
             if stage.GetPrimAtPath(human['prim']):stage.RemovePrim(human['prim'])
             c=nav.current;st.update(playing=False,last_rgb=None)
             if not c:
-                for guide in [old,fresh_guide,bypass,proxy,human_guide,occluder]:UsdGeom.Imageable(guide).MakeInvisible()
+                for guide in [old_full,old,fresh_guide,bypass,proxy,human_guide,occluder]:UsdGeom.Imageable(guide).MakeInvisible()
                 UsdGeom.Imageable(conflict).MakeInvisible();return
             if is_cart:
                 from research.hospital_cart import author
                 author(stage,cfg['cart_frozen'])
             else:author_human(stage,{**human,'start_position':c['position']},asset,physical=False)
+            full=c.get('old_full_world_xy',[])
+            if len(full)>1:
+                # Dash only the display geometry; preserve all source waypoints in the adapter.
+                segments=[full[i:i+2] for i in range(0,len(full)-1,2)]
+                old_full.CreateCurveVertexCountsAttr([2]*len(segments))
+                old_full.CreatePointsAttr([Gf.Vec3f(float(x),float(y),.09) for segment in segments for x,y in segment])
+                UsdGeom.Imageable(old_full).MakeVisible()
+            else:UsdGeom.Imageable(old_full).MakeInvisible()
             theta=np.linspace(0,2*np.pi,65);circle=np.column_stack([np.cos(theta),np.sin(theta)])
             for guide,points in [(old,c.get('remaining_world_xy',[])),(fresh_guide,c.get('fresh_world_xy',[])),(bypass,c['bypass']['centerline_xy']),
                                  (proxy,c['inflated_outline'] if is_cart else c['position'][:2]+circle*(cfg['robot_radius_m']+cfg['human_radius_m'])),
@@ -215,7 +229,7 @@ def main():
                 ui.Label('NO MODEL CALLS | NO NAVIGATION PHYSICS',height=25)
                 if summary.get('single_manual_placement'):
                     ui.Label('PREFLIGHT ONLY — NO HUMAN NAVIGATION RUN',height=32,word_wrap=True)
-                if is_cart:ui.Label('STATIONARY HOSPITAL CART | SAVED REAL MODEL RUN',height=32,word_wrap=True)
+                if is_cart:ui.Label(cart_title,height=32,word_wrap=True)
                 ui.Label('Cyan path | Orange OLD | Magenta '+('cart' if is_cart else 'human')+' | Red conflict | Green bypass',height=36,word_wrap=True)
                 info=ui.Label('',height=185,word_wrap=True)
                 with ui.HStack(height=28):
@@ -230,8 +244,11 @@ def main():
                 with ui.HStack(height=28):
                     ui.Button('Jump OLD',clicked_fn=lambda:jump('old'));ui.Button('Jump FRESH' if is_cart else 'Jump first CLEAR',clicked_fn=lambda:jump('fresh'))
                     ui.Button('Jump switch/application',clicked_fn=lambda:jump('application'))
-                if is_cart:ui.Button('Jump first cart visibility',height=25,clicked_fn=lambda:jump('visible'))
-                if cfg.get('previous_cart_run'):
+                if is_cart:
+                    with ui.HStack(height=25):
+                        ui.Button('First visible',clicked_fn=lambda:jump('visible'))
+                        ui.Button('First CLEAR',clicked_fn=lambda:jump('clear'))
+                if cfg.get('previous_cart_run') or cfg.get('cart_event_jumps'):
                     with ui.HStack(height=25):
                         ui.Button('Cart approach',clicked_fn=lambda:jump('approach'))
                         ui.Button('Closest cart approach',clicked_fn=lambda:jump('closest'))
@@ -248,7 +265,7 @@ def main():
                 ui.Button('Toggle saved semantic overlay',height=25,clicked_fn=lambda:st.update(overlay=not st['overlay'],last_rgb=None))
                 image_title=ui.Label('Actual archived preflight Hawk render',height=24)
                 rgb_panel=ui.Image('',height=260,fill_policy=ui.FillPolicy.PRESERVE_ASPECT_FIT)
-                ui.Label('Cart fixed throughout; grey no-cart, cyan new path, gold previous cart run, orange OLD, blue FRESH.\nArchived RGB is the original model observation. No physics or model reexecution.' if is_cart else 'Stationary human is fixed during each saved replay. Candidate changes are independent alternatives.\nOverview clips the roof for inspection; original preflight RGB has no guides.\nA near miss is never a selected strict candidate.',height=70,word_wrap=True)
+                ui.Label('Saved NO-CART baseline path/predictions only: it can pass through the inserted cart. Original no-cart RGB default; toggle shows cart preflight overlay. No actual C26 response or collision.' if preflight_only else 'Cart fixed throughout; grey no-cart, cyan new path, gold previous cart run, orange OLD, blue FRESH.\nArchived RGB is the original model observation. No physics or model reexecution.' if is_cart else 'Stationary human is fixed during each saved replay. Candidate changes are independent alternatives.\nOverview clips the roof for inspection; original preflight RGB has no guides.\nA near miss is never a selected strict candidate.',height=70,word_wrap=True)
 
         def update_pose():
             c=nav.current;t=st['time'];i=max(0,int(np.searchsorted(run['times'],t+1e-9,side='right')-1));row=run['robot'][i]
@@ -260,11 +277,11 @@ def main():
             rid=max(1,int(np.searchsorted(observation_times,t+1e-9,side='right')));nav.request_id=rid
             if c:
                 v=c['visibility'][rid-1] if c['visibility'] else None
-                source_image=Path(v['rgb']).resolve() if v else None
+                source_image=Path(v.get('baseline_rgb',v['rgb'])).resolve() if v else None
                 if v and st['overlay']:
                     overlay=out/f"overlays/c{c['id']:04d}_C{rid:02d}.png"
                     if not overlay.exists():
-                        overlay.parent.mkdir(exist_ok=True);im=np.asarray(Image.open(source_image)).copy();mask=np.asarray(Image.open(v['mask']))>0
+                        overlay.parent.mkdir(exist_ok=True);im=np.asarray(Image.open(v['rgb'])).copy();mask=np.asarray(Image.open(v['mask']))>0
                         im[mask]=(im[mask]*.45+np.array([255,0,200])*.55).astype(np.uint8);Image.fromarray(im).save(overlay)
                     source_image=overlay
                 url=str(source_image) if source_image else ''
@@ -275,10 +292,10 @@ def main():
                     f"Pixels {v['human_visible_pixel_count'] if v else None} / fraction {v['human_visible_fraction'] if v else None}\n"
                     f"OLD C{c.get('old_request_id')} -> {'primary FRESH' if is_cart else 'first CLEAR'} C{c.get('fresh_request_id')}\n"
                     f"OLD min clearance {c.get('old_min_clearance_m')} m\n"
-                    f"Current reveal clearance {c.get('robot_current_clearance_at_reveal_m')} m\n"
+                    f"Current FRESH clearance {c.get('robot_current_clearance_at_reveal_m')} m\n"
                     f"Lead {c.get('reveal_lead_s')} s | switch margin {c.get('switch_to_conflict_margin_s')} s\n"
                     f"Bypass {c['bypass']['pass']} | clearance {c['bypass'].get('clearance_m')} m")
-                image_title.text=f"Archived candidate {c['id']} C{rid} {'overlay' if st['overlay'] else 'RGB'}" if v else 'No rendered evidence for this geometry-filtered candidate'
+                image_title.text=f"C{rid} "+('cart preflight overlay' if st['overlay'] else 'original NO-CART RGB') if v and preflight_only else f"Archived candidate {c['id']} C{rid} {'overlay' if st['overlay'] else 'RGB'}" if v else 'No rendered evidence for this geometry-filtered candidate'
             else:
                 info.text='No candidates in this filter. Choose near misses or all candidates.';rgb_panel.source_url=''
             st['sync']=True;slider.model.set_value(t);st['sync']=False
@@ -298,7 +315,13 @@ def main():
             checks['jump_application']=st['time']==run['events'][(c.get('fresh_request_id') or 1)-1]['application']['sim_time']
             if is_cart:
                 jump('visible');checks['jump_first_cart_visibility']=update_pose()==(c.get('first_visible_request_id') or 1)
-            if cfg.get('previous_cart_run'):
+                jump('clear');checks['jump_separate_first_clear']=update_pose()==(c.get('first_clear_request_id') or c.get('fresh_request_id') or 1)
+                if not checks['jump_separate_first_clear']:raise RuntimeError('First CLEAR event differs')
+                if c.get('old_full_world_xy'):
+                    checks['old_full_source_waypoint_count']=len(c['old_full_world_xy'])
+                    checks['old_full_display_present']=UsdGeom.Imageable(old_full).GetVisibilityAttr().Get()!='invisible'
+                    if len(c['old_full_world_xy'])!=30 or not checks['old_full_display_present']:raise RuntimeError('Full OLD guide missing')
+            if cfg.get('previous_cart_run') or cfg.get('cart_event_jumps'):
                 for kind in ['approach','closest','structural_contact']:
                     if c.get(kind+'_sim_time') is not None:
                         jump(kind);update_pose();checks['jump_'+kind]=st['time']==c[kind+'_sim_time']
@@ -351,8 +374,8 @@ def main():
                 # remain untouched and are explicitly timestamped sample-and-hold.
                 im=Image.open(target).convert('RGB');im.load();draw=ImageDraw.Draw(im)
                 draw.rectangle((0,0,im.width,92),fill='#14212b')
-                draw.text((14,8),'STATIONARY HOSPITAL CART — SAVED REAL MODEL RUN' if is_cart else 'PREFLIGHT ONLY — NO HUMAN NAVIGATION RUN',font=font,fill='white')
-                draw.text((14,35),f'Saved {"cart run" if is_cart else "baseline"} replay t={t:.3f}s | C{rid} | model calls 0 | physics reexecution false',font=font,fill='white')
+                draw.text((14,8),cart_title if is_cart else 'PREFLIGHT ONLY — NO HUMAN NAVIGATION RUN',font=font,fill='white')
+                draw.text((14,35),f'Saved {"cart run" if is_cart and not preflight_only else "baseline"} replay t={t:.3f}s | C{rid} | model calls 0 | physics reexecution false',font=font,fill='white')
                 v=nav.current['visibility'][rid-1] if nav.current['visibility'] else None
                 if v:
                     rgb=Image.open(v['rgb']).convert('RGB');mask=np.asarray(Image.open(v['mask']))>0
