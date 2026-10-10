@@ -1,4 +1,12 @@
-# Fixed C26 Hospital cart: preflight stop
+# Fixed C26 Hospital cart: preflight and authorized single run
+
+**Latest follow-up:** the user explicitly requested the unchanged C26 run after
+being told the bypass gate failed. Exactly one actual run is now complete:
+**CONTACT BEFORE BYPASS**, first cart contact 13.333334 s, first Hospital
+structural contact 18.983334 s. The failed preflight is preserved, not relabelled
+PASS. See [actual run and results](#authorized-unchanged-c26-run).
+
+## Historical preflight-only result
 
 **No inference was run.** The cart is supported and separated from Hospital
 colliders, but neither side passes the unchanged conservative local bypass
@@ -222,3 +230,176 @@ Detailed validation and Git receipts: `outputs/e16-c26-setup-20261011-01`.
 No environment, visibility thresholds, model/controller, correspondence,
 graph optimization or trajectory correction changes. No causal navigation,
 latency-hard-case or reconciliation-performance claim.
+
+## Authorized unchanged C26 run
+
+Starting clean local/fetched origin `hardcase-probe`:
+`56d439c59e2e1bd5d1ce143576f4fef8e67482ea`; upstream/main unchanged at
+`9fa6f8b66b9e121d5df5df071297bba8e5353ebb`. User instruction:
+“그대로 C26에 cart를 고정시키고 주행을 해보자.” This explicitly superseded the
+preflight stop for **one unchanged run**, not the physical findings. The receipt
+binds the exact preflight hash and one fresh run ID; the default runner still
+rejects a failed gate without this narrow C26 authorization.
+
+- Run: **`outputs/nova-e16-c26-cart-20261011-01`**. Exactly one model/navigation
+  execution, no retry/reposition/tuning. 48 finite native (30,2) chunks,
+  1,523 measured ticks, t=0–25.366667989641428 s. Strict checkpoint loading
+  and continuous OLD-command retention validated.
+- Cart XYZ/yaw/pivot/asset above are unchanged at every tick. Floor/static
+  separation/initial clearance pass; north and south bypass remain 0/10.
+  **PHYSICAL PLACEMENT INVALID under the existing experiment gate** remains
+  the recorded result. This run is an explicit exception, not a gate repair.
+- Frozen receipt: `outputs/e16-c26-run-freeze-20261011-01`; config SHA256
+  `e7fe2906b720d3dd119b36c131683b62f61d55f2b14fa1114c868212d07424bf`.
+  Baseline instruction/start/goal/lights/Nova/Hawk/checkpoint/controller,
+  2 Hz target requests and 60 Hz control/physics are identical; only the
+  stationary-cart configuration is added. Continuous physics is used here,
+  unlike the older frozen-physics crossing experiment.
+
+### Instruction and actual visibility
+
+Exact runtime instruction equality **PASS across all four runs** (no-cart,
+exact C19, C19+0.40Y, C26), also verified in every C26 request:
+
+> Move forward toward the staircase, then turn left to enter the hallway. Continue straight ahead and stop in front of the blue hospital bed on the right side of the hallway.
+
+No instruction says to turn RIGHT on encountering an obstacle. “Right side”
+locates the goal bed. Actual C26-run visibility is **C1–10 HIDDEN, C11 MARGINAL,
+C12–32 CLEAR, C33–48 HIDDEN**. C1=0 pixels; first visible C11 at
+6.366666999 s, 430 pixels; first CLEAR C12 at 6.866667025 s, 4,878 pixels.
+First visible/CLEAR remain separate from the later inspection pair.
+
+Actual-pose camera audit: `outputs/e16-c26-run-camera-20261011-01`, original
+front Hawk fisheyePolynomial, horizontal centre-line FOV **120.314737°**, same
+body extrinsic and 1920×1080 images as above. No new RGB or navigation physics
+was needed for this post-run static collision-ray audit. Of 27 candidate
+passage samples on each side, all are inside FOV at C10–12:
+
+| Actual observation | North/right unoccluded | South/left unoccluded |
+|---|---:|---:|
+| C10 | 6/27 | 0/27 |
+| C11 first visible | 18/27 | 0/27 |
+| C12 first CLEAR | 27/27 | 12/27 |
+| C23 | 27/27 inside FOV | 24/24 inside FOV (3 outside) |
+| C24 | 21/21 inside FOV | 18/18 inside FOV |
+
+The south passage is initially occluded, partly observable at first CLEAR,
+and substantially observable later. Both alternatives are **not established
+as fully observable at first reveal**. Sampled rays do not replace semantic
+visibility, guarantee traversability or demonstrate model attention/right bias.
+North still fails the independent physical bypass check. Later cart HIDDEN
+states must be read with camera-space projections, not treated as fresh occlusion.
+
+### Actual outcome and direction
+
+**NO CLEAR BYPASS / CONTACT BEFORE BYPASS.** The measured robot never crosses
+the cart-centre plane or clears its downstream inflated extent. Minimum cart
+clearance proxy is −0.560424162 m (not a penetration-depth measurement).
+There are 11 cart-contact spans and 29 total nonfloor-contact spans. First cart
+contact, including nonzero impulse, is **13.333334028720856 s**:
+`/World/E16Cart/SM_SupplyCart_01e` against
+`/World/Robots/Nova_Carter/wheel_left/Cylinder_01`.
+
+First Hospital structural contact is **18.98333432339132 s**, against
+`/Root/Geo_M2_TrimDoor6/Geo_M2_TrimDoor/Geo_M2_TrimDoor`.
+**DoorFrame52 contact: false.** The robot turns toward the north wall after
+cart contact and ends at XY=(−1.5759221315383911,12.20274829864502), without
+passing the cart. This is not confirmed intentional north/right avoidance.
+
+Among all 47 FRESH curves, 45 do not reach the cart-centre plane and two cross
+inside its inflated lateral span. Among 23 pre-contact pairs, counts are 22
+and one respectively. **No complete north/right or south/left bypass is
+predicted under the existing centre-plane criterion.** This does not say that
+native curves have zero lateral components. Native lookahead sign and command
+w agree in 22/23 pre-contact pairs; at FRESH C23, left=−0.002700806 m but
+w=+0.019236069 rad/s because the existing yaw filter retains positive history.
+Exact controller/filter/lookahead recomputation agrees for **all 48 commands**;
+there is no forced side or modified controller.
+
+### Actual OLD/FRESH results
+
+All 47 adjacent pairs use full original native curves transformed with their
+**own observation poses**. OLD remaining is clipped to FRESH observation time;
+revision aligns common absolute nominal target times by temporal interpolation,
+without extrapolation or spatial correspondence. +0.1…3.0 s timing is assigned
+from the model target convention, not a native timestamp channel. Tangents are
+**derived geometric tangents, not native TIC-VLA yaw**. Short/reversing native
+segments can produce large tangent angles without large robot heading changes.
+
+Pre-contact requires **both FRESH observation and application before the first
+cart-or-structure contact**, 13.333334 s. The existing approach window begins
+9.883333849 s; primary descriptive inspection selects maximum absolute lateral
+revision among its pre-contact pairs C18→19…C23→24. No hard-case threshold or
+composite severity is added. First visible and first CLEAR are never replaced
+by that inspection selection.
+
+| Pair / role | OLD / FRESH cart clearance m | RMSE m | Mean / max abs lateral m | Signed lateral m | Endpoint m | Mean / max tangent ° | Δw rad/s |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| C10→11 first visible | +7.855035 / +7.205447 | .458823 | .055580 / .172511 | +.051322 | .531375 | 43.730836 / 178.527396 | +.031245613 |
+| C11→12 first CLEAR | +7.205447 / +6.800066 | .433055 | .061026 / .191966 | −.050250 | .538126 | 36.338144 / 161.924470 | −.072696935 |
+| C18→19 largest pre-contact approach lateral | +2.532526 / +1.749581 | .433020 | .098864 / .212837 | +.097555 | .515245 | 49.470497 / 175.096271 | −.003850049 |
+| C23→24 first numerical conflict improvement | −.594830 / −.587365 | .416650 | .026729 / .086865 | −.023099 | .393612 | 61.316035 / 167.854498 | −.083948884 |
+
+Δv=0 in all four listed pairs. At first CLEAR there is no OLD conflict and
+current robot/cart clearance is +8.193081 m: **EARLY REVEAL relative to conflict**.
+C18→19 is a real geometric revision, predominantly forward with lateral change
+increasing toward the far nominal horizon; it does not demonstrate a
+conflict-resolving avoidance plan. OLD observation t=9.866667181 s,
+SE(2)=(2.484924077987671,11.10122299194336,2.9129917397094958); FRESH
+observation t=10.366667207 s,
+SE(2)=(1.7465386390686035,11.233104705810547,3.007545483078566).
+Actual application t=10.466667213 s,
+SE(2)=(1.5976184606552124,11.2516508102417,3.024970066000192).
+Max displacement=.544970 m. Observation→application=.100000005 sim s /
+.538444285 wall s; action call=.055886176 wall s. Robot transport=.150070575 m,
+yaw change=+.998355061°. RAW seam=.020242568 m / 2.601761741° executed-to-FRESH
+derived tangent. These are distinct clocks/diagnostics, not latency causation.
+
+C23→24 improves proxy clearance by only **.007465468 m**, still negative:
+**no conflict-to-clear transition**. Current clearance is +.143450539 m;
+predicted conflict t=13.531707298 s and application t=12.966667343 s precedes
+actual contact. No pre-contact pair satisfies OLD conflict→FRESH clear with
+positive current clearance and application before conflict. Largest later
+lateral revision C36→37, 1.817483394 m, is **POST-CONTACT and excluded**.
+
+Decisions: **START HIDDEN; EARLY REVEAL; NO CLEAR BYPASS; PRE-CONTACT
+GEOMETRIC REVISION OBSERVED, but no confirmed meaningful avoidance revision;
+OLD CONFLICT→FRESH NUMERICAL IMPROVEMENT ONLY (still conflicting);
+RECONCILIATION-RELEVANT PAIR: INSUFFICIENT EVIDENCE.** One unsuccessful run
+under an explicit bypass exception does not establish general model behavior,
+right bias, latency-caused failure or benefits of reconciliation.
+
+### Actual-run artifacts and saved replay
+
+Final analysis **`outputs/e16-c26-run-analysis-20261011-02`**, preserving -01:
+`trajectory_result`, `trajectory_turn_zoom`, `trajectory_revision`,
+`old_fresh_pair_comparison` each PNG/PDF. Seven additional pair PNG/PDF cover
+first visible/CLEAR and every other pre-contact approach transition. Full
+OLD dashed / remaining orange / FRESH purple, exact observations/switch B,
+actual path, cart/inflation and wall context are retained. Overall plots show
+all four measured paths, all actual C26 C markers (spaced labels near stalls)
+and actual reported contact points, not substituted robot-centre positions.
+All plotted coordinates, full native/world curves, poses, 47 pair metrics,
+visibility and camera samples are exported as JSON/CSV.
+
+```bash
+MPLCONFIGDIR=/tmp/tic-vla-mpl python3 research/analyze_e16_c26_run.py --run-dir outputs/nova-e16-c26-cart-20261011-01 --preflight-dir outputs/e16-c26-preflight-20261011-01 --camera-dir outputs/e16-c26-run-camera-20261011-01 --output-dir outputs/e16-c26-run-analysis-REVIEW
+bash scripts/isaac6_python.sh research/view_reveal_window_search.py --search-dir outputs/e16-c26-run-analysis-20261011-02/viewer_data --output-dir outputs/e16-c26-run-gui-REVIEW --self-test
+```
+
+Fresh destinations required. **`outputs/e16-c26-run-gui-20261011-01` GUI_READY**,
+t0/C1 paused; original actual RGB, all required playback/views/visibility and
+OLD/FRESH/application controls checked. First contact jump now means first
+cart-or-structure contact (13.333334 s). Closest/approach jumps also pass.
+Model calls=0, navigation physics reexecuted=false; viewport rendering only.
+
+**17 focused tests PASS.** Independent validation confirms 48 finite predictions,
+47 overlaps, 192 observation coordinates across four comparison paths, all 48
+1920×1080 RGB/masks and semantic states, 1,523 stationary-cart ticks, all 48
+controller/filter/lookahead outputs, 2,157 protected file hashes, and 91 frozen
+executed-code hashes. Camera-audit extension and GUI button label changed only
+after the real run; their exact executed versions are archived and hash-checked
+in **`outputs/e16-c26-run-setup-20261011-01`**. All 11 PDFs were rendered and
+visually reviewed; GUI captures checked. The preflight/actual raw runs and
+frozen receipt are unchanged. No model retry, graph optimization, new
+correspondence, correction, environment edits or navigation-performance claim.

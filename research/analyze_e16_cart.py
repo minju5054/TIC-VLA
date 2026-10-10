@@ -127,7 +127,8 @@ def main():
         handles=[Line2D([],[],color=c,label=l) for c,l in [('#216e9d','No-cart reference'),('#20875b','Actual cart run'),('#e07419','OLD remaining'),('#6853ad','FRESH'),('#ac2580','Cart footprint')]]
         handles += [Line2D([],[],color='#ac2580',ls='--',label='Inflated conflict region'),Line2D([],[],color='black',marker='x',ls='',label='Application'),Patch(fc='#e1e5e9',label='Structural bounds')]
         fig.legend(handles=handles,loc='upper center',bbox_to_anchor=(.5,.90),ncol=4,frameon=False,fontsize=9)
-        fig.suptitle('Hospital E16 | Fixed original cart at exact C19'+(' | turn zoom' if zoom else ''),y=.98,fontsize=16)
+        location='C26' if frozen.get('intervention')=='EXACT_C26' else 'C19'
+        fig.suptitle('Hospital E16 | Fixed original cart at exact '+location+(' | turn zoom' if zoom else ''),y=.98,fontsize=16)
         for t in fig.texts:
             if t.get_position()[1]==.93:t.set_text(f'Actual first visible C{first_visible}; first CLEAR C{first_clear}; '+(f'pair C{selected} -> C{selected+1}' if selected else 'no adjacent primary pair'))
             if t.get_position()[1]==.03:t.set_text(decision+'\nAll C observation markers retained; labels C1–C21 and final. Tangents/timing are derived.');t.set_color('#923329')
@@ -145,11 +146,12 @@ def main():
     vc=[]
     for v in visibility:vc.append({**v,**{k.replace('cart_','human_'):val for k,val in v.items() if k.startswith('cart_')}})
     candidate={'id':1,'position':cart['center_world_xyz'],'visibility':vc,'strict_qualified':qualifies,'selection_rank':None,'failures':[] if qualifies else [decision],
-        'old_request_id':selected,'fresh_request_id':selected+1 if selected else (first_clear or 1),'first_visible_request_id':first_visible,
+        'old_request_id':selected,'fresh_request_id':selected+1 if selected else (first_clear or 1),'first_visible_request_id':first_visible,'first_clear_request_id':first_clear,
+        'old_full_world_xy':run['worlds'][selected-1].tolist() if selected else [],
         'remaining_world_xy':detail['old_remaining_world_xy'] if detail else [],'fresh_world_xy':detail['fresh_world_xy'] if detail else [],
         'old_min_clearance_m':metric['old_remaining_cart_clearance_m'] if metric else None,
         'robot_current_clearance_at_reveal_m':metric['current_cart_clearance_m'] if metric else None,'conflict':detail['old_conflict'] if detail else None,
-        'bypass':{'pass':True,'centerline_xy':vb['world_xy'],'clearance_m':vb['clearance_m']},'cart_outline':footprints['cart'],'inflated_outline':footprints['inflated']}
+        'bypass':{'pass':bool(vb),'centerline_xy':vb['world_xy'] if vb else [],'clearance_m':vb['clearance_m'] if vb else None},'cart_outline':footprints['cart'],'inflated_outline':footprints['inflated']}
     cfg={'baseline_run':str(run['path']),'reference_baseline_run':str(baseline['path']),'baseline_analysis':str(out),
         'collision_inventory':str(ROOT/'outputs/hospital-native-light-audit-20261010-01/collision_geometry.json'),
         'cart_frozen':frozen,'robot_radius_m':radius,'visibility':frozen['visibility_rules']}

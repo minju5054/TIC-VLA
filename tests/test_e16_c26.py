@@ -72,5 +72,23 @@ class C26Tests(unittest.TestCase):
         row={'fresh_observation_sim_time':1.,'application_sim_time':1.1}
         self.assertTrue(precontact(row,None));self.assertTrue(precontact(row,1.2));self.assertFalse(precontact(row,1.1));self.assertFalse(precontact(row,1.05))
 
+    def test_explicit_single_run_exception_preserves_failed_gate(self):
+        from research.e16_cart_run import c26_authorization
+        from research.hospital_episode import digest
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp);physical={'pass':False,'checks':{k:True for k in ['floor_support','no_static_overlap','no_initial_collision','baseline_intersects_inflated_cart']}}
+            physical['checks']['local_bypass']=False
+            summary={'cart_visible_at_C1':False,'stop_reasons':['PHYSICAL_PLACEMENT_INVALID','NO_FEASIBLE_BYPASS']}
+            for name,obj in [('freeze.json',{'intervention':'EXACT_C26'}),('physical.json',physical),('summary.json',summary)]:
+                (p/name).write_text(json.dumps(obj))
+            hashes=evidence_hashes([p])
+            with self.assertRaises(ValueError):c26_authorization(p,'one-run',None)
+            auth={'scope':'ONE_UNCHANGED_C26_RUN_DESPITE_BYPASS_FAILURE','run_id':'one-run','preflight_freeze_sha256':digest(p/'freeze.json'),'user_instruction':'Run the unchanged C26 cart once.'}
+            a=p/'authorization.json';a.write_text(json.dumps(auth))
+            self.assertEqual(c26_authorization(p,'one-run',a),auth);verify_hashes(hashes)
+            with self.assertRaises(ValueError):c26_authorization(p,'another-run',a)
+            summary['cart_visible_at_C1']=True;(p/'summary.json').write_text(json.dumps(summary))
+            with self.assertRaises(ValueError):c26_authorization(p,'one-run',a)
+
 
 if __name__=='__main__':unittest.main()

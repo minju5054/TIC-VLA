@@ -252,7 +252,7 @@ def main():
                     with ui.HStack(height=25):
                         ui.Button('Cart approach',clicked_fn=lambda:jump('approach'))
                         ui.Button('Closest cart approach',clicked_fn=lambda:jump('closest'))
-                        ui.Button('First structural contact',enabled=nav.current.get('structural_contact_sim_time') is not None,clicked_fn=lambda:jump('structural_contact'))
+                        ui.Button('First contact',enabled=nav.current.get('structural_contact_sim_time') is not None,clicked_fn=lambda:jump('structural_contact'))
                 with ui.HStack(height=28):
                     ui.Button('Restart from start',clicked_fn=restart);ui.Button('Play',clicked_fn=lambda:st.update(playing=True));ui.Button('Pause',clicked_fn=lambda:st.update(playing=False))
                 with ui.HStack(height=25):

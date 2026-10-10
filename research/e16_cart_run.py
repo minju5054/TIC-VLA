@@ -9,10 +9,25 @@ from research.hospital_episode import validate_config,digest
 from research.nova_evidence import NovaRecords,validate_continuous
 
 
-def freeze(preflight,out,run_id):
+def c26_authorization(preflight,run_id,authorization):
+    """Record the user's explicit exception without changing failed gate evidence."""
+    if authorization is None:raise ValueError('Physical gate not passed; explicit C26 authorization required')
+    auth=json.loads(Path(authorization).read_text());frozen=json.loads((preflight/'freeze.json').read_text())
+    physical=json.loads((preflight/'physical.json').read_text());summary=json.loads((preflight/'summary.json').read_text())
+    required=['floor_support','no_static_overlap','no_initial_collision','baseline_intersects_inflated_cart']
+    if (auth.get('scope')!='ONE_UNCHANGED_C26_RUN_DESPITE_BYPASS_FAILURE' or auth.get('run_id')!=run_id or
+        auth.get('preflight_freeze_sha256')!=digest(preflight/'freeze.json') or not auth.get('user_instruction') or
+        frozen.get('intervention')!='EXACT_C26' or not all(physical['checks'][k] for k in required) or
+        physical['checks']['local_bypass'] or summary['cart_visible_at_C1'] or
+        set(summary['stop_reasons'])!={'PHYSICAL_PLACEMENT_INVALID','NO_FEASIBLE_BYPASS'}):
+        raise ValueError('Authorization does not match the unchanged C26 bypass-only exception')
+    return auth
+
+
+def freeze(preflight,out,run_id,authorization=None):
     if out.exists() or (ROOT/'outputs'/run_id).exists():raise FileExistsError('Fresh receipt/run required')
     physical=json.loads((preflight/'physical.json').read_text());summary=json.loads((preflight/'summary.json').read_text())
-    if not physical['pass'] or not summary['model_run_permitted']:raise ValueError('Physical gate not passed')
+    override=c26_authorization(preflight,run_id,authorization) if not physical['pass'] or not summary['model_run_permitted'] else None
     cfg=json.loads((ROOT/'outputs/nova-e16-hospital-lights-baseline-20261010-01/metadata.json').read_text())['config']
     frozen=json.loads((preflight/'freeze.json').read_text());cfg['stationary_cart']=frozen
     validate_config(cfg);out.mkdir(parents=True)
@@ -20,8 +35,10 @@ def freeze(preflight,out,run_id):
     code=evidence_hashes([ROOT/'research',ROOT/'scripts/isaac6_python.sh',ROOT/'DynaNav/ticvla.py',ROOT/'DynaNav/ticvla_vlm.py'])
     code={p:h for p,h in code.items() if Path(p).suffix in ('.py','.sh')}
     write_json(out/'receipt.json',{'authorized_run_id':run_id,'config_sha256':digest(out/'config.json'),
-        'physical_pass':True,'visibility_diagnostic_only':True,'code_sha256':code,
-        'source_evidence_sha256':evidence_hashes([preflight]),'single_run_no_retry':True,**provenance(ROOT)})
+        'physical_pass':physical['pass'],'visibility_diagnostic_only':summary.get('visibility_diagnostic_only',True),
+        'explicit_user_authorization':override,'code_sha256':code,
+        'source_evidence_sha256':evidence_hashes([preflight]+([Path(authorization)] if override else [])),
+        'single_run_no_retry':True,**provenance(ROOT)})
 
 
 def execute(folder):
@@ -58,6 +75,7 @@ def execute(folder):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--phase',choices=['freeze','run'],required=True)
-    p.add_argument('--receipt-dir',required=True);p.add_argument('--preflight-dir');p.add_argument('--run-id');a=p.parse_args()
-    if a.phase=='freeze':freeze(Path(a.preflight_dir).resolve(),Path(a.receipt_dir).resolve(),a.run_id)
+    p.add_argument('--receipt-dir',required=True);p.add_argument('--preflight-dir');p.add_argument('--run-id')
+    p.add_argument('--authorization',help='Explicit user exception bound to this exact C26 freeze/run ID');a=p.parse_args()
+    if a.phase=='freeze':freeze(Path(a.preflight_dir).resolve(),Path(a.receipt_dir).resolve(),a.run_id,a.authorization)
     else:execute(Path(a.receipt_dir).resolve())

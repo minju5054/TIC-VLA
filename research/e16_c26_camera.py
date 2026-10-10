@@ -11,10 +11,21 @@ from research.records import write_json,provenance
 
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--preflight-dir',required=True);p.add_argument('--output-dir',required=True);a=p.parse_args()
-    source=Path(a.preflight_dir).resolve();out=validate_destination(a.output_dir,[source,BASELINE]);out.mkdir(parents=True)
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--preflight-dir',required=True);p.add_argument('--output-dir',required=True)
+    p.add_argument('--run-dir',help='Use actual saved cart-run camera poses and masks instead of baseline preflight poses');a=p.parse_args()
+    run_path=Path(a.run_dir).resolve() if a.run_dir else BASELINE
+    source=Path(a.preflight_dir).resolve();out=validate_destination(a.output_dir,[source,BASELINE,run_path]);out.mkdir(parents=True)
     frozen=json.loads((source/'freeze.json').read_text());physical=json.loads((source/'physical.json').read_text());vis=json.loads((source/'visibility.json').read_text())
-    hashes=evidence_hashes([source,BASELINE]);cfg=json.loads((BASELINE/'metadata.json').read_text())['config']
+    hashes=evidence_hashes([source,BASELINE,run_path]);cfg=json.loads((run_path/'metadata.json').read_text())['config']
+    if a.run_dir:
+        from research.analyze_nova_dynamic_handoff import load_saved
+        from research.control import rotation_wxyz
+        run=load_saved(run_path);vis=[];extrinsic=np.asarray(json.loads((run_path/'robot_asset.json').read_text())['camera_body_transform'])
+        if cfg['stationary_cart']!=frozen:raise ValueError('Actual cart differs from preflight')
+        for e in run['events']:
+            obs=e['observation'];body=np.eye(4);body[:3,:3]=rotation_wxyz(obs['quaternion_wxyz']).T;body[3,:3]=obs['position']
+            name=Path(e['rgb_observation_reference']).name;v=json.loads((run_path/'raw/visibility'/(name+'.json')).read_text())
+            vis.append({**v,'request_id':e['request_id'],'camera_world_matrix_row_vector':(extrinsic@body).tolist()})
     from isaacsim import SimulationApp
     app=SimulationApp({'headless':True,'disable_viewport_updates':True});code=1
     try:
@@ -65,7 +76,7 @@ def main():
                     'inside_count':sum(projected['inside_fov']),'unoccluded_count':sum(clear),'sample_count':len(points)}
             results.append(row)
         write_json(out/'camera.json',{'parameters':params,'horizontal_fov_deg':hfov,'raw_camera_attributes':attrs,
-            'camera_body_transform':json.loads((BASELINE/'robot_asset.json').read_text())['camera_body_transform'],
+            'source_run':str(run_path),'camera_body_transform':json.loads((run_path/'robot_asset.json').read_text())['camera_body_transform'],
             'convention':'USD row-vector world matrix; camera +X right,+Y up,-Z forward; polynomial theta in radians; nominal image scaled to 1920x1080',
             'limitations':'Rays test collision meshes at sampled passage heights, not full rendered optical surfaces or traversability. Semantic cart masks remain the visibility oracle.',
             'model_calls':0,'navigation_physics_reexecuted':False,'new_rgb_renders':0})
