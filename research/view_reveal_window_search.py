@@ -31,6 +31,12 @@ def replay_frame_times(times, fps=10):
     return frames
 
 
+def archived_visibility(candidate, request_id):
+    """A stopped preflight prefix must never supply invented later visibility."""
+    rows=candidate.get('visibility') or []
+    return rows[request_id-1] if 1<=request_id<=len(rows) else None
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--search-dir',required=True);p.add_argument('--output-dir',required=True)
@@ -45,7 +51,7 @@ def main():
     candidates=json.loads((source/'candidates.json').read_text());nav=CandidateNavigation(candidates)
     is_cart=summary.get('obstacle_type')=='cart'
     preflight_only=bool(summary.get('preflight_only'))
-    cart_title='C26 PREFLIGHT ONLY | NO CART-CONDITIONED RUN' if preflight_only else 'STATIONARY HOSPITAL CART | SAVED REAL MODEL RUN'
+    cart_title=cfg.get('preflight_title','C26 PREFLIGHT ONLY | NO CART-CONDITIONED RUN') if preflight_only else 'STATIONARY HOSPITAL CART | SAVED REAL MODEL RUN'
     asset=None if is_cart else json.loads((source/'human_asset.json').read_text())
     hashes=evidence_hashes([source,run['path']])
     hashes.update(json.loads((source/'source_evidence_sha256.json').read_text()))
@@ -265,7 +271,7 @@ def main():
                 ui.Button('Toggle saved semantic overlay',height=25,clicked_fn=lambda:st.update(overlay=not st['overlay'],last_rgb=None))
                 image_title=ui.Label('Actual archived preflight Hawk render',height=24)
                 rgb_panel=ui.Image('',height=260,fill_policy=ui.FillPolicy.PRESERVE_ASPECT_FIT)
-                ui.Label('Saved NO-CART baseline path/predictions only: it can pass through the inserted cart. Original no-cart RGB default; toggle shows cart preflight overlay. No actual C26 response or collision.' if preflight_only else 'Cart fixed throughout; grey no-cart, cyan new path, gold previous cart run, orange OLD, blue FRESH.\nArchived RGB is the original model observation. No physics or model reexecution.' if is_cart else 'Stationary human is fixed during each saved replay. Candidate changes are independent alternatives.\nOverview clips the roof for inspection; original preflight RGB has no guides.\nA near miss is never a selected strict candidate.',height=70,word_wrap=True)
+                ui.Label('Saved NO-CART baseline path/predictions only: it can pass through the inserted cart. Original no-cart RGB default; toggle shows available cart preflight overlay. No actual cart-conditioned response or collision.' if preflight_only else 'Cart fixed throughout; grey no-cart, cyan new path, gold previous cart run, orange OLD, blue FRESH.\nArchived RGB is the original model observation. No physics or model reexecution.' if is_cart else 'Stationary human is fixed during each saved replay. Candidate changes are independent alternatives.\nOverview clips the roof for inspection; original preflight RGB has no guides.\nA near miss is never a selected strict candidate.',height=70,word_wrap=True)
 
         def update_pose():
             c=nav.current;t=st['time'];i=max(0,int(np.searchsorted(run['times'],t+1e-9,side='right')-1));row=run['robot'][i]
@@ -276,8 +282,8 @@ def main():
                 look(follow_op,p-2*f+[0,0,2.4],p+.5*f+[0,0,.4])
             rid=max(1,int(np.searchsorted(observation_times,t+1e-9,side='right')));nav.request_id=rid
             if c:
-                v=c['visibility'][rid-1] if c['visibility'] else None
-                source_image=Path(v.get('baseline_rgb',v['rgb'])).resolve() if v else None
+                v=archived_visibility(c,rid)
+                source_image=Path(v.get('baseline_rgb',v['rgb'])).resolve() if v else (run['path']/run['events'][rid-1]['rgb_observation_reference'] if preflight_only else None)
                 if v and st['overlay']:
                     overlay=out/f"overlays/c{c['id']:04d}_C{rid:02d}.png"
                     if not overlay.exists():
@@ -295,7 +301,7 @@ def main():
                     f"Current FRESH clearance {c.get('robot_current_clearance_at_reveal_m')} m\n"
                     f"Lead {c.get('reveal_lead_s')} s | switch margin {c.get('switch_to_conflict_margin_s')} s\n"
                     f"Bypass {c['bypass']['pass']} | clearance {c['bypass'].get('clearance_m')} m")
-                image_title.text=f"C{rid} "+('cart preflight overlay' if st['overlay'] else 'original NO-CART RGB') if v and preflight_only else f"Archived candidate {c['id']} C{rid} {'overlay' if st['overlay'] else 'RGB'}" if v else 'No rendered evidence for this geometry-filtered candidate'
+                image_title.text=f"C{rid} "+('cart preflight overlay' if st['overlay'] else 'original NO-CART RGB') if v and preflight_only else f"Archived candidate {c['id']} C{rid} {'overlay' if st['overlay'] else 'RGB'}" if v else 'Original NO-CART RGB; cart visibility NOT MEASURED' if preflight_only else 'No rendered evidence for this geometry-filtered candidate'
             else:
                 info.text='No candidates in this filter. Choose near misses or all candidates.';rgb_panel.source_url=''
             st['sync']=True;slider.model.set_value(t);st['sync']=False
@@ -376,7 +382,7 @@ def main():
                 draw.rectangle((0,0,im.width,92),fill='#14212b')
                 draw.text((14,8),cart_title if is_cart else 'PREFLIGHT ONLY — NO HUMAN NAVIGATION RUN',font=font,fill='white')
                 draw.text((14,35),f'Saved {"cart run" if is_cart and not preflight_only else "baseline"} replay t={t:.3f}s | C{rid} | model calls 0 | physics reexecution false',font=font,fill='white')
-                v=nav.current['visibility'][rid-1] if nav.current['visibility'] else None
+                v=archived_visibility(nav.current,rid)
                 if v:
                     rgb=Image.open(v['rgb']).convert('RGB');mask=np.asarray(Image.open(v['mask']))>0
                     overlay=np.array(rgb);overlay[mask]=(overlay[mask]*.45+np.array([255,0,200])*.55).astype('uint8')
@@ -397,6 +403,12 @@ def main():
                 (out/'ffmpeg.log').write_text(result.stderr);video['returncode']=result.returncode
                 if result.returncode:raise RuntimeError('Installed ffmpeg export failed')
             write_json(out/'video.json',video);print('FULL_REPLAY_EXPORT_COMPLETE',len(times),flush=True)
+        if a.self_test and preflight_only and len(nav.current.get('visibility') or [])<len(run['events']):
+            st.update(time=float(run['times'][-1]),overlay=True,last_rgb=None);update_pose()
+            checks['unmeasured_tail_no_fabrication']=('NOT MEASURED' in image_title.text and
+                Path(rgb_panel.source_url).resolve()==(run['path']/run['events'][-1]['rgb_observation_reference']).resolve())
+            if not checks['unmeasured_tail_no_fabrication']:raise RuntimeError('Unmeasured visibility tail was misrepresented')
+            st.update(overlay=False,last_rgb=None)
         top();restart();overview();update_pose()
         checks['replay_starts_at_t0']=st['time']==0. and nav.request_id==1 and not st['playing']
         speed(.25);checks['speed_controls']=st['speed']==.25;speed(1.)

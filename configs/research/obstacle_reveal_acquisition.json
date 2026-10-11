@@ -1,0 +1,22 @@
+{
+  "baseline_run": "outputs/nova-e16-hospital-lights-baseline-20261010-01",
+  "asset_audit": "outputs/e16-cart-audit-20261010-01/asset.json",
+  "asset_identity": "outputs/e16-cart-preflight-20261010-01/freeze.json",
+  "collision_inventory": "outputs/hospital-native-light-audit-20261010-01/collision_geometry.json",
+  "visibility_config": "configs/research/reveal_window_search.json",
+  "candidate_cap": 12,
+  "station_request_ids": [16, 17, 18, 20],
+  "left_offsets_m": [0.0, 0.4, 0.8],
+  "orientation": "long axis parallel to saved C(k-1) to C(k+1) measured chord",
+  "candidate_order": "station ID ascending, then left offset ascending; fixed before qualification",
+  "selection": "smallest positive switch-to-conflict margin, larger first-CLEAR fraction, larger bypass clearance, lexicographic XYZ",
+  "native_waypoint_dt_s": 0.1,
+  "static_margin_m": 0.05,
+  "bypass_extra_offsets_m": [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5],
+  "bypass_sample_spacing_m": 0.05,
+  "bypass_connector_length_m": 1.5,
+  "minimum_predicted_support_beyond_inflated_cart_m": 0.5,
+  "render_policy": "physical and some same-pair temporal gates must pass; chronological RGB+semantic captures from C1 through first CLEAR, or all 48 if none; no ray-based semantic labels",
+  "stop_policy": "If none of these at most 12 candidates qualifies, stop. No additional placement or route search, no model run.",
+  "rationale": "Four proximal inner-corner stations around the audited south wall endpoint, with centreline and two left/inward offsets; neither previous C19 nor C26 placement is repeated. Use the successful unchanged E16 route and lights; the previous E21 baseline failed its useful-RGB gate."
+}
