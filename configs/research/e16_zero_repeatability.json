@@ -1,0 +1,15 @@
+{
+  "conditions": ["NO_HOOK", "ZERO_HOOK", "ZERO_HOOK", "NO_HOOK", "NO_HOOK", "ZERO_HOOK"],
+  "maximum_new_runs": 6,
+  "predictions": 48,
+  "additional_hold_s": 0.0,
+  "hook_rules_file": "configs/research/e16_late_handoff_stress.json",
+  "stop_policy": "Continue after navigation failure; stop on runtime/inference/contract failure. Six exclusive IDs, no retries, no positive-delay sweep.",
+  "progress_y_bin_edges_m": [2,3,4,5,6,7,8,9,10,11,12,13],
+  "progress_selection": "Precontact observation and application; east of original exit plane; measured northbound approach. Per-bin median w and native lookahead-left; representative observation closest to bin midpoint, ties by request ID. Record actual XY/yaw differences; bins are not identical views or states.",
+  "divergence_rule": "First two adjacent occupied common Y bins with different signs of BOTH median applied w and median native lookahead-left, using unchanged hospital_validation numerical sign tolerances. Descriptive persistent steering divergence, not causal onset, significance or hard-case threshold.",
+  "bootstrap_rule": "Compare saved first RGB pixels, observation pose, native arrays, commands, timing, history and reasoning. Numeric/hash inequality is not automatically meaningful divergence.",
+  "timing_note": "Response-detection-to-application monotonic duration is an upper-bound diagnostic including validation/controller/application/logging; not exact hook cost. Action ready and reasoning completion poll are different events. No exact KV tensor identity or worker-ready timestamp is inferred.",
+  "matching_note": "No cross-run equal-C-index physical correspondence; C12..C18 is a separately labeled descriptive appendix. Native local curves are shown in their own observation frames and are not a frame-invariant cross-run revision metric.",
+  "statistics": "Per-run descriptive median/p95/range, three independent trials per condition; no formal inference or estimated population failure probability. Historical references excluded from new-condition counts."
+}
