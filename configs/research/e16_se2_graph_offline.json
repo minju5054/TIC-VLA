@@ -1,0 +1,19 @@
+{
+  "source_runs": {
+    "A": "outputs/nova-e16-hospital-lights-baseline-20261010-01",
+    "B": "outputs/nova-e16-no-cart-15-repro-20261011-01"
+  },
+  "selected_pairs": [["A",13],["B",15],["B",47],["A",25],["A",9]],
+  "expected_requests": 48,
+  "native_dt_s": 0.1,
+  "time_epsilon_s": 1e-8,
+  "tangent": {"half_window_s": 0.2, "minimum_chord_m": 0.03, "minimum_coherence": 0.25, "short_segment_m": 0.01},
+  "execution_direction": {"window_s": 0.1, "minimum_displacement_m": 0.03, "minimum_forward_speed_m_s": 0.05, "maximum_heading_difference_deg": 30.0},
+  "scales": {"relative_translation_m": 0.05, "relative_rotation_deg": 10.0, "intent_translation_m": 0.10, "intent_rotation_deg": 15.0, "correspondence_m": 0.20, "join_deg": 10.0},
+  "weights": {"relative": 1.0, "intent": 1.0, "correspondence": 0.25, "join": 1.0},
+  "intent": {"near_weight": 0.10, "full_weight_after_s": 1.0},
+  "correspondence": {"support_after_switch_s": 0.5, "disagreement_scale_m": 0.3, "radial_pseudo_huber_delta": 1.0},
+  "solver": {"method": "trf", "jac": "3-point", "max_nfev": 300, "ftol": 1e-8, "xtol": 1e-8, "gtol": 1e-8},
+  "evaluation": {"near_window_s": 0.5, "far_start_s": 1.5, "minimum_segment_m": 0.01, "numerical_comparison_epsilon": 1e-7},
+  "policy": "One frozen formulation, no per-pair tuning. Centered clipped temporal chord headings; all reference headings must be valid. XY never smoothed. OLD uses native support only and radial robust XY factors within 0.5s; no OLD yaw. Fixed B is not a variable. No future measured robot state is an optimization target. C1->C2 retained but startup reported separately."
+}
