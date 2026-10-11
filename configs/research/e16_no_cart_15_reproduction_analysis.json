@@ -1,0 +1,10 @@
+{
+  "inherited_navigation_rules": "configs/research/e16_no_cart_speed10_analysis.json; original spatial/actual-left-motion gates unchanged",
+  "primary": "Historical no-cart1.5 versus NEW no-cart1.5, exact runtime config equality",
+  "secondary": "NEW no-cart1.5 versus recent no-cart1.0, same current host; single-run descriptive comparison",
+  "physical_progress_bins": "1m approach world-Y bins [2,3)..[9,10), robot X east of original corner exit; precontact only",
+  "divergence_inspection": "First of two consecutive common approach-Y bins where both median applied angular-command sign and median native-lookahead-left sign disagree between historical and new1.5; original numerical sign tolerances. This descriptive persistence rule is not a significance/causality threshold. Export all bins. If absent, state not identified and show first corner-region observation as inspection only.",
+  "selected_observation": "Observation nearest bin center in world Y within that bin, no same-C-index matching; differences in X/yaw/history retained",
+  "corner_inspection": "First precontact FRESH observation inside original corner entry region, as in prior saved analysis",
+  "reasoning": "Preserve saved reasoning text, start/poll steps, delay reference, sampled image IDs, state tokens and previous-motion prompt. No exact KV-state identity or worker-ready time inferred when absent."
+}
