@@ -1,6 +1,54 @@
 # Official DynaNav baseline reproduction — 2026-10-11
 
-**Latest decision: BLOCKED — HOST MAINTENANCE REQUIRED.** The follow-up below confirms that the NVIDIA mismatch persists. No fresh simulator startup or official navigation was attempted in this follow-up. The earlier one-attempt startup failure is retained later in this document as historical evidence.
+**Latest decision: BLOCKED — ISAAC RTX STARTUP.** After the user's reboot, GPU/driver checks pass with 595.99.02. The one new Isaac 5 startup attempt reproduces the earlier native RTX SIGSEGV. Official E16 remains unexecuted. All earlier mismatch/crash records below are retained as historical evidence.
+
+## Post-reboot attempt: 2026-10-11 11:14–11:15 KST
+
+Starting clean local/fetched `origin/hardcase-probe`: **580ed2f90383771f7209fafdb5b6cf3ab89c779b**; fetched official `upstream/main`: **9fa6f8b66b9e121d5df5df071297bba8e5353ebb**. The original DynaNav directory still matches upstream exactly. No source/config/dependency/controller/model changes were made. Checkpoint and base-model SHA256 identities remain those recorded below and are included in this attempt's protected-file manifest.
+
+Fresh evidence directory: [`outputs/official-dynanav-postreboot-20261011-01`](../outputs/official-dynanav-postreboot-20261011-01). This is a simulator-only failure record, not an E16 run.
+
+### Stage A — PASS; mismatch resolved
+
+- `nvidia-smi` succeeds and reports **NVIDIA GeForce RTX 5060 Ti**, driver **595.99.02**, 16,311 MiB VRAM.
+- Running kernel: **7.0.0-38-generic**; last boot **2026-10-11 11:07:22 KST**.
+- `/sys/module/nvidia/version` and `modinfo -F version nvidia` both report **595.99.02**. NVML and libcuda symlinks resolve to their **595.99.02** libraries.
+- A read-only CUDA Driver API check succeeds: `cuInit`, device count, device/name lookup and driver-version query all return 0; one RTX 5060 Ti device is enumerated. Driver API version is 13020. No model, CUDA context or inference was created by this check. Driver capability is not an installed CUDA toolkit version claim.
+- Exact commands/results are in `stage-a-gpu.json`. The post-crash `host-after.json` again confirms healthy NVIDIA-SMI and matching versions, with no remaining probe process. The agent did not reboot or change the host.
+
+### Stage B — FAIL; exactly one new attempt
+
+Used the original `/home/gpuadmin/isaacsim-ticvla-5.0.0/python.sh` and installed `5.0.0-rc.45+release.23960.184afb15.gl`. The saved probe is byte-identical to the preceding simulator-only probe: **RayTracedLighting**, headless, 640×480; construct `SimulationApp`, request ten `app.update()` iterations, then `app.close()`. No Hospital, robot, model or navigation code is loaded by the probe.
+
+Exact argv: `/home/gpuadmin/isaacsim-ticvla-5.0.0/python.sh /home/gpuadmin/Workspace/TIC-VLA/outputs/official-dynanav-postreboot-20261011-01/probe_isaac5.py`. Child-only environment removes `LD_LIBRARY_PATH`, `PYTHONPATH`, `PYTHONEXE`, sets `PYTHONNOUSERSITE=1`, `PYTHONUNBUFFERED=1`, `CUDA_VISIBLE_DEVICES=0`. Supervisor wall limit **180 s**, interrupt grace **15 s**; neither was reached. The launcher exited **1** after **10.038287 s**, reporting native **Segmentation fault**. No retry, alternate renderer, Isaac 6 switch or E16 launch followed.
+
+| Required startup evidence | Observed result |
+| --- | --- |
+| GPU recognized in Isaac | PASS: Vulkan table lists RTX 5060 Ti active, driver 595.99.02 |
+| RTX renderer initialization completed | FAIL: native RTX scene database startup crash |
+| `SimulationApp` constructor returned | FAIL: `ISAAC5_CONSTRUCTOR_RETURNED` absent |
+| Ten requested post-constructor updates | NOT REACHED; completion marker absent |
+| Clean requested shutdown | NOT REACHED; shutdown-request marker absent |
+
+Kit prints `[8.074s] app ready`, but this precedes the crash and does not prove constructor completion. The archived Python main-thread stack still includes `SimulationApp.__init__` at `simulation_app.py:269`, `_prepare_ui` at line530, and the probe constructor call at line5. The fatal native thread is separate: its first non-signal frame is **`librtx.scenedb.plugin.so`**, frame004 is **`carbOnPluginStartup+0x3b2fe`**, followed by **`libcarb.scenerenderer-rtx.plugin.so`** and **`libomni.hydra.rtx.plugin.so`**. Do not mistake the contemporaneous Python menu/hotkey stack for the native fault's established cause.
+
+### Crash comparison and cause limits
+
+`crash-comparison.json` records complete frame strings and source-log hashes. **Frames001–009 match exactly** across this attempt and all three 2026-10-09 failures (Hospital smoke, headless simulator-only, and simulator-only without CUDA mask). Those earlier runs used595.84; this run uses matching595.99.02. The 2026-10-11 pre-reboot attempt instead had NVML version mismatch and timed out; it is a distinct failure mode.
+
+The earlier Warp `cuDeviceGetUuid` entry-point warnings recur, but are not by themselves proof of the fatal crash's cause. No NVML version mismatch or CUDA OOM appears in the current startup log. The evidence localizes the blocker to native Isaac5 RTX startup, before TIC-VLA or navigation, and demonstrates that fixing the driver/library mismatch did **not** resolve it. An Isaac5 RTX binary/driver/GPU compatibility problem remains a candidate; the exact underlying defect is **UNKNOWN** without further native diagnosis. No controller, checkpoint, Hospital lighting or inference change is justified by this failure.
+
+Saved artifacts include `isaac5-startup.log`, `isaac5-process-result.json`, the exclusive one-attempt marker, `gpu-samples.jsonl`, `summary.json`, and `crash-comparison.json`. `crash/` archives the complete **kit_20261011_111520.log**, **6938ce65-8764-45f2-fcc4bd85-7e93ce14.dmp** (3,265,792bytes), matching `.dmp.toml` and `.py.txt`. `crash-artifacts.json` maps original paths to copies and verifies SHA256 equality. Original crash files remain in place; no manual upload was performed, and Kit reports upload prevented by user opt-out.
+
+### Stage C/D — not executed; no navigation outcome
+
+The unchanged runner was verified to accept `--child --episode_name episode_16 --run_id ... --result_json ...` through `DynaNav/run_benchmark.sh DynaNav/configs/benchmark_full.yaml`. This single-child invocation would select only original E16 (Hospital, Nova,0people,85s episode timeout, original start/goal/instruction/lighting). **It was not executed because Stage B failed.** No E17 or 85-episode benchmark ran.
+
+Actual RGB, strict checkpoint load in navigation, native30×2 output, original controller/wheel application/recovery, measured XY/yaw/velocity, left turn, contacts, goal progress/success, observation/inference/ready/application timing and achieved action frequency are **UNKNOWN / NOT RUN**. Model calls0; predictions0. This is neither navigation failure nor baseline reproduction. No measured-path/yaw graphs or GUI/replay are generated; the older conditional GUI command below remains unexecuted and gated on a future startup PASS.
+
+Focused validation checks the healthy-driver record, failed startup markers, single-attempt receipt, exact historical crash-frame matches, byte-identical probe, copied crash hashes, unchanged official runtime, append-only work log, and **570 protected files**, allowing only this report/work-log update. Prior evidence and both weight files are unchanged. No controller/model test was rerun to imply runtime success. Final verification and normal commit/push receipts are in this fresh output; logs/dumps/generated data are not committed.
+
+**Next single task:** use this simulator-only reproduction log and minidump for NVIDIA RTX startup compatibility diagnosis/support, before authorizing another launch or any environment change. No report has been sent to NVIDIA in this task.
 
 ## Follow-up: driver diagnosis, 2026-10-11 10:54–10:55 KST
 
