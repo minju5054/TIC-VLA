@@ -1,0 +1,28 @@
+{
+  "source_runs": {
+    "A": "outputs/nova-e16-hospital-lights-baseline-20261010-01",
+    "B": "outputs/nova-e16-no-cart-15-repro-20261011-01"
+  },
+  "previous_graph_dir": "outputs/e16-se2-graph-offline-20261011-01",
+  "expected_chunks_per_run": 48,
+  "native_dt_s": 0.1,
+  "expected_points": 30,
+  "spline_budgets_m": [0.01, 0.03, 0.05],
+  "primary_spline_budget_m": 0.03,
+  "spline": {"degree": 3, "unit_weights": true, "s_rule": "N * budget_m**2 separately for observation-local forward and left coordinates", "ext": 2, "check_finite": true},
+  "polynomial_degree": 3,
+  "minimum_derivative_m_per_nominal_s": 0.1,
+  "minimum_ratio_tangent_samples": 24,
+  "minimum_ratio_denominator_m": 1e-8,
+  "time_roundoff_tolerance_s": 1e-8,
+  "dense_dt_s": 0.005,
+  "selected_pairs": [["A",13],["B",15],["A",25],["B",47]],
+  "representative_chunks": [["A",26],["B",16],["A",14],["B",48]],
+  "boundary_anchor_policy": "Fit only native tau=0.1..3.0. For boundary query in [0,0.1), a separate linear observation-origin to fitted-first-point bridge is permitted; not a spline extrapolation or fitting datum. Native support endpoints use one-sided derivatives.",
+  "revision_basis": "Fixed RAW FRESH +/-0.2s chord T and left normal, using existing graph chord validity rules on full native support; same basis for RAW and every fit. Also retain FRESH observation-body forward/left components for prior-audit comparability.",
+  "editable_policy": "Reuse existing full/clip time construction, then retain queries strictly after switch+1e-8; report previous boundary-inclusive editable metrics separately.",
+  "phase_policy": "Reuse original audit phase_at at each observation for chunk residuals and actual FRESH application for pairs. Straight=initial_travel or hallway_straight; left_turn separate; retain approach/near_goal/each phase and bootstrap separately.",
+  "execution_direction_policy": "Reuse preceding saved execution direction and quality checks from existing graph configuration, plus original audit numerically-valid direction as separately labeled context.",
+  "supplemental_example_rule": "Do not replace four prescribed pairs. Among nonbootstrap pairs valid across three splines, additionally show largest decrease/increase in robot-heading seam for spline03; persistence example is closest smoothed/raw full-RMSE ratio to 1 among upper-half RAW full-RMSE cases. These are descriptive selections, not categorical thresholds.",
+  "policy_note": "No per-chunk budget search, no joint OLD/FRESH fit, no observation-frame change, no graph rerun/tuning, no future measured target. Fitting residual is a variation/model-mismatch proxy, not independent ground-truth noise. Coordinatewise adaptive-knot spline fits are not invariant to changing local fitting axes; global world transforms keep original local axes fixed."
+}
