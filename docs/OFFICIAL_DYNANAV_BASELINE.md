@@ -1,6 +1,45 @@
 # Official DynaNav baseline reproduction — 2026-10-11
 
-**BLOCKED.** The single authorized Isaac 5 simulator-only startup failed before the `SimulationApp` constructor returned. No official episode, model inference, robot navigation, or Isaac 6 runtime was executed. This is not an official or adapted baseline PASS.
+**Latest decision: BLOCKED — HOST MAINTENANCE REQUIRED.** The follow-up below confirms that the NVIDIA mismatch persists. No fresh simulator startup or official navigation was attempted in this follow-up. The earlier one-attempt startup failure is retained later in this document as historical evidence.
+
+## Follow-up: driver diagnosis, 2026-10-11 10:54–10:55 KST
+
+Started clean on local/fetched `origin/hardcase-probe` **55f6d14888ac10dc3048de939bc0bc68688fe3b4**, fetched `upstream/main` **9fa6f8b66b9e121d5df5df071297bba8e5353ebb**. Official `DynaNav/` remains identical to upstream. Read the current rules, work log, this report, SETUP and ISAAC6_COMPATIBILITY; the optional misspelled `docs/OFFICIAL_DYNAV_BASELINE.md` does not exist.
+
+Fresh evidence: [`outputs/official-dynanav-runtime-20261011-01`](../outputs/official-dynanav-runtime-20261011-01). `stage-a-host-diagnosis.json` contains exact command arguments, exit status/stdout/stderr, reboot-status files and relevant apt/dpkg history. `stage-a-followup.json` contains kernel-journal confirmation, package audit and installed-module checks. Each host subprocess had a 25-second bound; none timed out. `stage-a-summary.json` records the gate decision. These are diagnosis artifacts, not navigation data.
+
+| Item | Current read-only evidence |
+| --- | --- |
+| `nvidia-smi` | **UNRESOLVED**, exit 18, driver/library version mismatch, on both checks |
+| Running Linux kernel (`uname -r`) | `7.0.0-34-generic` |
+| Loaded NVIDIA module (`/sys/module/nvidia/version`, `/proc/driver/nvidia/version`) | **595.84** |
+| On-disk module (`modinfo nvidia`) | **595.99.02**, `/lib/modules/7.0.0-34-generic/updates/dkms/nvidia.ko.zst` |
+| DKMS | `nvidia/595.99.02` installed for **7.0.0-34-generic** and **7.0.0-38-generic**; explicit `modinfo -k 7.0.0-38-generic -F version nvidia` also returns 595.99.02 |
+| Installed driver/DKMS/compute/GL packages | `595.99.02-0ubuntu0.24.04.1` |
+| NVML symlink target | `/usr/lib/x86_64-linux-gnu/libnvidia-ml.so.595.99.02` |
+| CUDA driver-library symlink target | `/usr/lib/x86_64-linux-gnu/libcuda.so.595.99.02` |
+| Last boot (`uptime -s`) | **2026-10-08 09:20:03 KST** |
+| Package transaction | `/usr/bin/unattended-upgrade`, **2026-10-11 06:23:11–06:24:00 KST**, 595.84 → 595.99.02 |
+| Package state (`dpkg --audit`) | Exit 0, empty output; no incomplete package configuration reported |
+| `/run/reboot-required` | Present: `*** System restart required ***` |
+| `/run/reboot-required.pkgs` | `linux-image-7.0.0-38-generic`, `linux-base` |
+
+The apt transaction and dpkg log establish an automatic driver update after the last boot. The running kernel still holds the old module while NVML/libcuda and installed modules are newer. The current boot's kernel journal explicitly reports client version 595.99.02 versus kernel-module version 595.84. **The most likely cause is the completed automatic update awaiting reboot**, not a TIC-VLA checkpoint or controller failure. The reboot marker itself names Linux kernel packages, not NVIDIA; the loaded-versus-installed NVIDIA evidence independently supports the diagnosis. No driver downgrade/reinstall is indicated by these checks.
+
+Stage A's healthy-GPU gate fails, so **Stage B: NOT RUN; Stage C E16: NOT RUN**. Fresh Isaac 5 attempts **0**, model calls **0**, native predictions **0**. Strict model load, RGB, controller application, measured robot movement, collisions/recovery, latency/cadence and goal outcome are **UNKNOWN**. No GUI, RGB, XY/yaw plot or replay was created. The old startup failure is not counted as a new attempt. E17 and Isaac 6 porting are outside this follow-up; the older port discussion below is historical only.
+
+### Specific maintenance plan — approval required, not performed
+
+The current task explicitly says **“Do not reboot automatically”** and requires approval before host maintenance. Stop at this gate. No reboot, module unload/reload, package installation/removal, driver/CUDA/Python/Isaac/GPU/sudo configuration change, or service restart was performed.
+
+1. Have the user save open work and confirm that the desktop, remote sessions and any running jobs may be interrupted. Obtain explicit approval for **one normal host reboot** to activate the already-installed matching driver. No driver installation is proposed.
+2. Only after that approval, restart through the normal desktop restart action (equivalent administrative command: `sudo systemctl reboot`). This command has **not** been run. Leave bootloader and GPU settings unchanged; matching NVIDIA modules are installed for both listed kernels.
+3. After reconnecting, run `uname -r`, `cat /sys/module/nvidia/version`, `modinfo -F version nvidia`, and `nvidia-smi`. Require a healthy NVIDIA-SMI device listing and matching loaded/on-disk/userspace driver versions before any Isaac launch. If the mismatch persists, stop and inspect the boot/module logs; do not automatically reinstall or hot-reload modules.
+4. Only with that gate healthy, use the existing Isaac 5 installation for the authorized **one bounded RTX simulator-only test**, requiring constructor return, recognized GPU, ten updates and clean shutdown. Only a PASS permits **one original E16**, with bounded wall time and fresh evidence. No E17. Fixing this mismatch does not prove that the older Isaac 5 RTX SIGSEGV is resolved.
+
+Validation for this follow-up is limited to the actually executed host checks, cross-checking the diagnosis records, protected-file hashes, append-only work log, unchanged upstream runtime, and Git diff/whitespace review. The prior two controller tests below were **not rerun** and are not a current simulator/model/navigation PASS. All **563 protected files** are checked before delivery, allowing only this report update and the work-log append; this includes both weights and every file in the preceding official-baseline evidence directory. The checkpoint identity remains the SHA256 in the table below. Final validation and normal commit/push receipts are saved in this follow-up directory; generated evidence is excluded from Git.
+
+## Earlier investigation — historical record
 
 ## Source identity and evidence
 
