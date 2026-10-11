@@ -1,0 +1,13 @@
+{
+  "native_waypoint_dt_s": 0.1,
+  "nominal_timing_note": "Source-confirmed target convention, not native timestamp channel",
+  "goal_region_radius_m": 2.0,
+  "goal_region_source": "DynaNav/behavior/nova_carter_test_ticvla.py:_goal_threshold and _is_goal_reached (strict XY distance < 2m)",
+  "corner_entry": "First measured pose within original gate center Y band, east of exit plane and west of start X plus original robot disk radius",
+  "corner_passage": "Original spatial_turn_gate crossing plus next observation; completion at that next observation application; separately require original two-interval actual-left-motion evidence",
+  "trimdoor5_passage": "After entering corner, entire robot disk west of original TrimDoor5 minimum world X, center inside original corridor band",
+  "precontact": "Both FRESH observation and application strictly before first nonfloor contact",
+  "inspection_pair": "First precontact FRESH observation inside corner-entry region; fallback last precontact pair explicitly outside corner if entry never observed",
+  "spatial_comparison": "Precontact observation bins of world Y on approach and world X within original corridor Y band; no C-index matching",
+  "secondary_comparison": "Previous cart1.2 versus no-cart1.0 changes speed and cart; contextual only, no causal cart claim"
+}
