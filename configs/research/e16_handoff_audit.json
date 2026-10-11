@@ -1,0 +1,10 @@
+{
+  "expected_requests": 48,
+  "native_waypoint_dt_s": 0.1,
+  "executed_tangent_window_s": 0.1,
+  "minimum_tangent_displacement_m": 0.000001,
+  "tangent_rule": "Existing route_geometry right-hand segment at switch; reject lengths <= numerical epsilon; not native yaw",
+  "phase_rule": "At actual FRESH switch: initial travel before approach; approach starts at corner lower Y minus controller max_v times nominal 3s horizon; left turn from original dense corner entry through original crossing-plus-one application; hallway thereafter, except current goal distance < existing 2m radius. Post-goal exit returns to hallway. These are spatial descriptive bins, not new success gates.",
+  "selection_rule": "Per run: maximum position seam; maximum robot-heading seam; maximum full RMSE among both position and robot-heading seams <= their within-run medians; maximum lateral revision in left-turn phase; minimum full RMSE among both position and robot-heading seams <= their within-run medians. Report actual ranks and values; median conditions select relative illustrative examples only, not hard-case thresholds, a composite score or an independence claim.",
+  "timing_note": "Source-confirmed nominal target convention, not native timestamp channel. No ready simulator pose inferred from wall-clock."
+}
