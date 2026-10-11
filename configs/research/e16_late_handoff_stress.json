@@ -1,0 +1,16 @@
+{
+  "delays_s": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "trials_per_condition": 2,
+  "maximum_runs": 10,
+  "candidate_band_south_m": 1.5,
+  "trigger_band_south_m": 0.75,
+  "trigger_rule": "First non-bootstrap FRESH observation east of exit plane, west of start X + original radius, within inner half of proposed 1.5m southern approach band, facing and moving north, before any measured corner entry. No request ID or prediction-content criterion.",
+  "native_waypoint_dt_s": 0.1,
+  "maximum_predictions": 48,
+  "intervention": "One post-response application hold on integer 60Hz physics ticks, retaining OLD command and wheels; no sleep-based delay, no additional capture or inference during hold.",
+  "stop_rule": "Two zero-delay controls must pass original left-turn/west-hallway and goal gates without nonfloor contact. Ascending delays, two independent trials per level, no retries. Stop larger delays if both trials clearly fail the corner after both preceding-level trials passed, or on runtime/inference failure. Mixed navigation outcomes remain mixed; never extend beyond1s.",
+  "during_hold_contact": "Stop safely on actual environment nonfloor contact (original abs(normal.z)<0.5 convention), preserve unapplied response and partial trace.",
+  "corner_metric_window": "From first dense measured crossing of trigger band's south Y to original corner completion, first nonfloor contact or run end, whichever comes first. No fabricated passage time on failure.",
+  "clearance_note": "Original circumscribed disk vs structural world AABBs plus saved PhysX ray proxy, separate from measured contact; no exact recoverability oracle.",
+  "curvature_note": "Measured body yaw rate / measured XY speed, radius=1/abs(curvature), undefined if speed or abs yaw rate <= original1e-6 numerical floor. Not native yaw or minimum feasible turning radius."
+}

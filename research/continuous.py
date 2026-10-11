@@ -77,7 +77,7 @@ def next_observation_time(observation_time, application_time, interval):
     return max(nominal, application_time)
 
 
-def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
+def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None, application_hook=None):
     settings = cfg["simulation"]
     if settings["pause_physics_during_inference"] or not settings["real_time_pacing"]:
         raise ValueError("Continuous mode requires physics enabled and real-time pacing")
@@ -114,6 +114,8 @@ def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
         sim.apply(*active.command)
         state = sim.step()
         history.update(state)
+        if application_hook is not None:
+            application_hook.observe_state(state)
         return state
 
     try:
@@ -139,6 +141,11 @@ def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
             response["ready"]["event_source"] = "inference_service_post_CUDA_sync_and_CPU_copy"
             chunk = validate_chunk(np.asarray(response.pop("raw_action"), dtype=np.float32))
             command, yaw_filter, index = waypoint_command(chunk, yaw_filter, **cfg["controller"])
+            hold_record = None
+            if application_hook is not None:
+                hold_record = application_hook.before_application(
+                    sim, request, response, old, chunk, command, index, yaw_filter,
+                    detected, lambda: pacer.step(tick))
             wheels = sim.apply(*command)
             application = sim.state()
             application["event_source"] = "simulator_main_thread_post_wheel_target_application"
@@ -161,6 +168,8 @@ def run_model_loop(sim, cfg, records, mode, evidence_analyzer=None):
                 "lookahead_index": index, "yaw_filter_state": yaw_filter,
                 "clock_policy": "same-host monotonic durations; wall clocks retained; main-thread physics continues",
                 "fresh_consumption": "unchanged native lookahead controller; no transport compensation/reconciliation"}
+            if hold_record is not None:
+                metadata["late_handoff"] = hold_record
             records.request(rid, chunk, metadata)
             print("CONTINUOUS_PREDICTION_PASS", rid, "obs", observation["sim_time"],
                   "switch", application["sim_time"], "old_source", old["old_control_source_request_id"], flush=True)
