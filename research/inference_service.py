@@ -63,19 +63,22 @@ def main():
                     "torchvision": importlib.metadata.version("torchvision"),
                     "device": torch.cuda.get_device_name(), "artifact_sha256": hashes,
                     "simulation_app_started": False, **clocks()})
-        directory = Path(args.run_dir)/"runtime_images"
+        directory = Path(args.run_dir)/("raw/model_images" if cfg.get("paperlike") else "runtime_images")
         directory.mkdir(exist_ok=False)
         images = []
+        paperlike = bool(cfg.get("paperlike"))
         starts = deque(maxlen=2)
         last_id = 0
         while True:
             request, encoded = receive(sock)
             if request.get("type") == "shutdown":
                 break
-            rid = request["request_id"]
-            if not isinstance(rid, int) or rid <= last_id:
+            buffer_only = paperlike and request.get("type") == "buffer_image"
+            rid = request.get("request_id")
+            if not buffer_only and (not isinstance(rid, int) or rid <= last_id):
                 raise ValueError("Requests must be sequential unique IDs")
-            last_id = rid
+            if not buffer_only:
+                last_id = rid
             image = cv2.imdecode(np.frombuffer(encoded, np.uint8), cv2.IMREAD_COLOR)
             expected_resolution = cfg["camera"]["resolution"]
             if image is None or image.shape != (expected_resolution[1], expected_resolution[0], 3):
@@ -84,17 +87,25 @@ def main():
             success, jpeg = cv2.imencode(".jpg", image)
             if not success:
                 raise RuntimeError("JPEG encoding failed")
-            path = directory/f"request_{rid:06d}.jpg"
+            path = directory/(f"buffer_{request['observation_id']:06d}.jpg" if buffer_only else f"request_{rid:06d}.jpg")
             with path.open("xb") as f:
                 f.write(jpeg.tobytes())
             obs = request["observation"]
-            images.append((obs["sim_time"], str(path), rid))
+            images.append((obs["sim_time"], str(path), rid, request.get("observation_id", rid)))
+            if buffer_only:
+                send(sock, {"type": "image_buffered", "observation_id": request["observation_id"]})
+                continue
             sampled = []
-            for multiplier in [3, 2, 1, 0]:
-                offset = multiplier*cfg["inference"]["image_history_interval_seconds"]
-                candidates = [item for item in images if item[0] <= obs["sim_time"]-offset+1e-8]
-                if candidates and candidates[-1] not in sampled:
-                    sampled.append(candidates[-1])
+            if paperlike:
+                # Exact official 90/60/30/0 SENSOR-entry selection, including
+                # captures buffered during BACKUP when inference is skipped.
+                sampled = [images[len(images)-1-n] for n in [90, 60, 30, 0] if len(images)>n]
+            else:
+                for multiplier in [3, 2, 1, 0]:
+                    offset = multiplier*cfg["inference"]["image_history_interval_seconds"]
+                    candidates = [item for item in images if item[0] <= obs["sim_time"]-offset+1e-8]
+                    if candidates and candidates[-1] not in sampled:
+                        sampled.append(candidates[-1])
             delta = np.zeros(3)
             delay = 0.0
             reference = starts[0] if starts else None
@@ -107,10 +118,11 @@ def main():
             pose = {"position": obs["position"], "quaternion": obs["quaternion_wxyz"],
                     "rotation_matrix": rotation_wxyz(obs["quaternion_wxyz"]).tolist()}
             start = clocks()
+            model_step = request["model_step"] if paperlike else obs["tick"]
             with torch.no_grad():
                 text, action, gen_step, kv_available, gen_pose = model.predict_async(
                     image_paths=[x[1] for x in sampled], instruction=request["instruction"],
-                    robot_state=torch.tensor(robot_state, dtype=torch.float32), current_step=obs["tick"],
+                    robot_state=torch.tensor(robot_state, dtype=torch.float32), current_step=model_step,
                     current_robot_pose=pose, previous_waypoints_text=request["previous_waypoints_text"],
                     time_delay=delay, robot_type="wheeled robot")
             torch.cuda.synchronize()
@@ -119,7 +131,7 @@ def main():
             raw = validate_chunk(action[0].float().cpu().numpy())
             ready = clocks()
             if gen_step is not None:
-                if gen_step != obs["tick"] or gen_pose is None:
+                if gen_step != model_step or gen_pose is None:
                     raise RuntimeError("Cannot associate reasoning start with this observation")
                 starts.append({"request_id": rid, "tick": gen_step, "sim_time": obs["sim_time"],
                                "position": np.asarray(gen_pose["position"]).tolist(),
@@ -129,6 +141,10 @@ def main():
                 "inference_start": start, "ready": ready, "robot_state_input": robot_state,
                 "delay_seconds_input": delay, "delay_reference": reference,
                 "sampled_image_request_ids": [x[2] for x in sampled], "reasoning_text": text,
+                **({"model_step_30hz": model_step,
+                    "sampled_image_observation_ids": [x[3] for x in sampled],
+                    "sampled_image_sim_times": [x[0] for x in sampled],
+                    "sampled_image_paths": [str(Path(x[1]).relative_to(args.run_dir)) for x in sampled]} if paperlike else {}),
                 "reasoning_new_start_step": gen_step, "reasoning_completion_poll_step": model._kv_cache_completion_step,
                 "reasoning_exact_worker_ready_wall_time_ns": None, "kv_cache_available": bool(kv_available)})
     except Exception as exc:
