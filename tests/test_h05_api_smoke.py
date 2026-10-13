@@ -1,7 +1,9 @@
 """Preparation/identity guard tests only; no simulator or model execution."""
 import importlib.util
+import builtins
 import json
 from pathlib import Path
+import symtable
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -111,6 +113,21 @@ class PreparationGuards(unittest.TestCase):
         new_goal = {'runner_sha256': 'new', 'episode': {'goal': [2, 2], 'start_yaw': 90}}
         self.assertEqual(smoke.clean_identity(before), smoke.clean_identity(new_hash))
         self.assertNotEqual(smoke.clean_identity(before), smoke.clean_identity(new_goal))
+
+    def test_runtime_functions_have_no_unbound_global_names(self):
+        table = symtable.symtable(PATH.read_text(), str(PATH), 'exec')
+        available = set(vars(smoke)) | set(vars(builtins))
+        missing = []
+        def check(scope):
+            if scope.get_type() == 'function':
+                missing.extend((scope.get_name(), symbol.get_name())
+                               for symbol in scope.get_symbols()
+                               if symbol.is_global() and symbol.is_referenced()
+                               and symbol.get_name() not in available)
+            for child in scope.get_children():
+                check(child)
+        check(table)
+        self.assertEqual(missing, [], 'Runtime-only global names must resolve before simulator startup')
 
 
 if __name__ == '__main__':

@@ -364,7 +364,7 @@ def pre_model_gate(sim, cfg, receipt):
     before = sim.state()
     _, observation, _ = sim.capture('preflight.png')
     robot = read(sim.records.path/'robot_asset.json')
-    baseline_robot = read(ROOT/PRIMARY/'robot_asset.json')
+    baseline_robot = read(ROOT/BASELINE/'robot_asset.json')
     lights = read(sim.records.path/'hospital_lighting_applied.json')
     checks = {
         'asset_hash': asset_sha == receipt['human_source_sha256'],
@@ -381,7 +381,7 @@ def pre_model_gate(sim, cfg, receipt):
             'cameras', 'camera_body_transform', 'verified_drive_wheels', 'verified_wheel_base', 'controller_radius', 'controller_base']),
         'robot_source_matches_prepared_copy': robot['source'] == receipt['changes']['current_robot_source'],
         'spawn_valid': read(sim.records.path/'nova_spawn_audit.json')['placement_valid'],
-        'lighting_unchanged': lights == read(ROOT/PRIMARY/'hospital_lighting_applied.json'),
+        'lighting_unchanged': lights == read(ROOT/BASELINE/'hospital_lighting_applied.json'),
         'brightness': read(sim.records.path/'raw/brightness/preflight.png.json')['pass'],
         'capture_no_physics_advance': before['tick'] == observation['tick'] == 0 and before['position'] == observation['position'],
     }
@@ -390,7 +390,7 @@ def pre_model_gate(sim, cfg, receipt):
         'semantic_labels': labels, 'geometry': geometry, 'initial_human_surface_clearance_m': clearance,
         'visibility': read(sim.records.path/'raw/visibility/preflight.png.json'),
         'note': 'One same-pose render gate; no inference, no candidate search, no bypass forcing; C1 need not be CLEAR'}
-    write_json(sim.records.path/'pre-model-gate.json', record)
+    write(sim.records.path/'pre-model-gate.json', record)
     if not record['pass']:
         raise RuntimeError('H05_PREREQUISITE_FAILED: '+str([k for k, v in checks.items() if not v]))
 
