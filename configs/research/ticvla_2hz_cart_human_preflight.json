@@ -1,0 +1,292 @@
+{
+  "schema": 1,
+  "policy": {
+    "scope": "MODEL-FREE HUMAN PLACEMENT PREFLIGHT \u2014 NO HUMAN-CONDITIONED NAVIGATION",
+    "goal_cutoff": "First measured dense pose with XY distance strictly <2 m; include that row only",
+    "near_cart_surface_distance_m": 3.0,
+    "meaningful_cart_robot_clearance_max_m": 2.0,
+    "passage_windows_progress_relative_to_cart_m": {
+      "approach": [
+        -3.0,
+        -1.0
+      ],
+      "local": [
+        -1.0,
+        1.0
+      ],
+      "post": [
+        1.0,
+        3.0
+      ]
+    },
+    "trend": "OLS lateral offset versus west progress in approach window; extrapolate unchanged",
+    "excursion_threshold_m": 0.2,
+    "persistence_progress_m": 0.5,
+    "return": "Absolute median post residual <=0.10 m and <=half local peak absolute residual",
+    "passage_validity": "Entire windows inside goal-cut west corridor; cart footprint intersects physical corridor; valid cross-sections; meaningful clearance",
+    "grid_downstream_m": [
+      3.0,
+      5.0,
+      7.0,
+      9.0
+    ],
+    "grid_left_offsets_m": [
+      0.0,
+      0.25,
+      -0.25
+    ],
+    "left_definition": "West forward=(-1,0), left=(0,-1); positive left decreases world Y",
+    "human_root_yaw_rad": 0.0,
+    "human_orientation": "Same Z-up source rest pose, root RotateZ=0; no anatomical facing inferred",
+    "human_radius_m": 0.25,
+    "robot_radius_m": 0.6069825421953869,
+    "static_margin_m": 0.05,
+    "required_center_separation_m": 0.906982542195387,
+    "bypass": "Primary-route connectors at person west progress +/-2.5 m; side strip at +/-1.1 m longitudinal, left/right offset 1.0 m from human; full path tested",
+    "max_sample_spacing_m": 0.05,
+    "structural_proxy": "Enabled original collider world AABB intersecting robot sphere vertical range [0.70-(radius+margin),0.70+(radius+margin)]; floor excluded; continuous segment distance",
+    "human_proxy_limit": "0.25 m capsule does not enclose outstretched rest-pose arms; separate full visual bounds placement overlap check",
+    "visibility": {
+      "fraction_min": 0.002,
+      "width_min_px": 20,
+      "height_min_px": 80,
+      "early_along_track_min_m": 5.0
+    },
+    "render_sequence": "All primary saved observations before first continuous path conflict, up to goal cutoff; exact full position/quaternion; stopped timeline",
+    "valid_early": "CLEAR, original brightness PASS, correct camera/asset/settings, >=5 m remaining measured path arc length to closest human station, before first conflict; corner observations allowed and straight-corridor flag reported",
+    "ranking": [
+      "maximum structural clearance of passing side",
+      "maximum valid early CLEAR remaining distance",
+      "minimum absolute corridor-left offset",
+      "ascending candidate ID"
+    ],
+    "stop": "At most 12 frozen sites; no relocation, relaxation, inference or navigation; select exactly one or NO_QUALIFIED_STATIONARY_HUMAN_SITE"
+  },
+  "geometry": {
+    "entrance_x_m": 2.5521036832844546,
+    "south_y_m": 8.850853576660183,
+    "north_y_m": 12.348226013183607,
+    "center_y_m": 10.599539794921895,
+    "width_m": 3.497372436523424,
+    "goal_region_east_extent_x_m": -10.23
+  },
+  "references": [
+    "outputs/nova-e16-hospital-lights-baseline-20261010-01",
+    "outputs/nova-e16-no-cart-15-repro-20261011-01",
+    "outputs/nova-e16-zero-repeat-20261011-01-r01-no_hook",
+    "outputs/nova-e16-zero-repeat-20261011-01-r02-zero_hook",
+    "outputs/nova-e16-zero-repeat-20261011-01-r03-zero_hook",
+    "outputs/nova-e16-zero-repeat-20261011-01-r04-no_hook",
+    "outputs/nova-e16-zero-repeat-20261011-01-r05-no_hook",
+    "outputs/nova-e16-zero-repeat-20261011-01-r06-zero_hook"
+  ],
+  "primary": "outputs/nova-e16-hospital-lights-baseline-20261010-01",
+  "candidates": [
+    {
+      "id": "H01",
+      "downstream_m": 3.0,
+      "left_offset_m": 0.0,
+      "position_world_xyz": [
+        -0.4478963167155454,
+        10.599539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H02",
+      "downstream_m": 3.0,
+      "left_offset_m": 0.25,
+      "position_world_xyz": [
+        -0.4478963167155454,
+        10.349539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H03",
+      "downstream_m": 3.0,
+      "left_offset_m": -0.25,
+      "position_world_xyz": [
+        -0.4478963167155454,
+        10.849539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H04",
+      "downstream_m": 5.0,
+      "left_offset_m": 0.0,
+      "position_world_xyz": [
+        -2.4478963167155454,
+        10.599539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H05",
+      "downstream_m": 5.0,
+      "left_offset_m": 0.25,
+      "position_world_xyz": [
+        -2.4478963167155454,
+        10.349539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H06",
+      "downstream_m": 5.0,
+      "left_offset_m": -0.25,
+      "position_world_xyz": [
+        -2.4478963167155454,
+        10.849539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H07",
+      "downstream_m": 7.0,
+      "left_offset_m": 0.0,
+      "position_world_xyz": [
+        -4.447896316715545,
+        10.599539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H08",
+      "downstream_m": 7.0,
+      "left_offset_m": 0.25,
+      "position_world_xyz": [
+        -4.447896316715545,
+        10.349539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H09",
+      "downstream_m": 7.0,
+      "left_offset_m": -0.25,
+      "position_world_xyz": [
+        -4.447896316715545,
+        10.849539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H10",
+      "downstream_m": 9.0,
+      "left_offset_m": 0.0,
+      "position_world_xyz": [
+        -6.447896316715545,
+        10.599539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H11",
+      "downstream_m": 9.0,
+      "left_offset_m": 0.25,
+      "position_world_xyz": [
+        -6.447896316715545,
+        10.349539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    },
+    {
+      "id": "H12",
+      "downstream_m": 9.0,
+      "left_offset_m": -0.25,
+      "position_world_xyz": [
+        -6.447896316715545,
+        10.849539794921895,
+        0.0
+      ],
+      "yaw_rad": 0.0,
+      "station_valid": true,
+      "invalid_reason": null
+    }
+  ],
+  "human": {
+    "prim": "/World/PreflightHuman",
+    "asset": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/People/Characters/male_adult_construction_03/male_adult_construction_03.usd",
+    "radius_m": 0.25,
+    "capsule_cylinder_height_m": 1.2
+  },
+  "human_asset_audit": {
+    "asset": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/People/Characters/male_adult_construction_03/male_adult_construction_03.usd",
+    "source_units": 1.0,
+    "source_up_axis": "Z",
+    "height_m": 1.9383541345596313,
+    "visual_translation_m": [
+      -1.1682510375976562e-05,
+      0.02393507957458496,
+      0.15741968154907227
+    ],
+    "source_bounds": [
+      [
+        -1.0058958530426025,
+        -0.2989746928215027,
+        -0.15741968154907227
+      ],
+      [
+        1.0059192180633545,
+        0.25110453367233276,
+        1.780934453010559
+      ]
+    ],
+    "source_to_z_up_rotation": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "motion_note": "Scripted fixed-speed translated character; frozen authored rest pose, no gait/crowd-policy reproduction"
+  },
+  "geometry_sha256": "cae8bca9a3f2e41015a12412ef59c0493aa47a0c3437ccfd73b1cf5f01f682c9",
+  "reference_validation_sha256": "ce0fc166a46be6cc8ee7470cf631d63567941f1930d043e2cb0a75a12b4239fb",
+  "historical_receipt_sha256": "13622cc3110b493a6fc2d009a80a2933408a82aa4b2b59d0f751a1fad8a54ce8"
+}

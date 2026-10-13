@@ -1,0 +1,266 @@
+{
+  "scope": "MODEL-FREE HUMAN PLACEMENT PREFLIGHT \u2014 NO HUMAN-CONDITIONED NAVIGATION",
+  "date": "2026-10-13",
+  "local_start_sha": "2258caa21efed76b2c6be47273313642416ffbfa",
+  "remote_start_sha": "f99f6d2f29f24e93ff02e19161642353416f1748",
+  "upstream_sha": "9fa6f8b66b9e121d5df5df071297bba8e5353ebb",
+  "branch": "hardcase-probe",
+  "publication_receipt": "outputs/ticvla-2hz-human-preflight-20261013-01/git-finalization.json",
+  "raw_output_dir": "outputs/ticvla-2hz-human-preflight-20261013-01",
+  "stage_a": {
+    "classification": "INSUFFICIENT_GEOMETRIC_EVIDENCE",
+    "original_cart_instances": 28,
+    "near_route_original_carts": [
+      "/Root/SM_SupplyCart_01e9",
+      "/Root/SM_SupplyCart_02a2_91"
+    ],
+    "valid_straight_corridor_cart_passages": 0,
+    "local_excursion_m": null,
+    "minimum_near_cart_aabb_clearance_m": 0.5920208979748565,
+    "primary_centerline_offset_range_left_m": [
+      -0.6265277481078897,
+      0.8864593887329306
+    ],
+    "primary_minimum_parallel_wall_disk_clearance_m": 0.25524428733339444,
+    "corridor_center_world_y_m": 10.599539794921895,
+    "corridor_width_m": 3.497372436523424,
+    "interpretation": "No eligible local cart-passage window in validated west corridor; no causal avoidance or leakage conclusion"
+  },
+  "stage_b": {
+    "decision": "HUMAN_SITE_QUALIFIED_MODEL_FREE",
+    "candidate_count": 12,
+    "counts": {
+      "physical_pass": 12,
+      "baseline_conflict": 12,
+      "left_bypass_pass": 4,
+      "right_bypass_pass": 8,
+      "early_clear_pass": 10,
+      "qualified": 10
+    },
+    "selected_id": "H05",
+    "plan_sha256": "1142a519f28e0d29ce402e5d8bca538efb16bd233ccc73018d397bfb542f8e47",
+    "model_calls": 0,
+    "checkpoint_loads": 0,
+    "navigation_trials": 0,
+    "physics_steps": 0
+  },
+  "selected": {
+    "id": "H05",
+    "world_xyz_m": [
+      -2.4478963167155454,
+      10.349539794921895,
+      0.0
+    ],
+    "world_yaw_ccw_rad": 0.0,
+    "human": {
+      "prim": "/World/PreflightHuman",
+      "asset": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/People/Characters/male_adult_construction_03/male_adult_construction_03.usd",
+      "radius_m": 0.25,
+      "capsule_cylinder_height_m": 1.2,
+      "start_position": [
+        -2.4478963167155454,
+        10.349539794921895,
+        0.0
+      ],
+      "yaw": 0.0
+    },
+    "human_source_sha256": "2e5d7fc72d6e2ed67f0ab86e2f3aaa91066019a4c71266361735956f232ccff0",
+    "robot_radius_m": 0.6069825421953869,
+    "human_radius_m": 0.25,
+    "static_margin_m": 0.05,
+    "required_center_separation_m": 0.9069825421953869,
+    "first_visible_request_id": 11,
+    "first_clear_request_id": 12,
+    "first_clear_remaining_measured_path_m": 9.801864989002507,
+    "first_clear_camera_to_human_base_m": 8.75369493515365,
+    "first_clear_already_inside_straight_corridor": false,
+    "obstructed_primary_plus_six": 7,
+    "bypass_side": "RIGHT",
+    "bypass_vertices_world_xy_m": [
+      [
+        0.05210368328445458,
+        11.188700185246221
+      ],
+      [
+        -1.3478963167155453,
+        11.349539794921895
+      ],
+      [
+        -3.5478963167155455,
+        11.349539794921895
+      ],
+      [
+        -4.947896316715545,
+        10.351896536563132
+      ]
+    ],
+    "minimum_human_surface_clearance_m": 0.14301745780461306,
+    "minimum_structural_clearance_m": 0.35146472432884646,
+    "configuration": "configs/research/ticvla_2hz_stationary_human_selected.json",
+    "configuration_sha256": "1b9d2beec527fdede71f3b33984cfd3e11a0d75dcf01da1ac4b1544d57da434e"
+  },
+  "candidate_matrix": [
+    {
+      "id": "H01",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H02",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 6,
+      "left_bypass_pass": false,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H03",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": false,
+      "early_clear_pass": false,
+      "qualified": false,
+      "reasons": [
+        "NO_CONNECTED_BYPASS",
+        "RGB_NOT_ELIGIBLE"
+      ]
+    },
+    {
+      "id": "H04",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H05",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H06",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": false,
+      "early_clear_pass": false,
+      "qualified": false,
+      "reasons": [
+        "NO_CONNECTED_BYPASS",
+        "RGB_NOT_ELIGIBLE"
+      ]
+    },
+    {
+      "id": "H07",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": true,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H08",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H09",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 6,
+      "left_bypass_pass": true,
+      "right_bypass_pass": false,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H10",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 6,
+      "left_bypass_pass": true,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H11",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 7,
+      "left_bypass_pass": false,
+      "right_bypass_pass": true,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    },
+    {
+      "id": "H12",
+      "physical_pass": true,
+      "baseline_conflict": true,
+      "obstructed_primary_plus_six": 2,
+      "left_bypass_pass": true,
+      "right_bypass_pass": false,
+      "early_clear_pass": true,
+      "qualified": true,
+      "reasons": []
+    }
+  ],
+  "validation": {
+    "status": "PASS",
+    "protected_file_count": 3440,
+    "protected_changes": [],
+    "frozen_source_matches": true,
+    "render_frames_revalidated": 254,
+    "connected_side_checks": 24
+  },
+  "cpu_tests": {
+    "passed": 31,
+    "command": "python3 -m pytest -q tests/test_two_hz_preflight.py"
+  },
+  "model_inferences": 0,
+  "checkpoint_loads": 0,
+  "navigation_trials": 0,
+  "physics_steps": 0,
+  "limitations": [
+    "Capsule excludes outstretched arms",
+    "Constructed geometric bypass has no dynamics/tracking validation",
+    "Early CLEAR for selected H05 occurs before the turn",
+    "Three unused historical dirty analysis/calibration source versions not recoverable; required raw data and runtime source hashes verified"
+  ],
+  "report": "docs/TICVLA_2HZ_CART_AND_HUMAN_PREFLIGHT.md",
+  "next_uncertainty": "Can the existing successful adapted 2 Hz TIC-VLA configuration, without a speed governor or controller modification, generate a safe human-conditioned FRESH trajectory and actually pass this one frozen stationary human while reaching the original E16 goal region?"
+}
