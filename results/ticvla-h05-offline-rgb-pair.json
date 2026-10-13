@@ -1,0 +1,1275 @@
+{
+  "status": "PASS",
+  "interpretation": [
+    "NO_CLEAR_DIRECTIONAL_RESPONSE",
+    "PREVISIBLE_DIVERGENCE",
+    "REPLAY_VARIABILITY_UNRESOLVED"
+  ],
+  "model_loads": 2,
+  "new_inferences": 28,
+  "requests_per_condition": 14,
+  "navigation_trials": 0,
+  "physics_steps": 0,
+  "new_renders": 0,
+  "retries": 0,
+  "service_pids": {
+    "ABSENT": 1273989,
+    "PRESENT": 1274175
+  },
+  "first_native_opposite_direction_request": null,
+  "first_angular_opposite_direction_request": null,
+  "first_raw_native_sign_disagreement": 5,
+  "first_operational_difference_request": 1,
+  "context_mismatch_requests": {
+    "sampled_ids_equal": [],
+    "state_float32_equal": [],
+    "delay_equal": [],
+    "delay_reference_equal": [],
+    "generation_start_equal": [],
+    "completion_poll_equal": [],
+    "kv_available_equal": []
+  },
+  "previsible_rgb_mae_range": [
+    3.52711210776749,
+    13.99529353137861
+  ],
+  "raw_manifest_sha256": "23a5d0d29de436fc2f09e6df265a40e3ed55dddce9be9dd6c894617e910d9e5f",
+  "protocol_sha256": "4bd25fdd583c2b1cac66889d757c360a2961cdbf3548212a7aa3c0dd135132ab",
+  "exact_consumed_KV_identity": "NOT_AVAILABLE",
+  "causal_limit": "Archived sequences are not a human-only pixel intervention. Background render differences and any internal context differences are retained; no attribution of previous navigation failure and no repeatability claim.",
+  "experiment": "H05 offline teacher-forced archived RGB-sequence comparison",
+  "condition_order": [
+    "ABSENT",
+    "PRESENT"
+  ],
+  "starting_local_and_fetched_origin_sha": "7474461f0c72118cf86e314f44ed79c18e4cbb9b",
+  "upstream_sha": "9fa6f8b66b9e121d5df5df071297bba8e5353ebb",
+  "execution_dirty_status": "?? research/analyze_h05_offline_rgb_pair.py\n?? research/h05_offline_rgb_pair.py\n?? tests/test_h05_offline_rgb_pair.py\n",
+  "tracked_diff_sha256_at_execution": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "final_git_identity_receipt": "outputs/h05-offline-rgb-pair-20261013-01/git-finalization.json",
+  "output_dir": "outputs/h05-offline-rgb-pair-20261013-01",
+  "baseline_config_sha256": "47dfec04f4fbee560e61389347e132765cd0135b360de91010575ccac675c0bb",
+  "weights": {
+    "base": {
+      "path": "/home/gpuadmin/Workspace/models/tic-vla/InternVL3-1B/model.safetensors",
+      "sha256": "a8b67c54568417f3631723e6b3e120720eaa638e03e62dc25666c70e3ae3e484"
+    },
+    "checkpoint": {
+      "path": "/home/gpuadmin/Workspace/models/tic-vla/checkpoints/TIC-VLA-model.ckpt",
+      "sha256": "376263f89fad0f42c267d85655019232edc91d36e214e23424804dd4cd42e036"
+    }
+  },
+  "sources": {
+    "ABSENT": "outputs/nova-e16-hospital-lights-baseline-20261010-01/diagnostics/rgb_000001.png \u2026 rgb_000014.png",
+    "PRESENT": "outputs/ticvla-2hz-human-preflight-20261013-01/stage-b/renders/H05/C01-rgb.png \u2026 C14-rgb.png",
+    "shared_metadata": "outputs/nova-e16-hospital-lights-baseline-20261010-01/raw/requests/request_000001.json \u2026 request_000014.json"
+  },
+  "frozen_input_and_source_manifest": "outputs/h05-offline-rgb-pair-20261013-01/protocol.json",
+  "saved_rgb_audit": "outputs/h05-offline-rgb-pair-20261013-01/rgb-audit.json",
+  "raw_native_outputs": "outputs/h05-offline-rgb-pair-20261013-01/raw/{ABSENT,PRESENT}/raw/requests/request_000001.npy \u2026 request_000014.npy",
+  "raw_event_fields": "Matching JSON stores actual state/delay/reference, sampled IDs, reasoning text, generation-start/latest-completion-poll, KV availability, all clocks and counterfactual commands.",
+  "native_and_world_difference_arrays": "outputs/h05-offline-rgb-pair-20261013-01/derived/native-and-world-differences.json",
+  "maximum_camera_matrix_error": 2.768230027427876e-07,
+  "reasoning_text_different_requests": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "observed_async_lifecycle_mismatch": false,
+  "exact_original_async_state_replay": false,
+  "primary_directional_response": false,
+  "raw_C5_sign_difference_note": "A=-0.007537841796875 m, B=0.0281982421875 m; A is within preregistered 0.02 m near-zero band. No opposite LEFT/RIGHT outside bands anywhere C1-C14.",
+  "timing": {
+    "A": {
+      "action_call_median_s": 0.0549271255,
+      "action_call_max_s": 1.697298149,
+      "maximum_schedule_drift_s": 0.01141633819497656
+    },
+    "B": {
+      "action_call_median_s": 0.0565567775,
+      "action_call_max_s": 1.633376237,
+      "maximum_schedule_drift_s": 0.003239215206122026
+    }
+  },
+  "rules": {
+    "conditions": [
+      "ABSENT",
+      "PRESENT"
+    ],
+    "requests_each": 14,
+    "maximum_new_inferences": 28,
+    "independent_model_loads": 2,
+    "retries": false,
+    "navigation_trials": 0,
+    "physics_steps": 0,
+    "renders": 0,
+    "primary_window": [
+      12,
+      13,
+      14
+    ],
+    "previsible_window": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "marginal": 11,
+    "scheduling": "After service ready: nominal_i=monotonic_epoch+(reference_sim_i-reference_sim_1); dispatch no earlier than nominal_i and previous_dispatch+reference_interval_i. Synchronous one outstanding request; no catch-up bursts. Record nominal/guard/actual/drift.",
+    "teacher_forcing": "Both receive exact same saved observation, instruction and previous_waypoints_text. Never update pose/history from new actions. Reset service and controller filter between conditions.",
+    "rgb_changed_pixel": "Any RGB channel absolute difference >10 on original uint8 PNG; distribution is mean absolute RGB channel difference per pixel",
+    "previsible_significant_operational": "XY point RMSE>=0.05 m OR abs lookahead-left difference>=0.05 m OR abs angular-command difference>=0.05 rad/s; descriptive threshold, not statistical significance",
+    "native_direction_deadband_m": 0.02,
+    "angular_direction_deadband_rad_s": 0.03,
+    "primary_response": "Opposite LEFT/RIGHT native lookahead or angular-command signs, outside declared deadbands, at any C12-C14; report which channel and all confounds",
+    "native_rmse": "sqrt(mean(sum((B-A)**2,axis=XY))) over all 30 corresponding native points; no interpolation/stitching",
+    "world_transform": "World metres, original Hospital origin, +Z up. Body forward/left [dx,dy,0] mapped by observation wxyz body-to-world rotation and XYZ translation, then XY projection. Positive angular command is yaw-CCW LEFT. No native yaw/time.",
+    "context_parity": "Compare actual float32 six-value state sent to predict_async, delay/reference, sampled IDs, generation-start step, completion-poll step and cache availability. Exact consumed KV identity unavailable.",
+    "interpretation": "Exploratory archived RGB-sequence association only; stopped-render/background and stochastic/asynchronous context confounds; original asynchronous state not reproduced; repeatability unresolved"
+  },
+  "controller": {
+    "lookahead": 1.0,
+    "angular_gain": 0.8,
+    "filter_gain": 0.35,
+    "epsilon": 0.001,
+    "max_v": 1.5,
+    "max_w": 1.2
+  },
+  "seed": 36,
+  "inference_runtime": {
+    "model_source": "/home/gpuadmin/Workspace/TIC-VLA/DynaNav/ticvla.py",
+    "strict_checkpoint": true,
+    "python": "3.11.13 (tags/v3.11.13-dirty:498b971, Jun  9 2025, 16:37:36) [GCC 7.3.1 20180303 (Red Hat 7.3.1-5)]",
+    "executable": "/home/gpuadmin/isaacsim-ticvla-5.0.0/kit/python/bin/python3",
+    "isaac_version": "5.0.0-rc.45+release.23960.184afb15.gl",
+    "torch": "2.7.0+cu128",
+    "numpy": "1.26.0",
+    "transformers": "4.57.6",
+    "torchvision": "0.22.0+cu128",
+    "device": "NVIDIA GeForce RTX 5060 Ti",
+    "artifact_sha256": {
+      "base": "a8b67c54568417f3631723e6b3e120720eaa638e03e62dc25666c70e3ae3e484",
+      "checkpoint": "376263f89fad0f42c267d85655019232edc91d36e214e23424804dd4cd42e036"
+    },
+    "simulation_app_started": false
+  },
+  "validation": {
+    "status": "PASS",
+    "model_loads": 2,
+    "inferences": 28,
+    "navigation_trials": 0,
+    "physics_steps": 0,
+    "new_renders": 0,
+    "native_arrays": 28,
+    "raw_manifest_files": 128,
+    "paired_inputs": 112,
+    "protected_files_verified_by_phase_verify": 4787,
+    "frozen_source_files_verified_by_phase_verify": 130,
+    "independent_scalar_max_errors": {
+      "controller": 5.551115123125783e-17,
+      "world": 1.7763568394002505e-15,
+      "state": 0.0,
+      "native_delta": 0.0
+    },
+    "reasoning_text_different_requests": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "official_and_existing_runtime_sources_unchanged": true,
+    "separate_services_sequential_filters_and_no_motion": true,
+    "analysis_versions": {
+      "python": "3.12.3",
+      "numpy": "1.26.4",
+      "Pillow": "10.2.0",
+      "matplotlib": "3.6.3"
+    },
+    "raw_manifest_sha256": "23a5d0d29de436fc2f09e6df265a40e3ed55dddce9be9dd6c894617e910d9e5f",
+    "protocol_sha256": "4bd25fdd583c2b1cac66889d757c360a2961cdbf3548212a7aa3c0dd135132ab",
+    "verification_script_sha256": "499bb5f7d8d768c4b77b01bef0b24b0f36f9b3ff1979c9ebb9d271b8d8cd477b",
+    "checks_note": "Saved-only audit. Synthetic unit tests are infrastructure checks, not additional model experiments."
+  },
+  "focused_tests_passed": 10,
+  "commands": [
+    "python3 -m unittest tests.test_h05_offline_rgb_pair tests.test_research.ControllerTests tests.test_research.RecordsTests.test_shape_finite -v",
+    "python3 -m py_compile research/h05_offline_rgb_pair.py research/analyze_h05_offline_rgb_pair.py",
+    "python3 research/h05_offline_rgb_pair.py --phase prepare --output-dir outputs/h05-offline-rgb-pair-20261013-01",
+    "set -o noclobber\npython3 research/h05_offline_rgb_pair.py --phase run --output-dir outputs/h05-offline-rgb-pair-20261013-01 > outputs/h05-offline-rgb-pair-20261013-01/run.log 2>&1",
+    "MPLCONFIGDIR=/tmp/h05-offline-mpl python3 research/analyze_h05_offline_rgb_pair.py --output-dir outputs/h05-offline-rgb-pair-20261013-01",
+    "python3 research/h05_offline_rgb_pair.py --phase verify --output-dir outputs/h05-offline-rgb-pair-20261013-01",
+    "python3 /tmp/verify_h05_pair.py",
+    "git diff --check"
+  ],
+  "report": "docs/TICVLA_H05_OFFLINE_RGB_PAIR.md",
+  "plots": [
+    "outputs/h05-offline-rgb-pair-20261013-01/derived/steering-comparison.png",
+    "outputs/h05-offline-rgb-pair-20261013-01/derived/primary-native-curves.png"
+  ],
+  "next_uncertainty": "Would a matched-render A/B control remove the previsible steering differences? No additional experiment authorized by this result.",
+  "rows": [
+    {
+      "C": 1,
+      "reference_sim_time_s": 0.0,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 13.99529353137861,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        3.0,
+        9.0,
+        24.333333333333332,
+        32.0,
+        36.666666666666664,
+        48.0,
+        186.66666666666666
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.4786395640432099,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        13.99529353137861
+      ],
+      "mean_luminance_A_B": [
+        192.4681783529129,
+        206.1786349135802
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.03125,
+        0.0230712890625
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.015625,
+        0.052490234375
+      ],
+      "lookahead_B_minus_A_m": [
+        -0.015625,
+        0.0294189453125
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.05041978524189505
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.11743741483919712
+      ],
+      "angular_B_minus_A_rad_s": 0.06701762959730206,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.047458021050785795,
+      "world_xy_point_rmse_m": 0.047457962702785614,
+      "sampled_ids_both": [
+        1
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 0.0,
+      "generation_start_both": 0,
+      "latest_completion_poll_both": 0,
+      "kv_available_both": true
+    },
+    {
+      "C": 2,
+      "reference_sim_time_s": 1.8000000938773155,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 3.7751581790123483,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        1.0,
+        2.0,
+        5.0,
+        8.333333333333334,
+        11.666666666666666,
+        26.0,
+        186.33333333333334
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.07173804012345679,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        3.7751581790123483
+      ],
+      "mean_luminance_A_B": [
+        204.57222332600318,
+        207.61105530941376
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.015625,
+        0.0216064453125
+      ],
+      "native_lookahead_forward_left_B_m": [
+        0.98046875,
+        0.029052734375
+      ],
+      "lookahead_B_minus_A_m": [
+        -0.03515625,
+        0.0074462890625
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.048993319280551395
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.0804383409769035
+      ],
+      "angular_B_minus_A_rad_s": 0.031445021696352105,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.0387147709887157,
+      "world_xy_point_rmse_m": 0.0387147246093626,
+      "sampled_ids_both": [
+        2
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 1.8000000938773155,
+      "generation_start_both": 108,
+      "latest_completion_poll_both": 0,
+      "kv_available_both": true
+    },
+    {
+      "C": 3,
+      "reference_sim_time_s": 2.3000001199543476,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 3.52711210776749,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        1.3333333333333333,
+        2.6666666666666665,
+        4.333333333333333,
+        6.666666666666667,
+        9.333333333333334,
+        20.666666666666668,
+        163.66666666666666
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.04531057098765432,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        3.52711210776749
+      ],
+      "mean_luminance_A_B": [
+        203.13619630266214,
+        206.0089583277392
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.0859375,
+        0.0181884765625
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.0703125,
+        0.0255126953125
+      ],
+      "lookahead_B_minus_A_m": [
+        -0.015625,
+        0.00732421875
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.03925008938708331
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.06290475671921328
+      ],
+      "angular_B_minus_A_rad_s": 0.023654667332129967,
+      "native_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.031086419171264427,
+      "world_xy_point_rmse_m": 0.031086391763066493,
+      "sampled_ids_both": [
+        3
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.3000001199543476,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 0,
+      "kv_available_both": true
+    },
+    {
+      "C": 4,
+      "reference_sim_time_s": 2.8000001460313797,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 4.530434188528804,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.0,
+        4.0,
+        6.0,
+        8.666666666666666,
+        10.333333333333334,
+        17.666666666666668,
+        108.0
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.06002604166666667,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        4.530434188528804
+      ],
+      "mean_luminance_A_B": [
+        200.15595354128087,
+        204.24971005488044
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.1171875,
+        0.01806640625
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.1796875,
+        0.037841796875
+      ],
+      "lookahead_B_minus_A_m": [
+        0.0625,
+        0.019775390625
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.03671318802565102
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.0689108931906269
+      ],
+      "angular_B_minus_A_rad_s": 0.03219770516497589,
+      "native_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.047404032804042734,
+      "world_xy_point_rmse_m": 0.047403978488787135,
+      "sampled_ids_both": [
+        4
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.8000001460313797,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 0,
+      "kv_available_both": true
+    },
+    {
+      "C": 5,
+      "reference_sim_time_s": 3.300000172108412,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 4.518486207561728,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.0,
+        4.0,
+        6.0,
+        8.666666666666666,
+        10.666666666666666,
+        17.0,
+        110.66666666666667
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.06251977237654321,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        4.518486207561728
+      ],
+      "mean_luminance_A_B": [
+        198.47844392833713,
+        202.57474687229956
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.1484375,
+        -0.007537841796875
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.09375,
+        0.0281982421875
+      ],
+      "lookahead_B_minus_A_m": [
+        -0.0546875,
+        0.035736083984375
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        -0.0006561163636708642
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.060858146723060294
+      ],
+      "angular_B_minus_A_rad_s": 0.06151426308673116,
+      "native_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        false,
+        false
+      ],
+      "native_xy_point_rmse_m": 0.10978078713371398,
+      "world_xy_point_rmse_m": 0.10978077034540294,
+      "sampled_ids_both": [
+        1,
+        5
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 3.300000172108412,
+      "generation_start_both": 198,
+      "latest_completion_poll_both": 198,
+      "kv_available_both": true
+    },
+    {
+      "C": 6,
+      "reference_sim_time_s": 3.800000198185444,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 4.780643164866257,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.3333333333333335,
+        4.333333333333333,
+        6.333333333333333,
+        8.666666666666666,
+        10.333333333333334,
+        18.0,
+        127.33333333333333
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.05942708333333333,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        4.780643164866257
+      ],
+      "mean_luminance_A_B": [
+        196.53975405941355,
+        200.85620023659348
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.15625,
+        -0.0027923583984375
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.109375,
+        0.03515625
+      ],
+      "lookahead_B_minus_A_m": [
+        -0.046875,
+        0.0379486083984375
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.001336441920505499
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.06826684175899739
+      ],
+      "angular_B_minus_A_rad_s": 0.06693039983849189,
+      "native_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        false,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.11405543201237392,
+      "world_xy_point_rmse_m": 0.11405542044386804,
+      "sampled_ids_both": [
+        1,
+        6
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.0000001043081284,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 198,
+      "kv_available_both": true
+    },
+    {
+      "C": 7,
+      "reference_sim_time_s": 4.300000224262476,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 4.39467705118313,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.0,
+        4.0,
+        5.666666666666667,
+        7.666666666666667,
+        9.666666666666666,
+        18.666666666666668,
+        201.33333333333334
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.04665316358024691,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        4.39467705118313
+      ],
+      "mean_luminance_A_B": [
+        194.25654560850703,
+        198.12958322636956
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.109375,
+        0.01104736328125
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.171875,
+        0.07177734375
+      ],
+      "lookahead_B_minus_A_m": [
+        0.0625,
+        0.06072998046875
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.019156573847123368
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.1117853512519251
+      ],
+      "angular_B_minus_A_rad_s": 0.09262877740480173,
+      "native_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "NEAR_ZERO",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.12167837992843748,
+      "world_xy_point_rmse_m": 0.12167835876610297,
+      "sampled_ids_both": [
+        1,
+        7
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.5000001303851604,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 198,
+      "kv_available_both": true
+    },
+    {
+      "C": 8,
+      "reference_sim_time_s": 4.800000250339508,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 4.141656700102882,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.0,
+        3.3333333333333335,
+        5.333333333333333,
+        7.666666666666667,
+        9.666666666666666,
+        18.0,
+        148.0
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.04613184799382716,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        4.141656700102882
+      ],
+      "mean_luminance_A_B": [
+        190.64961684654708,
+        194.21344174382705
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.0859375,
+        0.09033203125
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.1171875,
+        0.06494140625
+      ],
+      "lookahead_B_minus_A_m": [
+        0.03125,
+        -0.025390625
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.14104981793280325
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.11593386064545777
+      ],
+      "angular_B_minus_A_rad_s": -0.025115957287345475,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.12754604433430905,
+      "world_xy_point_rmse_m": 0.12754600364230131,
+      "sampled_ids_both": [
+        2,
+        8
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 3.0000001564621925,
+      "generation_start_both": 288,
+      "latest_completion_poll_both": 288,
+      "kv_available_both": true
+    },
+    {
+      "C": 9,
+      "reference_sim_time_s": 5.30000027641654,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 4.476559767232507,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.0,
+        3.6666666666666665,
+        6.0,
+        8.333333333333334,
+        10.666666666666666,
+        19.0,
+        157.33333333333334
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.05979070216049383,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        4.476559767232507
+      ],
+      "mean_luminance_A_B": [
+        184.24175558940973,
+        188.22794754253465
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.09375,
+        0.0673828125
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.109375,
+        0.058349609375
+      ],
+      "lookahead_B_minus_A_m": [
+        0.015625,
+        -0.009033203125
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.11890859916637636
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.11043096640133332
+      ],
+      "angular_B_minus_A_rad_s": -0.008477632765043042,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.1162549318923963,
+      "world_xy_point_rmse_m": 0.11625488638635277,
+      "sampled_ids_both": [
+        3,
+        9
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.0000001043081284,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 288,
+      "kv_available_both": true
+    },
+    {
+      "C": 10,
+      "reference_sim_time_s": 5.800000302493572,
+      "visibility": "HIDDEN",
+      "human_pixels": 0,
+      "rgb_mae_0_255": 5.066088927469135,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.3333333333333335,
+        4.0,
+        6.666666666666667,
+        9.666666666666666,
+        12.0,
+        21.333333333333332,
+        198.33333333333334
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.08668836805555556,
+      "inside_outside_mask_rgb_mae": [
+        null,
+        5.066088927469135
+      ],
+      "mean_luminance_A_B": [
+        175.98298142756562,
+        180.58878288416275
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.1796875,
+        0.0927734375
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.0859375,
+        0.04248046875
+      ],
+      "lookahead_B_minus_A_m": [
+        -0.09375,
+        -0.05029296875
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.14393549391708954
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.09058127332046789
+      ],
+      "angular_B_minus_A_rad_s": -0.05335422059662165,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.10431898459565887,
+      "world_xy_point_rmse_m": 0.10431894500323713,
+      "sampled_ids_both": [
+        4,
+        10
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.5000001303851604,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 288,
+      "kv_available_both": true
+    },
+    {
+      "C": 11,
+      "reference_sim_time_s": 6.300000328570604,
+      "visibility": "MARGINAL",
+      "human_pixels": 264,
+      "rgb_mae_0_255": 5.732755915637859,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        2.6666666666666665,
+        4.666666666666667,
+        7.333333333333333,
+        11.0,
+        14.0,
+        22.0,
+        211.0
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.11973524305555555,
+      "inside_outside_mask_rgb_mae": [
+        41.60858585858586,
+        5.728187809404746
+      ],
+      "mean_luminance_A_B": [
+        164.10583927739205,
+        169.40953643180936
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.09375,
+        0.10546875
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.1015625,
+        0.123046875
+      ],
+      "lookahead_B_minus_A_m": [
+        0.0078125,
+        0.017578125
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.186903763101822
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.20518710809525514
+      ],
+      "angular_B_minus_A_rad_s": 0.018283344993433148,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.039570658206214096,
+      "world_xy_point_rmse_m": 0.039570649890025573,
+      "sampled_ids_both": [
+        1,
+        5,
+        11
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 3.0000001564621925,
+      "generation_start_both": 378,
+      "latest_completion_poll_both": 378,
+      "kv_available_both": true
+    },
+    {
+      "C": 12,
+      "reference_sim_time_s": 6.800000354647636,
+      "visibility": "CLEAR",
+      "human_pixels": 5358,
+      "rgb_mae_0_255": 6.922408371913579,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        3.3333333333333335,
+        5.666666666666667,
+        8.666666666666666,
+        12.333333333333334,
+        15.666666666666666,
+        28.333333333333332,
+        193.33333333333334
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.16951967592592593,
+      "inside_outside_mask_rgb_mae": [
+        73.0704864999378,
+        6.7510447681331955
+      ],
+      "mean_luminance_A_B": [
+        145.1365170146605,
+        151.37365956057093
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.09375,
+        0.1630859375
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.1015625,
+        0.1689453125
+      ],
+      "lookahead_B_minus_A_m": [
+        0.0078125,
+        0.005859375
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.27780711023791826
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.2823761133773505
+      ],
+      "angular_B_minus_A_rad_s": 0.0045690031394322594,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.030122075028567792,
+      "world_xy_point_rmse_m": 0.030122040428238187,
+      "sampled_ids_both": [
+        1,
+        6,
+        12
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.0000001043081284,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 378,
+      "kv_available_both": true
+    },
+    {
+      "C": 13,
+      "reference_sim_time_s": 7.3000003807246685,
+      "visibility": "CLEAR",
+      "human_pixels": 5849,
+      "rgb_mae_0_255": 7.192131397890945,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        3.3333333333333335,
+        5.666666666666667,
+        9.0,
+        13.0,
+        16.666666666666668,
+        35.666666666666664,
+        176.33333333333334
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.20075327932098766,
+      "inside_outside_mask_rgb_mae": [
+        67.40098022453981,
+        7.021820003149961
+      ],
+      "mean_luminance_A_B": [
+        128.57948948234957,
+        135.0482376908757
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.0859375,
+        0.21484375
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.0859375,
+        0.1943359375
+      ],
+      "lookahead_B_minus_A_m": [
+        0.0,
+        -0.0205078125
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.36822081350019154
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.34002087216426313
+      ],
+      "angular_B_minus_A_rad_s": -0.028199941335928402,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.053717042113670635,
+      "world_xy_point_rmse_m": 0.053717038100895405,
+      "sampled_ids_both": [
+        1,
+        7,
+        13
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 2.5000001303851604,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 378,
+      "kv_available_both": true
+    },
+    {
+      "C": 14,
+      "reference_sim_time_s": 7.800000406801701,
+      "visibility": "CLEAR",
+      "human_pixels": 6464,
+      "rgb_mae_0_255": 7.766142618312758,
+      "pixel_mae_quantiles_0_25_50_75_90_95_99_100": [
+        0.0,
+        3.6666666666666665,
+        6.333333333333333,
+        10.333333333333334,
+        14.666666666666666,
+        17.666666666666668,
+        26.333333333333332,
+        217.66666666666666
+      ],
+      "fraction_pixel_any_channel_difference_gt10": 0.26189236111111114,
+      "inside_outside_mask_rgb_mae": [
+        84.09457508250826,
+        7.527461183008765
+      ],
+      "mean_luminance_A_B": [
+        121.57182733314036,
+        128.38143682947532
+      ],
+      "brightness_pass_A_B": [
+        true,
+        true
+      ],
+      "native_lookahead_forward_left_A_m": [
+        1.0234375,
+        0.17578125
+      ],
+      "native_lookahead_forward_left_B_m": [
+        1.1015625,
+        0.2119140625
+      ],
+      "lookahead_B_minus_A_m": [
+        0.078125,
+        0.0361328125
+      ],
+      "counterfactual_vw_A": [
+        1.5,
+        0.36055091140575335
+      ],
+      "counterfactual_vw_B": [
+        1.5,
+        0.3711497530652364
+      ],
+      "angular_B_minus_A_rad_s": 0.01059884165948305,
+      "native_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "angular_direction_A_B": [
+        "LEFT",
+        "LEFT"
+      ],
+      "raw_native_and_angular_sign_agreement": [
+        true,
+        true
+      ],
+      "native_xy_point_rmse_m": 0.03790752199635388,
+      "world_xy_point_rmse_m": 0.037907486529111765,
+      "sampled_ids_both": [
+        2,
+        8,
+        14
+      ],
+      "all_recorded_context_fields_equal": true,
+      "delay_both_s": 3.0000001564621925,
+      "generation_start_both": null,
+      "latest_completion_poll_both": 378,
+      "kv_available_both": true
+    }
+  ]
+}
