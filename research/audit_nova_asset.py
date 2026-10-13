@@ -50,7 +50,7 @@ def main():
     args = parser.parse_args(); out = Path(args.output_dir); out.mkdir(parents=True, exist_ok=False)
     source = source_audit(); write_json(out/"metadata.json", {"source": source, **provenance(ROOT)})
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": True, "renderer": "RayTracedLighting"})
+    app = SimulationApp({"headless": True, "renderer": "RealTimePathTracing"})
     code = 1
     try:
         import omni.usd

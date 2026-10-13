@@ -30,7 +30,7 @@ def main():
         'freeze_receipt':receipt,'freeze_receipt_sha256':digest(a.freeze_receipt),'config_sha256':digest(a.config),
         'all_research_code_sha256':{str(p.relative_to(ROOT)):digest(p) for p in (ROOT/'research').rglob('*.py')},**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});sim=None;code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});sim=None;code=1
     try:
         import inspect
         from research.bright_simulation import BrightSimulation

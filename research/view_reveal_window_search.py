@@ -60,7 +60,7 @@ def main():
     write_json(out/'metadata.json',{'mode':'cart_preflight_baseline_GUI' if preflight_only else 'saved_cart_run_GUI' if is_cart else 'saved_baseline_stationary_alternative_GUI','search':str(source),
                'model_calls':0,'navigation_physics_reexecuted':False,'source_evidence_sha256':hashes,**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':False,'renderer':'RayTracedLighting','width':1600,'height':1000})
+    app=SimulationApp({'headless':False,'renderer':'RealTimePathTracing','width':1600,'height':1000})
     try:
         import omni.ui as ui
         import omni.timeline

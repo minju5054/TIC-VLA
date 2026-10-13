@@ -245,7 +245,7 @@ def execute(out, stage, preflight=False):
         "command_variant": "paperlike", "command_argv": sys.argv, "protocol_sha256": digest(out/"protocol.json"),
         "config_sha256": receipt["config_sha256"][stage], **provenance(ROOT)})
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": True, "renderer": "RayTracedLighting", "width": 1920, "height": 1080})
+    app = SimulationApp({"headless": True, "renderer": "RealTimePathTracing", "width": 1920, "height": 1080})
     sim = None
     code = 1
     try:

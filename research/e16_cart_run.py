@@ -51,7 +51,7 @@ def execute(folder):
         'command_variant':'direct','freeze_receipt':receipt,'command_argv':sys.argv,
         'actor_metadata_note':'Legacy human_at_* keys carry object_type=stationary_hospital_cart; cart_state.csv is the cart log',**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});sim=None;code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});sim=None;code=1
     try:
         import omni.client
         from research.hospital_cart import StationaryCart

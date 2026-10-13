@@ -132,7 +132,7 @@ def main():
     parser.add_argument("--audit", action="store_true", help="Check imports and installed APIs after startup")
     args = parser.parse_args()
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": True, "renderer": "RayTracedLighting", "width": 640, "height": 480})
+    app = SimulationApp({"headless": True, "renderer": "RealTimePathTracing", "width": 640, "height": 480})
     print("ISAAC6_SIMULATION_APP_READY", flush=True)
     code = 0
     try:

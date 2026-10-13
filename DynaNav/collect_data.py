@@ -21,7 +21,7 @@ from isaacsim import SimulationApp
 from generate_commands import *
 
 
-APP_CONFIG = {"renderer": "RayTracedLighting", "headless": False, "width": 640, "height": 480}
+APP_CONFIG = {"renderer": "RealTimePathTracing", "headless": False, "width": 640, "height": 480}
 
 
 class DataCollector:

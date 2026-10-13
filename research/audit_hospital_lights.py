@@ -66,7 +66,7 @@ def main():
     hashes={str(p):digest(p) for p in [source/'metadata.json',*sorted((source/'raw/requests').glob('*.json'))]}
     write_json(out/'metadata.json',{'model_calls':0,'physics_reexecuted':False,'source_hashes':hashes,**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         import carb,omni.client
         from PIL import Image

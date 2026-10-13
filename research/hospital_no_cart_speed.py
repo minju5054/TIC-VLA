@@ -78,7 +78,7 @@ def execute(folder):
     from isaacsim import SimulationApp
     app=None;sim=None;code=1
     try:
-        app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080})
+        app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080})
         from research.hospital_lights_simulation import HospitalLightsSimulation
         from research.continuous import run_model_loop
         from isaacsim.robot.wheeled_robots.controllers.differential_controller import DifferentialController

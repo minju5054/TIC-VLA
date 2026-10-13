@@ -118,7 +118,7 @@ def execute(folder,index):
         host=host_state();write_json(records.path/'host.json',dict(**host,simulator_process_id=os.getpid(),**clocks()))
         if host!=receipt['host']:raise ValueError('Host GPU/driver/kernel changed')
         from isaacsim import SimulationApp
-        app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080})
+        app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080})
         from research.hospital_lights_simulation import HospitalLightsSimulation
         from research.continuous import run_model_loop
         from isaacsim.robot.wheeled_robots.controllers.differential_controller import DifferentialController

@@ -173,7 +173,7 @@ def run(out):
         'command_argv': sys.argv, 'authorization_receipt': str(out/'authorization.json'),
         'authorization_sha256': digest(out/'authorization.json'), **provenance(ROOT)})
     from isaacsim import SimulationApp
-    app = SimulationApp({'headless': True, 'renderer': 'RayTracedLighting', 'width': 1920, 'height': 1080})
+    app = SimulationApp({'headless': True, 'renderer': 'RealTimePathTracing', 'width': 1920, 'height': 1080})
     sim = None
     code = 1
     try:

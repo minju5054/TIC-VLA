@@ -89,7 +89,7 @@ def main():
     records = RunRecords(args.output_dir, {"mode": "preflight_no_inference", "config": cfg,
                                           "command_argv": sys.argv, **provenance(REPO)})
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": True, "renderer": "RayTracedLighting", "width": 640, "height": 480})
+    app = SimulationApp({"headless": True, "renderer": "RealTimePathTracing", "width": 640, "height": 480})
     sim, code = None, 1
     try:
         from research.sim import Simulation

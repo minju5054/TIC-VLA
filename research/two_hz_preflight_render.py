@@ -21,7 +21,7 @@ def main():
     if digest(__file__)!=amendment['adapter_sha256']:raise ValueError('Adapter source changed')
     cfg=read(Path(PRIMARY)/'runtime-config.json')
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         from isaacsim.core.utils import semantics
         if hasattr(semantics,'add_update_semantics'):raise ValueError('Unexpected legacy API in selected runtime')

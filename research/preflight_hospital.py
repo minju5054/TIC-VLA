@@ -20,7 +20,7 @@ def main():
     cfg = yaml.safe_load(Path(args.config).read_text()); validate_config(cfg)
     records = RunRecords(args.output_dir, {"mode": "hospital_preflight_no_model", "config": cfg, **provenance(ROOT)})
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": True, "renderer": "RayTracedLighting", "width": 640, "height": 480})
+    app = SimulationApp({"headless": True, "renderer": "RealTimePathTracing", "width": 640, "height": 480})
     sim, code = None, 1
     try:
         from research.sim import Simulation

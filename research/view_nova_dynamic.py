@@ -28,7 +28,7 @@ def main():
         "display_note":"Retrospective selected predictions; display-only fill lighting, guides lifted above floor, overview near-plane clips roof; original RGB panel is archived evidence",
         **provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({"headless":False,"renderer":"RayTracedLighting","width":1440,"height":900})
+    app=SimulationApp({"headless":False,"renderer":"RealTimePathTracing","width":1440,"height":900})
     try:
         import omni.usd
         import omni.timeline

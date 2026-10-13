@@ -17,7 +17,7 @@ def main():
     fixtures=fixture_sources(json.loads((audit/'fixtures.json').read_text()));lights=json.loads((audit/'lights.json').read_text());renderer=json.loads((audit/'renderer_defaults.json').read_text())
     cfg=json.loads((Path(a.source_run)/'metadata.json').read_text())['config']
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':640,'height':480});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':640,'height':480});code=1
     try:
         from research.nova_render_saved import SavedRenderer
         from pxr import Usd,UsdShade

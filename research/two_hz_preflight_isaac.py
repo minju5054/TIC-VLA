@@ -292,7 +292,7 @@ def main():
         raise ValueError('Simulator-only startup gate required')
     cfg=read(Path(PRIMARY)/'runtime-config.json')
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         {'inspect':inspect,'physical':physical,'render':render_candidates}[a.phase](app,cfg,out)
         import omni.timeline

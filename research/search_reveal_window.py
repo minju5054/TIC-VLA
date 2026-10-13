@@ -296,7 +296,7 @@ def main():
                 write_json(out/('render_'+a.render_part+'_immutable.json'),{'source_unchanged':True,'model_calls':0})
                 print('RENDER_REUSE_ONLY',len(eligible),'new renders 0',flush=True);return
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080})
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080})
     code=1
     try:
         if a.phase=='geometry':geometry(app,cfg,run,out)

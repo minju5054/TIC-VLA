@@ -87,7 +87,7 @@ def semantic(out):
     folder=out/'candidate_001';folder.mkdir(exist_ok=False)
     cfg=json.loads((out/'preregistered.json').read_text())['config']
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         import omni.replicator.core as rep
         from isaacsim.core.utils.semantics import add_labels

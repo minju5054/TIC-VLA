@@ -23,7 +23,7 @@ def main():
     with (out/'baseline_config.yaml').open('x') as f:yaml.safe_dump(cfg,f,sort_keys=False)
     write_json(out/'metadata.json',{'mode':'selected-route no-human preview','source_selection':str(source.resolve()),'model_calls':0,**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         from research.nova_render_saved import SavedRenderer
         from research.hospital_lights import apply_hospital_lights

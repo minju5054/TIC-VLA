@@ -56,7 +56,7 @@ def main():
             'no_navigation': True, 'model_calls': 0}
     write_json(out/'preregistered.json', rule)
     from isaacsim import SimulationApp
-    app = SimulationApp({'headless': True, 'renderer': 'RayTracedLighting', 'width': 1920, 'height': 1080})
+    app = SimulationApp({'headless': True, 'renderer': 'RealTimePathTracing', 'width': 1920, 'height': 1080})
     sim = None; code = 1
     try:
         import carb

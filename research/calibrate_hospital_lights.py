@@ -21,7 +21,7 @@ def main():
     write_json(out/'preregistered.json',{'profiles':profiles,'criteria':BRIGHT_RULES,'selection':'First passing least-invasive profile in listed order, all 48 poses plus manual scene visibility review',
         'model_calls':0,'source_evidence_sha256':hashes,**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         from research.nova_render_saved import SavedRenderer
         from PIL import Image

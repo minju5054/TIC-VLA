@@ -44,7 +44,7 @@ def main():
         **provenance(REPO)})
 
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": False, "renderer": "RayTracedLighting", "width": 1280, "height": 800})
+    app = SimulationApp({"headless": False, "renderer": "RealTimePathTracing", "width": 1280, "height": 800})
     try:
         import omni.usd
         import omni.timeline

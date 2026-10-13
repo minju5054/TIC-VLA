@@ -70,7 +70,7 @@ def main():
     meta=json.loads((base/"metadata.json").read_text());cfg=meta["config"]
     records=RunRecords(out,{"mode":"model_free_human_placement","baseline_run":str(base),"config":cfg,**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({"headless":True,"renderer":"RayTracedLighting","width":1920,"height":1080})
+    app=SimulationApp({"headless":True,"renderer":"RealTimePathTracing","width":1920,"height":1080})
     sim=None;code=1
     try:
         from research.nova_simulation import NovaSimulation

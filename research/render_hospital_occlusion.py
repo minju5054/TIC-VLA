@@ -28,7 +28,7 @@ def main():
     write_json(out/'metadata.json',{'baseline_run':str(run['path']),'geometry_dir':str(geometry),'source_evidence_sha256':hashes,
                'model_calls':0,'physics_reexecuted':False,'rule':rule,**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080}); code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080}); code=1
     try:
         import omni.replicator.core as rep
         from isaacsim.core.utils.semantics import add_labels

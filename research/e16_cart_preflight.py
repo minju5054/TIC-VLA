@@ -105,7 +105,7 @@ def semantic(out):
     if not physical_result['pass'] and not frozen.get('strict_visibility_gate'):raise ValueError('Physical gate failed; no model run')
     folder=out/'visibility';folder.mkdir(exist_ok=False)
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         import omni.replicator.core as rep
         from research.nova_render_saved import SavedRenderer

@@ -40,7 +40,7 @@ def main():
         "command_argv":sys.argv,"all_research_code_sha256":{str(p.relative_to(ROOT)):digest(p) for p in (ROOT/"research").rglob("*.py")},
         **provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({"headless":True,"renderer":"RayTracedLighting","width":1920,"height":1080})
+    app=SimulationApp({"headless":True,"renderer":"RealTimePathTracing","width":1920,"height":1080})
     sim=None;code=1
     try:
         from research.nova_simulation import NovaSimulation

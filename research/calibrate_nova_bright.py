@@ -28,7 +28,7 @@ def main():
         'candidate_type':'world-fixed sphere intensity, exposure +2 stops' if a.fixed_lights_fallback else 'exposure stops',
         'criteria':BRIGHT_RULES,'selection':'Lowest exposure passing every saved observation plus manual visual review. If none, fixed world lights fallback requires separate preregistered calibration; no model call.',**provenance(ROOT)})
     from isaacsim import SimulationApp
-    app=SimulationApp({'headless':True,'renderer':'RayTracedLighting','width':1920,'height':1080});code=1
+    app=SimulationApp({'headless':True,'renderer':'RealTimePathTracing','width':1920,'height':1080});code=1
     try:
         import carb
         from PIL import Image

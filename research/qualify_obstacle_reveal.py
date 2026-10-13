@@ -133,7 +133,7 @@ def semantic(out):
     if not survivors:
         write_json(out/'visibility.json', []); return
     from isaacsim import SimulationApp
-    app = SimulationApp({'headless': True, 'renderer': 'RayTracedLighting', 'width': 1920, 'height': 1080}); code = 1
+    app = SimulationApp({'headless': True, 'renderer': 'RealTimePathTracing', 'width': 1920, 'height': 1080}); code = 1
     try:
         import omni.replicator.core as rep
         from PIL import Image

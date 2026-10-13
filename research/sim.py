@@ -72,7 +72,7 @@ def main():
                           "command_argv": sys.argv, "prerequisite_run": args.prerequisite_run,
                           **({"official_freeze_receipt": official_receipt} if official_receipt else {}), **provenance(REPO)})
     from isaacsim import SimulationApp
-    app = SimulationApp({"headless": cfg["simulation"]["headless"], "renderer": "RayTracedLighting",
+    app = SimulationApp({"headless": cfg["simulation"]["headless"], "renderer": "RealTimePathTracing",
                          "width": cfg["camera"]["resolution"][0], "height": cfg["camera"]["resolution"][1]})
     code = 1
     sim = None
@@ -82,7 +82,7 @@ def main():
         runtime_root = Path(os.environ["ISAAC_PATH"])
         write_json(records.path/"simulation-runtime.json", {"python": sys.version, "executable": sys.executable,
             "isaac_root": str(runtime_root), "isaac_version": (runtime_root/"VERSION").read_text().strip(),
-            "numpy": np.__version__, "renderer": "RayTracedLighting", "physics_dt": cfg["simulation"]["dt"]})
+            "numpy": np.__version__, "renderer": "RealTimePathTracing", "physics_dt": cfg["simulation"]["dt"]})
         sim = Simulation(cfg, records, args.mode)
         if args.mode == "wheel":
             result = sim.validate_wheels()
