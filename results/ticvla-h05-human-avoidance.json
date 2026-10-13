@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "run_id": "nova-e16-h05-stationary-20261013-01",
+  "scientific_trials": 1,
+  "scientific_retries": 0,
+  "scientific_claim": "outputs/h05-avoidance-setup-20261013-01/scientific-claim.json",
+  "runtime": "PASS: 48 finite native predictions, validated continuous OLD retention",
+  "human_navigation": "HUMAN_NAVIGATION_FAIL",
+  "safe_fresh": "SAFE_FRESH_INSUFFICIENT_EVIDENCE",
+  "qualification": "TICVLA_H05_NOT_QUALIFIED",
+  "observed_failures": [
+    "STRUCTURAL_CONTACT",
+    "FAILED_TO_BYPASS",
+    "GOAL_NOT_REACHED"
+  ],
+  "preregistered_evaluator_flags": [
+    "STRUCTURAL_CONTACT",
+    "FAILED_TO_BYPASS",
+    "GOAL_NOT_REACHED",
+    "VISIBILITY_NOT_ESTABLISHED",
+    "PREDICTION_HORIZON_INSUFFICIENT"
+  ],
+  "visibility_flag_note": "VISIBILITY_NOT_ESTABLISHED means preinteraction qualification cannot be established because the robot never approached H05; it does NOT mean no CLEAR image. Conflict lead distance is undefined.",
+  "first_visible_and_clear": {
+    "request_id": 12,
+    "observation_sim_time": 7.000000365078449,
+    "human_visible_pixel_count": 5649,
+    "human_visible_fraction": 0.002724247685185185,
+    "human_bbox_if_visible": [
+      10,
+      335,
+      70,
+      555
+    ],
+    "robot_to_human_center_m": 8.630668114566395,
+    "brightness": {
+      "mean": 143.9276808283179,
+      "std": 43.060997704004365,
+      "p05": 69.0642,
+      "p50": 153.57479999999998,
+      "p95": 204.54959999999997,
+      "p99": 234.1404,
+      "dark_pixel_fraction": 0.0023697916666666667,
+      "saturated_pixel_fraction": 0.00013406635802469137,
+      "note": "Rec.709 luminance on archived 8-bit RGB; saturation = any channel >=250",
+      "pass": true,
+      "observation_sim_time": 7.000000365078449,
+      "rgb_reference": "diagnostics/rgb_000012.png"
+    },
+    "rgb": "diagnostics/rgb_000012.png"
+  },
+  "clear_observation_ids": [
+    12,
+    13
+  ],
+  "before_potential_human_conflict": null,
+  "useful_visibility_5m_before_conflict": null,
+  "visibility_lead_note": "No actual disk conflict or upstream safety-plane approach; C12 center distance is 8.631 m, not a measured 5 m lead-to-conflict result.",
+  "brightness_pass_observations": 29,
+  "brightness_fail_ids": [
+    21,
+    22,
+    23,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    44,
+    45,
+    46,
+    47,
+    48
+  ],
+  "relevant_prediction_counts": {
+    "PREDICTED_COLLISION_OR_LOW_CLEARANCE": 0,
+    "HORIZON_INSUFFICIENT": 48,
+    "SAFE_PREFIX_ONLY": 0,
+    "COMPLETE_SAFE_BYPASS_PREDICTED": 0
+  },
+  "clear_conditioned_prediction_counts": {
+    "PREDICTED_COLLISION_OR_LOW_CLEARANCE": 0,
+    "HORIZON_INSUFFICIENT": 2,
+    "SAFE_PREFIX_ONLY": 0,
+    "COMPLETE_SAFE_BYPASS_PREDICTED": 0
+  },
+  "safe_complete_fresh_ids": [],
+  "prediction_note": "All curves fail to reach the H05 upstream safety plane. This does not establish that short horizon alone caused failure.",
+  "actual_bypass_side": "NOT_REACHED",
+  "minimum_center_distance_m": 7.569586614964257,
+  "minimum_human_surface_clearance_m": 6.712604072768871,
+  "margin_violation": false,
+  "human_PhysX_contact": false,
+  "structural_PhysX_contact": true,
+  "structural_contact_spans": 14,
+  "first_structural_contact_sim_s": 16.266667515039444,
+  "first_structural_contact_robot_xy": [
+    10.892143249511719,
+    18.432828903198242
+  ],
+  "first_structural_contact_colliders": [
+    "/Root/Geo_W_TrimStrateBase1_453/Geo_W_TrimStrateBase1_2/Geo_W_TrimStrateBase1_2",
+    "/World/Robots/Nova_Carter/wheel_right/Cylinder_05"
+  ],
+  "downstream_safety_crossed": false,
+  "additional_1m_downstream": false,
+  "goal_reached": false,
+  "minimum_goal_distance_m": 17.300141350534055,
+  "end_goal_distance_m": 20.817667193416973,
+  "end_xy": [
+    8.476285934448242,
+    12.34057903289795
+  ],
+  "primary_end_sim_s": 25.500001329928637,
+  "post_goal_motion_sim_s": 0.0,
+  "matched_corridor_max_lateral_deviation_m": null,
+  "lateral_note": "Never entered the shared west-corridor X range; frozen matched-progress lateral metric is undefined. Supplementary geometric departure below is NOT a human bypass excursion.",
+  "maximum_distance_from_saved_baseline_path_m": 10.462481458110274,
+  "maximum_abs_Y_offset_from_corridor_center_after_reaching_entrance_Y_band_m": 8.0279187774658,
+  "timing": {
+    "action_call_wall_s": {
+      "min": 0.048810081,
+      "median": 0.0547478005,
+      "p95": 0.1150467626,
+      "max": 1.943710892
+    },
+    "observation_to_application_wall_s": {
+      "min": 0.240064203,
+      "median": 0.5082551815,
+      "p95": 0.5887485996999999,
+      "max": 2.426173787
+    },
+    "observation_to_application_sim_s": {
+      "min": 0.06666667014360428,
+      "median": 0.10000000521540642,
+      "p95": 0.15000000782310963,
+      "max": 2.0000001043081284
+    }
+  },
+  "applied_commands": {
+    "v_m_s": {
+      "min": 0.0041726852825753275,
+      "median": 1.5,
+      "p95": 1.5,
+      "max": 1.5
+    },
+    "w_rad_s": {
+      "min": -1.2,
+      "median": -0.09804819197289111,
+      "p95": 0.3488450299546787,
+      "max": 0.5471660187838425
+    }
+  },
+  "initial_rgb_mean_absolute_channel_difference_from_baseline_0_255": 12.792429269547325,
+  "causality_note": "C1 poses match, but pixels and native actions already differ before human visibility. One extra model-free initial capture is recorded; its contribution and asynchronous context effects are not isolated.",
+  "identity": {
+    "local_sha_at_run": "e7b7abe11e8f05409c208364c7ec192d4a6f9bea",
+    "upstream_sha": "9fa6f8b66b9e121d5df5df071297bba8e5353ebb",
+    "git_status": "?? research/h05_stationary_analysis.py\n?? research/h05_stationary_run.py\n?? tests/test_h05.py\n",
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "authorization_sha256": "5dde9c5b08a30e40dff782e61e684bf1a579fde47e09397eb383858bdd1ce2f0",
+    "selection_sha256": "1b9d2beec527fdede71f3b33984cfd3e11a0d75dcf01da1ac4b1544d57da434e",
+    "baseline_config_sha256": "47dfec04f4fbee560e61389347e132765cd0135b360de91010575ccac675c0bb",
+    "weights": {
+      "base": {
+        "path": "/home/gpuadmin/Workspace/models/tic-vla/InternVL3-1B/model.safetensors",
+        "sha256": "a8b67c54568417f3631723e6b3e120720eaa638e03e62dc25666c70e3ae3e484"
+      },
+      "checkpoint": {
+        "path": "/home/gpuadmin/Workspace/models/tic-vla/checkpoints/TIC-VLA-model.ckpt",
+        "sha256": "376263f89fad0f42c267d85655019232edc91d36e214e23424804dd4cd42e036"
+      }
+    }
+  },
+  "human_world_xyz_m": [
+    -2.4478963167155454,
+    10.349539794921895,
+    0.0
+  ],
+  "human_yaw_rad": 0.0,
+  "human_source_sha256": "2e5d7fc72d6e2ed67f0ab86e2f3aaa91066019a4c71266361735956f232ccff0",
+  "native_transform_and_rules": {
+    "primary_window": "Through first measured dense XY goal distance strictly <2 m, else normal bounded C48 period remainder; no extension",
+    "goal_radius_m_strict": 2.0,
+    "robot_radius_m": 0.6069825421953869,
+    "human_radius_m": 0.25,
+    "human_surface_margin_m": 0.05,
+    "required_center_separation_m": 0.906982542195387,
+    "downstream_additional_m": 1.0,
+    "world": "Hospital original world, metres, +Z up; west forward=(-1,0), LEFT=(0,-1), RIGHT=(0,+1)",
+    "native_transform": "Embed native body forward/left as [dx,dy,0]; world=observation position+R(body-to-world quaternion wxyz)*local; project XY. No reanchoring/cumsum/yaw/timestamps",
+    "prediction_geometry": "Continuous segments of one native curve plus separately identified observation-origin connector; H05 disk/capsule clearance only, no predicted structural guarantee",
+    "class_priority": "Below 0.05 m clearance => unsafe; max west progress < upstream safety plane => horizon insufficient; else endpoint < downstream safety plane+1 m or no center-plane crossing => safe prefix; otherwise complete",
+    "relevant": "Observation and application before first measured westward human-center-plane passage (or primary end); observation upstream; raw pre-CLEAR chunks retained separately",
+    "safe_fresh": "At least one relevant COMPLETE_SAFE_BYPASS_PREDICTED with current CLEAR semantic mask and brightness PASS",
+    "clear": "Existing VISIBLE state: fraction >=0.002, bbox width>=20, height>=80; report as CLEAR",
+    "visibility_before_interaction": "CLEAR/brightness PASS before first continuous disk overlap; if no overlap, before crossing upstream safety plane",
+    "useful_early": "At least 5 m of measured path arc between CLEAR observation and first potential disk conflict; if no conflict, upstream safety-plane crossing is explicitly labeled substitute",
+    "contacts": "Human: measured robot/human PhysX contact with contact points, independent of proxy overlap. Structure: existing near-horizontal-normal nonfloor classifier on /Root contacts",
+    "lateral_deviation": "Maximum absolute world-Y offset from frozen no-human baseline, at matching west progress, within shared straight-corridor X range; also report human-centered offsets",
+    "qualification": "Navigation PASS requires valid preinteraction visibility, downstream safety plane+1m, clearance>=0.05m, no human/structural contact, strict goal entry. Full qualification additionally requires safe_fresh",
+    "scientific_runs": 1,
+    "retry_or_tuning": false
+  },
+  "exact_run_command": "bash scripts/isaac6_python.sh research/h05_stationary_run.py --phase run --receipt-dir outputs/h05-avoidance-setup-20261013-01",
+  "report": "docs/TICVLA_H05_HUMAN_AVOIDANCE.md",
+  "artifacts": {
+    "execution_plot": "outputs/nova-e16-h05-stationary-20261013-01/derived/h05/execution-xy.png",
+    "native_comparison": "outputs/nova-e16-h05-stationary-20261013-01/derived/h05/fresh-curves.png",
+    "first_clear_rgb": "outputs/nova-e16-h05-stationary-20261013-01/diagnostics/rgb_000012.png",
+    "closest_approach_rgb": "outputs/nova-e16-h05-stationary-20261013-01/diagnostics/rgb_000016.png",
+    "detailed_evaluation": "outputs/nova-e16-h05-stationary-20261013-01/derived/h05/evaluation.json",
+    "all_native_metrics": "outputs/nova-e16-h05-stationary-20261013-01/derived/h05/predictions.json"
+  },
+  "closest_rgb_note": "C16 at 9.000000469 s; continuous closest at 9.044486993 s. Original RGB, no synthesized exact-time image.",
+  "limitations": [
+    "One adapted Isaac6 trial, Isaac5 model process; no general reliability estimate",
+    "Human capsule excludes outstretched arms; geometric proxy overlap and measured PhysX contact differ",
+    "Native geometric classes assess H05 only, not global structural planning; actual structural contacts evaluated separately",
+    "Nearest saved RGB to closest physical approach may differ in simulation time",
+    "Action-call latency is separate from background reasoning age; exact worker-ready timestamp unavailable"
+  ],
+  "next_uncertainty": "Why does the policy fail to complete the left turn, with divergence already present before H05 is visible? Initial render/history and asynchronous context contributions are not isolated.",
+  "git_publication_receipt": "outputs/h05-avoidance-setup-20261013-01/git-finalization.json"
+}
