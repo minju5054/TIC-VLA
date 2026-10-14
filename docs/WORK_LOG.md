@@ -832,3 +832,21 @@ provenance, contact/goal/visibility outcomes and limits are in
 `docs/SEQUENTIAL_WHEELCHAIR_TRIALS.md`, with audit
 `outputs/sequential-wheelchair-preparation-20261014T051203Z-aca2c4`. No upstream source changes; focused local commit,
 no generated outputs or weights included.
+
+
+## 2026-10-14 — Publish measured wheelchair results to GitHub
+
+User requested an additional results-only report from local outputs. Added
+`docs/results/2026-10-14-sequential-wheelchairs.md` and linked it from the
+existing sequential-trials documentation. The Korean report contains the
+three run conditions, goal distances, passage sides/times, contacts, RGB
+brightness results, source run IDs and derived-summary SHA-256 identities.
+Runtime PASS remains separate from three navigation FAIL outcomes.
+
+Validation: recomputed goal distances and durations from saved robot rows;
+checked prediction counts, brightness failures, contact span counts and
+step2/3 instruction-only equality against local records; verified 27 source
+files stayed unchanged. No simulator execution or runtime/source changes.
+Raw outputs, plots, recordings and model files are excluded from this commit.
+Report validation audit: `outputs/wheelchair-report-publication-20261014T062652Z`.
+Publication target: `origin/hardcase-probe`; normal push only.

@@ -1,5 +1,8 @@
 # Three sequential static wheelchair trials
 
+Saved measurements and outcomes are summarized in the
+[Korean results report](results/2026-10-14-sequential-wheelchairs.md).
+
 Executed **1 → 2 → 3**, once per condition, with fresh preflight and model run
 IDs. Runtime completed for all three; navigation and encounter outcomes below
 are separate from process exit/runtime PASS. No retries or outcome-driven
