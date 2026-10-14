@@ -4,7 +4,7 @@ This fork is the home of the user's TIC-VLA-based research: official reproductio
 
 - Preserve official TIC-VLA behavior. Prefer environment configuration, ignored local environment files, and additive wrappers before minimal upstream patches.
 - Document every upstream source change: file, reason, behavior difference, and possible research impact. Do not refactor unrelated code.
-- Work on `hardcase-probe`, not `main`. Never force push or rewrite history.
+- Work on `TIC-VLA-TEST` in this worktree, not `main`. The sibling `TIC-VLA` workspace stays on `hardcase-probe`. The user explicitly authorized this separate working branch on 2026-10-14. Never force push or rewrite history.
 - Never commit model weights, checkpoints, Hugging Face caches, large datasets, Isaac caches, recordings, or generated experiment outputs.
 - Never overwrite previous raw experiment output. Use a new run ID and reject existing run directories. Keep raw and derived artifacts separate. Upstream image buffers are temporary and are deleted; do not present them as an archival dataset.
 - Do not infer coordinate frames from variable names. State axes, origins, quaternion ordering, transform direction, units, and timing explicitly for every coordinate transform.

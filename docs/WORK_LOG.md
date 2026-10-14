@@ -766,3 +766,13 @@ failure here. C27-C29 remained at .8 m/s; C30 slowing to .029531 m/s applied
 saved command context inspected. A saved-only quaternion check was corrected
 for one polyline-vertex pre/post-step rounding boundary; recorded authored yaw
 matches PhysX within 2.44e-7 rad, no raw or runtime source changes.
+
+
+## 2026-10-14 — Separate TEST worktree and VS Code commit destination
+
+- User explicitly requested a separate VS Code window for `TIC-VLA-TEST` with commits targeting the same-named branch. This overrides the usual `hardcase-probe` preference only in the TEST worktree. The existing folder had no `.git`; its Python `.venv` could not choose a Git branch.
+- Original workspace started clean on `hardcase-probe` at `efda3e6255b2aea28e433fd9601a72734345898f`. Existing TEST branch started at `a6383275902ab368ebd5be1b10ab2b9cccb9ef46`, two commits ahead of locally recorded `origin/TIC-VLA-TEST` (`e8d1f0b7821af96eab2c236803e34e0166c30219`). Upstream baseline remains `9fa6f8b66b9e121d5df5df071297bba8e5353ebb`; no network fetch or push is part of this setup.
+- Attached the populated sibling using `git worktree add --no-checkout`, `git read-tree HEAD`, a new `.git` pointer and `git worktree repair`. Filled only 29 absent tracked files from that branch with exclusive creates. Verified all 660 pre-existing tracked files before edits; retained source bytes, and only updated the TEST branch rule and appended the missing committed work-log suffix after an exact-prefix check. Setup receipts and the original rule/log are in `/tmp/ticvla-test-worktree-20261014-qqmf2n4k/` (temporary local audit, not experiment output).
+- Added ignored TEST-local VS Code Git discovery settings, documented the folder/branch mapping and enabled `*.bak` exclusion for existing source backups. Kept other pre-existing untracked scripts/tools outside the setup commit. Restored existing branch ignores cover `.venv`, outputs, weights, checkpoints and caches. No original-workspace file or branch changed.
+- Validation PASS: independent worktree roots/branches/indexes; source-byte preservation; append-only original log; ignored environment/output/cache paths; original clean status/SHA; focused diff review and `git diff --check`. `code --new-window /home/gpuadmin/Workspace/TIC-VLA-TEST` succeeded and VS Code's Git extension detected this worktree and queried `refs/heads/TIC-VLA-TEST`. Only Git/editor configuration and documentation changed; no simulator, inference, training, dependency installation, upstream-source edit, history rewrite or experimental validation.
+- Focused setup commit targets `TIC-VLA-TEST` only. Existing commits on `hardcase-probe` are preserved in place; historical experiments are not relabeled with this setup commit.

@@ -57,3 +57,6 @@ isaac_cache/
 model_cache/
 recordings/
 *.log
+
+# Local source backups from the TEST copy
+*.bak

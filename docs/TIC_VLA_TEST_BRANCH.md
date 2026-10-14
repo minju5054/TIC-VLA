@@ -87,3 +87,55 @@ commit and remote verification are saved in the ignored publication audit.
 Validation: 46 focused CPU tests PASS; all 36 copied sources parse and exactly
 match the executed TEST bytes; `bash -n run_test.sh` PASS; current C24 config
 exactly matches the completed TEST run. No new simulation or inference.
+
+
+## Separate VS Code worktree (2026-10-14)
+
+The formerly Git-free sibling is now a linked Git worktree. Open each folder
+in its own VS Code window; its checked-out branch determines where commits go.
+Activating a Python virtual environment does not select a Git branch.
+
+| Open folder | Working branch |
+|---|---|
+| `/home/gpuadmin/Workspace/TIC-VLA` | `hardcase-probe` |
+| `/home/gpuadmin/Workspace/TIC-VLA-TEST` | `TIC-VLA-TEST` |
+
+```bash
+code --new-window /home/gpuadmin/Workspace/TIC-VLA-TEST
+git -C /home/gpuadmin/Workspace/TIC-VLA-TEST branch --show-current
+git -C /home/gpuadmin/Workspace/TIC-VLA-TEST status --short --branch
+```
+
+In the TEST window, Source Control commits staged files to `TIC-VLA-TEST`;
+the lower-left branch indicator should show that name. Its existing upstream
+is `origin/TIC-VLA-TEST`. A local commit and a remote push remain separate
+operations. This setup makes no push and does not transfer or rewrite existing
+`hardcase-probe` commits.
+
+The worktrees share Git history/remotes, but have separate files, HEADs and
+staging indexes. The TEST `.git` is a pointer file into the original repository's
+worktree metadata; keep the original repository in place.
+
+The attachment preserved existing source bytes. It filled only 29 missing
+tracked paths from the existing TEST branch, including `.gitignore`, and
+appended missing committed history to the older work log after verifying that
+the old log was an exact prefix. The TEST branch's `AGENTS.md` now selects
+`TIC-VLA-TEST`; the original workspace rule is unchanged. Existing untracked
+scripts/tools remain available for separate review and commits.
+
+Ignored, folder-local `.vscode/settings.json` uses the following settings so
+this window discovers its own repository without automatically opening other
+registered worktrees or repositories belonging to outside editor tabs:
+
+```json
+{
+  "git.autoRepositoryDetection": "subFolders",
+  "git.openRepositoryInParentFolders": "never",
+  "git.detectWorktrees": false
+}
+```
+
+Existing ignores cover `.venv`, outputs, model weights, checkpoints and caches;
+`*.bak` additionally excludes the copy's local source backups. No virtual
+environment, simulator, inference dependency or experiment output was changed.
+This is a Git/editor setup validation, not runtime or navigation validation.
