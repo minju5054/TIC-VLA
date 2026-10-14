@@ -836,3 +836,21 @@ runner SHA differs from current DynaNav/benchmark.py. Those three files match
 HEAD and were not changed. Required and legacy test logs are saved in the audit.
 Focused commit and normal push target origin/TIC-VLA-TEST; only analyzer, tests,
 report and this append-only log are included, with no generated outputs/weights.
+
+
+## 2026-10-14 — Centimetre closeups of the E16 handoff audit
+
+User requested greater magnification and cm units. Added the display-only
+research/plot_e16_handoff_cm.py and report appendix, using the same frozen
+C12->C13, C38->C39 and C2->C3 examples. New ignored figures in
+outputs/e16-handoff-cm-zoom-20261014T081148Z-4ea1bc/ provide matched 6x6 cm and
+80x80 cm panels as PNG/SVG. The common display transform subtracts each measured
+switch XY and multiplies by 100; world axes remain fixed, and native predictions
+retain their original observation-to-world anchors. No metrics, classifications,
+thresholds, inference, simulator, controller or prior outputs were changed.
+Boundary gaps are 1.005/0.661/0.954 cm; pending travel 8.009/8.010/8.006 cm.
+Validation PASS: saved metric/pose agreement, equal aspect and fixed spans,
+visual review of both rendered figures, source 1,204-file hash preservation and
+previous audit hash preservation, syntax and diff checks. No new tests for this
+presentation-only change. Focused commit on TIC-VLA-TEST; generated images and
+provenance remain excluded from Git.

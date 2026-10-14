@@ -194,3 +194,37 @@ MPLCONFIGDIR=/tmp/tic-vla-mpl python3 -B -m research.audit_e16_wheelchair_handof
 분석 시작 HEAD/원격: `5be3384009ccadbfed41324fb2abe6689685379e`, branch `TIC-VLA-TEST`. 실제 주행 시작 SHA: `e8d1f0b7821af96eab2c236803e34e0166c30219`, upstream: `9fa6f8b66b9e121d5df5df071297bba8e5353ebb`. 주행 당시 `tools/two_wheelchairs_v08/`는 미추적 상태였고 별도 provenance에 파일 해시가 보존됐다. 이 audit의 commit을 주행 당시 revision으로 재표기하지 않는다.
 
 모델 기록은 strict checkpoint, 별도 Isaac 5 Python inference, native BF16 `(1,30,2)`다. Base SHA-256 `a8b67c54568417f3631723e6b3e120720eaa638e03e62dc25666c70e3ae3e484`, checkpoint SHA-256 `376263f89fad0f42c267d85655019232edc91d36e214e23424804dd4cd42e036`. Simulation은 Isaac 6.0.1, 모델 worker는 Isaac 5.0.0이며 이는 수정 harness의 시뮬레이션 증거다. Offline 분석은 system Python 3.12 / NumPy 1.26.4를 사용했다. 설치·환경 변경은 없다.
+
+
+## cm 단위 접합 확대도
+
+사용자 요청에 따라 같은 대표 pair의 표시 단위만 cm로 바꾸고 확대했다.
+새 산출물: `outputs/e16-handoff-cm-zoom-20261014T081148Z-4ea1bc/`. 이전 audit와 raw는 변경하지 않았다.
+
+| 사례 | Pair | B와 FRESH nominal switch 위치 차이 cm | Pending OLD 실제 이동 cm |
+|---|---|---:|---:|
+| C10 | C12→C13 | 1.005 | 8.009 |
+| C24 | C38→C39 | 0.661 | 8.010 |
+| Control | C2→C3 | 0.954 | 8.006 |
+
+`handoff-closeup-6cm.png`는 각 패널 가로·세로 6 cm(±3 cm),
+`handoff-context-80cm.png`는 가로·세로 80 cm(±40 cm)다. SVG도 함께 저장했다.
+실제 switch B를 표시 원점으로 두고 `q_cm = 100 × (p_world_m − B_world_m)`만 적용했다.
+세 패널의 XY 축척은 동일하고 world 축 방향은 회전하지 않았다.
+OLD/FRESH는 원래 observation pose에 투영한 값을 그대로 사용한다.
+이는 표시 원점 이동이며 FRESH를 switch pose로 다시 anchor하는 연산이 아니다.
+빨간 X는 실제 B, 초록 마름모는 기존 nominal timing으로 계산한 FRESH switch 위치다.
+자주색 점선은 실행 궤적이 아닌 가상 connector이며 작은 창 밖의 곡선은 잘려 보인다.
+원본 prediction, pair 선정, threshold, metric, 판정은 바뀌지 않았다.
+
+전체 유효 boundary gap의 중앙값/최대는 **0.900 / 3.860 cm**다.
+두 확대 그림을 직접 확인했으며 원본 1,204개 파일과 이전 audit 파일의 해시 보존을 확인했다.
+표시 전용 변경이므로 신규 동역학 테스트나 navigation 실행은 하지 않았다.
+
+```bash
+cd /home/gpuadmin/Workspace/TIC-VLA-TEST
+CM_OUT="outputs/e16-handoff-cm-zoom-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+MPLCONFIGDIR=/tmp/tic-vla-mpl python3 -B -m research.plot_e16_handoff_cm \
+  --audit outputs/e16-wheelchair-handoff-audit-20261014T073502Z-96bd3c \
+  --output "$CM_OUT"
+```
