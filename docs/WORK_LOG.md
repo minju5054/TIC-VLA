@@ -776,3 +776,20 @@ matches PhysX within 2.44e-7 rad, no raw or runtime source changes.
 - Added ignored TEST-local VS Code Git discovery settings, documented the folder/branch mapping and enabled `*.bak` exclusion for existing source backups. Kept other pre-existing untracked scripts/tools outside the setup commit. Restored existing branch ignores cover `.venv`, outputs, weights, checkpoints and caches. No original-workspace file or branch changed.
 - Validation PASS: independent worktree roots/branches/indexes; source-byte preservation; append-only original log; ignored environment/output/cache paths; original clean status/SHA; focused diff review and `git diff --check`. `code --new-window /home/gpuadmin/Workspace/TIC-VLA-TEST` succeeded and VS Code's Git extension detected this worktree and queried `refs/heads/TIC-VLA-TEST`. Only Git/editor configuration and documentation changed; no simulator, inference, training, dependency installation, upstream-source edit, history rewrite or experimental validation.
 - Focused setup commit targets `TIC-VLA-TEST` only. Existing commits on `hardcase-probe` are preserved in place; historical experiments are not relabeled with this setup commit.
+
+
+## 2026-10-14 — Publish wheelchair measurements on TIC-VLA-TEST
+
+User corrected the publication destination to `origin/TIC-VLA-TEST`.
+Copied the measured-results report from `hardcase-probe` commit
+`f4e081c998cecad4ce0b2ac66feef36c3d7b4acb`, together with its linked
+`docs/SEQUENTIAL_WHEELCHAIR_TRIALS.md` context, into this worktree.
+Both documents are byte-identical to the reviewed source. Existing TEST code,
+raw outputs and recorded experiment revision identities are preserved.
+
+Validation: report and context content equality; existing relative links;
+Markdown table structure; focused documentation diff and whitespace checks.
+No simulator run, source change, model/output upload or history rewrite.
+The three outcomes remain runtime PASS and navigation FAIL. This new
+publication commit targets only `TIC-VLA-TEST`; the prior `hardcase-probe`
+publication history is retained.
