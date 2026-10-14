@@ -704,3 +704,30 @@ All 72 commands independently recomputed; applied v cap 1.0 m/s.
 1045 protected files unchanged. No retry/tuning or causal-speed-only claim.
 Report `docs/TWO_WHEELCHAIRS_V1.md`; audit `outputs/two-wheelchairs-v1-preparation-20261014T013912Z-47b6f5`.
 Focused local commit on user-selected `TIC-VLA-TEST`; outputs/weights excluded.
+
+
+## 2026-10-14 — Same C10/C24 wheelchairs at 0.8 m/s
+
+User requested further reduction. Added independent `tools/two_wheelchairs_v08/`;
+max_v 1.0 -> 0.8 m/s, predictions 72 -> 90, all other actual configuration and
+original instruction unchanged. Max_w 1.2 rad/s and controller formula preserved;
+no upstream source change. One run `two-wheelchairs-v08-20261014T015420Z-a56068`:
+runtime PASS / PASS_THIS_SCENARIO; 90 predictions, 2787 robot rows,
+5574 paired wheelchair rows. C10/C24 contacts
+0/0;
+passage 10.450001/23.433335 sim s.
+Goal entry 32.583335 sim s, closest/final goal
+0.347256/8.984652 m.
+1 non-floor spans, first 40.433335 sim s.
+Wheelchair motion and transform error zero; independently recomputed all commands,
+applied v cap 0.8 m/s. Preflight/model gates 30 PASS; 15 existing tests and
+config/source checks PASS. 1092 raw/167 source/383 reference hashes,
+180 masks and 90 GIF frames verified; 1204 protected files unchanged.
+0 PhysX NULL-material warnings, 0 Python tracebacks.
+No retry/tuning or causal speed-only conclusion. See `docs/TWO_WHEELCHAIRS_V08.md`
+and `outputs/two-wheelchairs-v08-preparation-20261014T015420Z-a56068`. Focused local commit on user-selected
+`TIC-VLA-TEST`; outputs and weights excluded, no push for this new run.
+PASS is limited to contact-free passage and goal-region entry. The robot did not
+stop at the goal and ended 8.984652 m away. All 65 later trim contact reports
+have zero impulse and positive separation (minimum 5.329 mm); no confirmed impact
+or penetration. An additional saved-only trajectory separates pre/post-goal motion.
