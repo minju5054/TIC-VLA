@@ -661,3 +661,27 @@ See `docs/C10_WHEELCHAIR_ONLY.md` and `outputs/c10-wheelchair-only-preparation-2
 Modified Isaac6 harness plus preserved Isaac5 inference; not official reproduction,
 general avoidance validation or a causal comparison. Focused local commit on
 user-selected `TIC-VLA-TEST`; experiment outputs and weights excluded.
+
+
+## 2026-10-14 — C10/C24 stationary wheelchairs with 1.2 m/s controller cap
+
+User requested slightly slower control with two exact-position wheelchairs and no
+people. Added independent `tools/two_wheelchairs_slow/` and tests; no upstream
+source changes. max_v 1.5 -> 1.2 m/s; max_w 1.2 rad/s and existing formula
+unchanged. Budget 48 -> 60 predictions to compensate 20% lower speed. Original
+instruction/model/robot/camera and other config unchanged. First model-free gate
+failed lowercase renderer label matching; saved exact failed source/output,
+corrected labels and regression-tested, fresh preflight-p2 PASS (30 gates).
+15 focused tests PASS. One actual model run `two-wheelchairs-slow-20261014T012825Z-59d63c`
+completed: runtime PASS, FAIL_THIS_SCENARIO, 1886 robot rows and
+3772 wheelchair rows, zero wheelchair motion. C10 passage
+7.733334 s/contact reports 0;
+C24 passage Not observed s/contact reports 619.
+First goal entry Not observed s, closest/final distances
+11.129198/22.840990 m. Recorded applied speed cap
+1.2 m/s verified and all 60 commands independently recomputed.
+732 raw, 167 source, 383 reference hashes, 120 masks,
+60-frame GIF verified; 830 protected files unchanged.
+See `docs/TWO_WHEELCHAIRS_SLOW.md`, `outputs/two-wheelchairs-slow-preparation-20261014T012825Z-59d63c`.
+No navigation retry/tuning; no causal speed-only conclusion. Focused local commit
+on user-selected `TIC-VLA-TEST`; no outputs, caches or weights committed.
