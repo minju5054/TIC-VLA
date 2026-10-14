@@ -785,3 +785,27 @@ matches PhysX within 2.44e-7 rad, no raw or runtime source changes.
 - Basec50da4a52abeedac4cc6e520bd834b3bd5d55823, branchhardcase-probe; final focused local commit in /home/gpuadmin/Workspace/TIC-VLA/outputs/c24-cart-v05-preparation-20261014T042243Z-1da200/git-finalization.json; no push.
 
 - Actual outcome detail: C10 passed15.566667s without contact; missed corridor turn, travelled +Y beyond stairs, returned. First nonzero stair-mesh impulse58.416670s (first proximity callback58.283336s),9 spans4431 reports all staircase; no added-obstacle contacts. C24 pair never jointly CLEAR, wheelchair never visible, no C24 passage; goal min17.860225m/final19.816141m. Avoidance of the C24 pair was not exercised. Reviewed actual RGB and 0.8/0.5 path overlay; no speed-causality claim.
+
+
+## 2026-10-14 — E21 current renderer, 1.5 m/s RGB and right-turn check
+
+User selected historical E21 speed 1.5 m/s. Added `tools/e21_current_render/`
+(strict diagnostic preparation/analyzer) and `tools/e21_rgb_diagnostic/`
+(explicit operational-gated no-actor continuation); no upstream/runtime source
+changes. Preserved the initial strict RGB-failed preflight and recorded why the
+separate requested turn diagnostic proceeded without asserting quality PASS.
+Exactly one 48-prediction model run `e21-current-render-20261014T044932Z-68ab22`: physical right-turn gate PASS
+(C11 6.333334 s; C12 application 6.950000 s), RGB FAIL (C1–C17; C1 mean
+232.186253 and saturation 52.036169%). No non-floor contact reports, camera
+proximity or near-black observations. First goal-region entry 20.950001 s;
+minimum distance 1.022769 m; continued past goal, final distance 5.042042 m.
+No goal-stopping, human/dynamic or combined baseline qualification.
+
+Historical source hash establishes RayTracedLighting versus current
+RealTimePathTracing; no renderer-only causal claim. 32 focused CPU tests PASS;
+all 48 commands and RGB statistics independently recomputed; 293 raw/165
+source/365 reference/22 external hashes verified; 6,686 protected files unchanged.
+Actual RGB/path visually reviewed; 48-frame GIF checked. Full conditions,
+provenance and artifact locations: `docs/E21_CURRENT_RENDER.md`; audit
+`outputs/e21-preparation-20261014T044932Z-68ab22`. Focused commit contains additions/documentation
+only; generated output stays ignored; no push requested.
