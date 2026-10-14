@@ -854,3 +854,44 @@ visual review of both rendered figures, source 1,204-file hash preservation and
 previous audit hash preservation, syntax and diff checks. No new tests for this
 presentation-only change. Focused commit on TIC-VLA-TEST; generated images and
 provenance remain excluded from Git.
+
+
+## 2026-10-14 — Prespecified E16 application-hold experiment
+
+User authorized only the fixed E16 C10 delay protocol on TIC-VLA-TEST, with no
+Graph or navigation configuration changes. Added tools/e16_wheelchair_delay/
+and a 90-prediction saved validator, tests, four saved-only figures and
+E16_WHEELCHAIR_DELAY_INJECTION.md. Existing continuous loop/controller/model,
+167 original runtime source files and all 1,204 reference files are unchanged.
+Protocol was frozen before new model results: same C13 observation anchor and
+measured approach direction, spatial eligibility only, one-shot hold, no
+re-anchoring, OLD wheel retention, contact/horizon stop before FRESH application.
+
+Suite: outputs/e16-delay-suite-20261014T095206Z-14e2d1/.
+Stage A is constant-OLD unicycle approximation only; +0.25 s adds 20 cm OLD
+path and changes nominal boundary position error from 1.005 to 3.836 cm.
+It is not an actual PhysX delay trial. Four new independent simulator/model
+runs completed 90 native predictions each, in NO_HOOK/ZERO_HOOK/ZERO_HOOK/NO_HOOK
+order. All four reached the fixed trigger and passed C10 without contact.
+Only run 2 passed C24 and entered the goal (32.500 s); runs 1/3/4 failed with
+actual nonfloor callbacks, including positive impulse and penetration.
+Verdict BASELINE_UNSTABLE; no replacement/retry and zero actual positive-delay
+runs. Stage C was not started. No potential positive-delay reconciliation case
+or basis for Graph comparison was established.
+
+Same-FRESH B0/B_delta position errors are 0.984/0.904/1.545/1.210 cm; all actual
+holds were zero ticks and all deltas zero. Local proxy qualification is separate
+from actual contact and overall navigation. ZERO_HOOK has measurable wall cost:
+nonselected detect-to-apply medians 26.226/23.106 ms versus NO_HOOK 0.319/0.323 ms.
+The hook scans contact history on each response; no post-outcome optimization or
+rerun was performed. Background reasoning uses wall time, so zero added physics
+does not establish full temporal equivalence or causal attribution.
+
+Validation: simulator-only startup PASS; 25 new + 30 handoff + 7 continuous
+unit tests PASS; all four actual 90-call retention/timing validators PASS;
+full config identity, original and new raw hashes, frozen source/protocol
+identity, saved analysis, syntax/diff review and four-figure visual review PASS.
+Raw/derived outputs remain ignored; only seven additive tools, one test file,
+report and this append-only log are committed/pushed to origin/TIC-VLA-TEST.
+Execution started at 05f029f85693c658bc816decc992b54368879bc3 with wrapper source
+hashes recorded; publication SHA is not substituted for execution identity.
