@@ -809,3 +809,26 @@ Actual RGB/path visually reviewed; 48-frame GIF checked. Full conditions,
 provenance and artifact locations: `docs/E21_CURRENT_RENDER.md`; audit
 `outputs/e21-preparation-20261014T044932Z-68ab22`. Focused commit contains additions/documentation
 only; generated output stays ignored; no push requested.
+
+
+## 2026-10-14 — Three sequential static wheelchair trials
+
+User requested E21 C10 at 0.8 m/s, then E16 C10/C24 without added cart at
+0.5 m/s, then identical E16 with the English C24-left avoidance sentence.
+Added one scoped tools/sequential_wheelchair_trials bundle. Three new
+preflights and exactly three real-model runs executed in requested order;
+no outcome-based reruns. All runtime, wheel/camera/source gates PASS;
+E21 known RGB failure remains independently recorded.
+
+- 1 `seq1-e21-c10-v08-20261014T051203Z-aca2c4`: FAIL_THIS_SCENARIO; 90 predictions, closest goal 12.885903 m; non-floor spans 12; C10 right, C24 not placed.
+- 2 `seq2-e16-no-cart-v05-20261014T051203Z-aca2c4`: FAIL_THIS_SCENARIO; 144 predictions, closest goal 17.423574 m; non-floor spans 36; C10 left, C24 NOT REACHED.
+- 3 `seq3-e16-no-cart-v05-left-20261014T051203Z-aca2c4`: FAIL_THIS_SCENARIO; 144 predictions, closest goal 17.242414 m; non-floor spans 6; C10 left, C24 NOT REACHED.
+
+32 focused CPU tests PASS; 378 native/command/instruction records verified;
+all per-tick actor transforms stationary; exact stage2→3 instruction-only
+config and equal actor asset checks PASS; prior 7084 files unchanged.
+Raw/derived remain separate; actual RGB/path reviewed. Source and experiment
+provenance, contact/goal/visibility outcomes and limits are in
+`docs/SEQUENTIAL_WHEELCHAIR_TRIALS.md`, with audit
+`outputs/sequential-wheelchair-preparation-20261014T051203Z-aca2c4`. No upstream source changes; focused local commit,
+no generated outputs or weights included.
