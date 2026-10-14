@@ -640,3 +640,24 @@
 - Fresh preflight and actual runtime each pass all 24 gates; body/feet views reviewed, maximum sole-floor error about 0.0154 mm, exact measured XY error 0. One actual run `c30-human-only-20261013T161234Z-34d314`: runtime PASS / navigation FAIL, 48 predictions, 1,522 paired actor/robot rows, 25.350001 simulation seconds. Person motion/quaternion change 0; visible C12 / clear C18; no human contact, no passage, closest human centre 8.295654 m. First right-wheel/door contact 10.350001 s, 36 non-floor spans / 2,593 persistent-included reports; goal never entered, minimum 14.233705 m / final 14.254377 m.
 - C16-C18 turn left before contact while retaining 1.5 m/s, but route clearance is insufficient; C21 slowing applies after collision. Early corridor door/wall failure does not demonstrate human avoidance. No causal placement-effect, perception-defect or handoff-defect claim. 5,157 PhysX internal-face material NULL warnings / zero tracebacks; contact-material impact unquantified. No retry or tuning; model/controller/renderer/Isaac 6 simulator and Isaac 5 inference-only split unchanged; no upstream or host/package changes.
 - Saved-only evidence audit PASS: 490 raw / 167 source / 376 reference hashes, 48 native arrays/RGB/original instructions and semantic masks verified, stationary paired rows checked, 48-frame 25.35 s GIF decoded. 773 protected previous source/output files unchanged. 12 focused tests PASS. `docs/C30_HUMAN_ONLY.md` and audit `outputs/c30-human-only-preparation-20261013T161234Z-34d314` record commands, hashes, contact-command review and inspected figures. Local focused commit only; no push for this new run.
+
+
+## 2026-10-14 — Only one stationary wheelchair at exact original C10
+
+User requested no person and one wheelchair at original C10. Added independent
+`tools/c10_wheelchair_only/` plus focused tests; no upstream source change.
+Original instruction and all non-actor configuration preserved. C10 centre
+(6.824887275695801, 7.096357822418213) m, lowest mesh Z=0, fixed original Hospital
+collision geometry; no extra people/cart/C24 wheelchair. Two 20-check gates and
+11 CPU tests PASS. One run `c10-wheelchair-only-20261014T011550Z-75cf4a` completed
+48 predictions, 1528 paired robot/wheelchair rows. Runtime PASS,
+wheelchair contact-free passage 6.766667 s, stationary transform/XY
+error zero. Overall navigation FAIL: door contact 10.283334 s,
+46 spans/3289 reports, no goal entry, closest/final
+goal 14.542965 m. 5496 PhysX NULL-material warnings, zero Python
+tracebacks; no tuning/retry. 539 raw, 167 source, 378 reference hashes and
+48 semantic masks/GIF frames audited; 776 protected files unchanged.
+See `docs/C10_WHEELCHAIR_ONLY.md` and `outputs/c10-wheelchair-only-preparation-20261014T011550Z-75cf4a`.
+Modified Isaac6 harness plus preserved Isaac5 inference; not official reproduction,
+general avoidance validation or a causal comparison. Focused local commit on
+user-selected `TIC-VLA-TEST`; experiment outputs and weights excluded.
