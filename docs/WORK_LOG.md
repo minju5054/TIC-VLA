@@ -731,3 +731,38 @@ PASS is limited to contact-free passage and goal-region entry. The robot did not
 stop at the goal and ended 8.984652 m away. All 65 later trim contact reports
 have zero impulse and positive separation (minimum 5.329 mm); no confirmed impact
 or penetration. An additional saved-only trajectory separates pre/post-goal motion.
+
+
+## 2026-10-14 — C30 oncoming human with C10 stationary wheelchair
+
+User requested a corner encounter; explicitly accepted existing rest-pose
+translation without gait. Added `tools/c30_oncoming_c10_wheelchair/` and motion/
+rotated-sole tests, no upstream changes. Preserved max_v .8 m/s, max_w 1.2 rad/s,
+90 calls and initial instruction. Exact original C10 wheelchair, no C24 wheelchair;
+human starts exact original C30 at 6.928525 sim s and follows
+reverse original C30-C12 at 1 m/s. Timing frozen from prior static PASS before
+inference, with planned encounter 15.933334 sim s.
+Two failed model-free preflights preserved with source snapshots (JSON/rotated
+sole check; 2 cm natural robot drift guard). Corrected checks without geometry,
+physics or controller changes; full explanation in report/audit. Third preflight
+29 scene + 5 motion checks PASS. 20 focused tests PASS.
+One model run `c30-oncoming-c10-wheelchair-20261014T031747Z-a5e1bf` completed: runtime PASS /
+FAIL_OR_UNQUALIFIED_ENCOUNTER; measured corner encounter True,
+first 14.950001 sim s, minimum human centre distance
+0.375470 m at 25.383335 sim s.
+Human/C10 contact reports 1575/0;
+C10 motion zero, human target error 0.000000524 m.
+Goal entry Not observed sim s, closest/final goal
+15.323622/23.104632 m. Stopping is a
+separate requirement; fixed loop continues. 85 nonfloor spans.
+1093 raw/170 source/500 reference hashes,
+1441 prior files unchanged, 90 commands/180 masks/GIF verified.
+No navigation retry or general/causal avoidance claim. See
+`docs/C30_ONCOMING_C10_WHEELCHAIR.md` and `outputs/c30-oncoming-preparation-20261014T031747Z-a5e1bf`.
+Focused local commit on user-selected `TIC-VLA-TEST`, no output/weight commit or push.
+The encounter was qualified, so the combined analyzer status means avoidance
+failure here. C27-C29 remained at .8 m/s; C30 slowing to .029531 m/s applied
+15.966667 s, .100 s after first human contact. First-contact RGB/trajectory and
+saved command context inspected. A saved-only quaternion check was corrected
+for one polyline-vertex pre/post-step rounding boundary; recorded authored yaw
+matches PhysX within 2.44e-7 rad, no raw or runtime source changes.
