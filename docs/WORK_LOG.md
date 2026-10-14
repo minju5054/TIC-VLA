@@ -793,3 +793,46 @@ No simulator run, source change, model/output upload or history rewrite.
 The three outcomes remain runtime PASS and navigation FAIL. This new
 publication commit targets only `TIC-VLA-TEST`; the prior `hardcase-probe`
 publication history is retained.
+
+
+## 2026-10-14 — Independent E16 wheelchair reconciliation-need audit
+
+User requested saved-only analysis of the actual successful C10/C24 stationary
+wheelchair 0.8 m/s run, excluding all previous Graph results and selection rules.
+Worked only on TIC-VLA-TEST, starting at 5be3384009ccadbfed41324fb2abe6689685379e.
+Added research/audit_e16_wheelchair_handoffs.py, 30 focused tests and
+docs/E16_WHEELCHAIR_RECONCILIATION_NEED_AUDIT.md. No upstream, simulator,
+controller, environment or Graph implementation changes; no model/navigation run.
+
+Verified 90 native (30,2) predictions, 2,787 robot rows, 5,574 static wheelchair
+rows, action/state alignment, unchanged command replay/OLD retention, 1,092 raw
+manifest entries and all 1,204 protected input files. Evaluated all 89 consecutive
+pairs; 62 switches before first strict goal entry (32.583335 s), 27 post-goal
+excluded and C1 bootstrap excluded. Protocol and geometry-based windows were
+frozen before pair metrics. Observation anchors, nominal time convention,
+committed history, invalid tangents and conservative proxies remain explicit.
+
+Verdict: NO_RECONCILIATION_HARD_CASE_EVIDENCE. Primary A/B/C/D/E counts are
+0/0/29/20/13. Pending OLD travel median 0.080097 m is measured, while valid
+boundary gap median/max are 0.009003/0.038597 m. No observed predicted passage
+side flip or additional connector-only proxy risk with clear B and FRESH.
+C10 C12->C13 and C24 C38->C39 are diagnostic representatives, C2->C3 control;
+none is selected as a Graph hard case. Conservative disk/AABB overlap also occurs
+on the actual contact-free successful path; never equated with PhysX collision.
+The report separates measured facts, interpretation and untested hypotheses.
+
+Final ignored audit: outputs/e16-wheelchair-handoff-audit-20261014T073502Z-96bd3c/.
+Preserved earlier attempts: two quaternion arithmetic checks blocked before
+metrics, then a completed version with a conflated side/overlap label. Corrected
+float32 arithmetic verification and separated signed side from proxy overlap;
+no threshold tuning, input overwrite or changed candidate outcome. Five plots
+were visually reviewed; display-only revisions retained separately. Final
+measurement-function AST and protocol semantics match the executed analyzer.
+
+Validation: 30 new tests PASS; 7 continuous regression tests PASS; source/hash,
+89-pair CSV accounting, syntax and focused diff checks PASS. Existing Nova tests:
+10 PASS / 1 pre-existing FAIL at tests/test_nova.py:38 because the frozen config
+runner SHA differs from current DynaNav/benchmark.py. Those three files match
+HEAD and were not changed. Required and legacy test logs are saved in the audit.
+Focused commit and normal push target origin/TIC-VLA-TEST; only analyzer, tests,
+report and this append-only log are included, with no generated outputs/weights.
