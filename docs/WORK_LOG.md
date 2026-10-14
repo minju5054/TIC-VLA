@@ -776,3 +776,12 @@ matches PhysX within 2.44e-7 rad, no raw or runtime source changes.
 - Latest AGENTS branch rule followed by fast-forwarding hardcase-probe to a638327; previous TIC-VLA-TEST branch preserved, no push. Focused local commit recorded in /home/gpuadmin/Workspace/TIC-VLA/outputs/c24-adjacent-cart-preparation-20261014T040913Z-07666d/git-finalization.json.
 
 - Contact review: post-corner joint CLEAR at observation29/t15.283334s; first callback21.550001s (zero impulse), first nonzero impulse21.566668s; first reduced-speed command applied21.866668s (.3s later). All3816 nonfloor reports target C24 wheelchair; no cart/Hospital contacts. C10 passes10.316667s. Both C24 centre planes remain uncrossed. Saved-only reviewed plot corrects a decorative arrow; final original-repo analyzer receives only that cosmetic fix while TEST executed sources/receipts remain frozen.
+
+### 2026-10-14 — C24 adjacent cart at 0.5 m/s
+
+- Requested max_v .8 -> .5 m/s, max_w1.2 unchanged; proportional prediction budget90 ->144. Original instruction, C10/C24 fixed wheelchairs and C24+Y0.846196140m cart unchanged. All non-speed/budget configuration and actual assets identical.
+- Preflight/actual39-check gates PASS. One actual run **c24-adjacent-cart-v05-20261014T042243Z-1da200**: runtime PASS, **FAIL_THIS_SCENARIO**, goal minimum17.860225m, entryNone, nonfloor spans9. Full outcome in [C24_ADJACENT_CART_V05.md](C24_ADJACENT_CART_V05.md). No navigation retry.
+- 21 focused tests, new-module symbols and exact diff review PASS; independent audit1886raw/170source/388reference hashes, 4203 protected files unchanged,144 finite native arrays/commands,432 semantic masks,144-frame GIF. No upstream/model/host changes. Original raw/derived evidence preserved; additive tools/docs only.
+- Basec50da4a52abeedac4cc6e520bd834b3bd5d55823, branchhardcase-probe; final focused local commit in /home/gpuadmin/Workspace/TIC-VLA/outputs/c24-cart-v05-preparation-20261014T042243Z-1da200/git-finalization.json; no push.
+
+- Actual outcome detail: C10 passed15.566667s without contact; missed corridor turn, travelled +Y beyond stairs, returned. First nonzero stair-mesh impulse58.416670s (first proximity callback58.283336s),9 spans4431 reports all staircase; no added-obstacle contacts. C24 pair never jointly CLEAR, wheelchair never visible, no C24 passage; goal min17.860225m/final19.816141m. Avoidance of the C24 pair was not exercised. Reviewed actual RGB and 0.8/0.5 path overlay; no speed-causality claim.
