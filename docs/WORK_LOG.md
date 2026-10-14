@@ -685,3 +685,22 @@ First goal entry Not observed s, closest/final distances
 See `docs/TWO_WHEELCHAIRS_SLOW.md`, `outputs/two-wheelchairs-slow-preparation-20261014T012825Z-59d63c`.
 No navigation retry/tuning; no causal speed-only conclusion. Focused local commit
 on user-selected `TIC-VLA-TEST`; no outputs, caches or weights committed.
+
+
+## 2026-10-14 — Same C10/C24 wheelchairs at 1.0 m/s
+
+User requested further speed reduction. New independent `tools/two_wheelchairs_v1/`
+keeps the preceding geometry/labels/instruction exactly; only max_v 1.2 -> 1.0 m/s
+and predictions 60 -> 72. Max_w 1.2 rad/s and formula unchanged. No upstream
+changes. Fresh preflight/model gates: 30 PASS; one model run
+`two-wheelchairs-v1-20261014T013912Z-47b6f5` completed 72 predictions. Runtime PASS,
+FAIL_THIS_SCENARIO; C10/C24 contact reports
+0/0; goal entry
+Not observed s, closest/final distances
+13.736755/13.782937 m. Both wheelchairs stationary.
+All 72 commands independently recomputed; applied v cap 1.0 m/s.
+15 existing tests, actual config/source equality and symbol-table checks PASS.
+876 raw/167 source/383 reference hashes and 144 masks verified,
+1045 protected files unchanged. No retry/tuning or causal-speed-only claim.
+Report `docs/TWO_WHEELCHAIRS_V1.md`; audit `outputs/two-wheelchairs-v1-preparation-20261014T013912Z-47b6f5`.
+Focused local commit on user-selected `TIC-VLA-TEST`; outputs/weights excluded.
