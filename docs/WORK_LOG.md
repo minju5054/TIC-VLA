@@ -766,3 +766,13 @@ failure here. C27-C29 remained at .8 m/s; C30 slowing to .029531 m/s applied
 saved command context inspected. A saved-only quaternion check was corrected
 for one polyline-vertex pre/post-step rounding boundary; recorded authored yaw
 matches PhysX within 2.44e-7 rad, no raw or runtime source changes.
+
+### 2026-10-14 — C24 adjacent stationary cart with C10/C24 wheelchairs
+
+- User selected cart, original instruction, minimal nonoverlapping +worldY spacing. Exact prior wheelchairs and .8m/s90-call settings preserved. Cart centre [-1.7567275762557981, 11.834615672735879, 0.0], C24+Y0.846196140m, enclosing bounds gap.05m.
+- 39-check model-free/actual gates PASS; left conservative local path remains feasible, images reviewed. Initial preflight logging-only duplicate exclusive manifest failure retained; combined diagnostic invocation fixed it before inference with identical geometry.
+- One actual run **c24-adjacent-cart-20261014T040913Z-07666d**: runtime PASS, **FAIL_THIS_SCENARIO**; 90 native predictions, goal min10.886267m, first entryNone, nonfloor spans22. Actual side/contacts/co-observation reported in [C24_ADJACENT_CART.md](C24_ADJACENT_CART.md).
+- 21 focused tests and independent evidence audit PASS; 1184 raw/170 source/388 reference hashes, 2807 protected files unchanged, 270 semantic masks, 90-frame GIF. No upstream/model/controller/host changes; raw/derived uncommitted.
+- Latest AGENTS branch rule followed by fast-forwarding hardcase-probe to a638327; previous TIC-VLA-TEST branch preserved, no push. Focused local commit recorded in /home/gpuadmin/Workspace/TIC-VLA/outputs/c24-adjacent-cart-preparation-20261014T040913Z-07666d/git-finalization.json.
+
+- Contact review: post-corner joint CLEAR at observation29/t15.283334s; first callback21.550001s (zero impulse), first nonzero impulse21.566668s; first reduced-speed command applied21.866668s (.3s later). All3816 nonfloor reports target C24 wheelchair; no cart/Hospital contacts. C10 passes10.316667s. Both C24 centre planes remain uncrossed. Saved-only reviewed plot corrects a decorative arrow; final original-repo analyzer receives only that cosmetic fix while TEST executed sources/receipts remain frozen.
