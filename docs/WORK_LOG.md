@@ -895,3 +895,35 @@ Raw/derived outputs remain ignored; only seven additive tools, one test file,
 report and this append-only log are committed/pushed to origin/TIC-VLA-TEST.
 Execution started at 05f029f85693c658bc816decc992b54368879bc3 with wrapper source
 hashes recorded; publication SHA is not substituted for execution identity.
+
+
+## 2026-10-15 — Saved C24 failure OLD/FRESH pre-contact audit
+
+User asked whether the failed E16 C24 trials contained dangerous OLD / safe
+FRESH handoffs and whether those FRESH futures could be connected at actual
+switches. Added a saved-only scanner and cm plotting companion under
+tools/e16_wheelchair_delay/ (no existing runtime change), four qualification
+tests and an append-only report section. No simulator, inference or Graph ran.
+
+Audited all 76 pre-contact handoffs in delay-suite trials 3/4 (40/36), including
+15 in the geometry-fixed C24 approach window (8/7). No OLD C24 proxy-conflict to
+FRESH-clear revision exists, even without requiring a centre-plane crossing;
+zero-radius centreline diagnostics also contain no such transition. Early clear
+predictions end before the obstacle and are not qualified complete bypasses.
+
+Last handoffs C40->C41 and C36->C37 have position gaps 1.253/1.458 cm and measured
+execution-direction gaps 1.634/2.189 deg. FRESH commands were actually applied
+0.20/0.30 simulation seconds before the first zero-impulse proximity callback.
+First positive impulses followed one tick later, with active source C41/C37 and
+no pending inference. Both remaining FRESH predictions intersect the saved C24
+bounding proxy; there is no demonstrated safe-FRESH/connector-only problem.
+Conservative proxy overlap is not exact collision geometry, and command
+application does not prove full-chunk tracking or alternative-path feasibility.
+No reconciliation hard case or Graph benefit has been established.
+
+Artifacts: outputs/e16-c24-precontact-audit-20261015-01/ (all prior outputs
+preserved). Final figure uses cm and 10x10 cm boundary panels; initial figure
+retained with a new figures-v2 legend layout. Validation: 4 new + 25 delay +
+30 handoff tests PASS (59 total), actual 90-call contracts, pre-contact selection,
+raw/full snapshot hashes, frozen source identity, visual review, append-only
+report/log and focused diff checks PASS. Generated output is excluded from Git.

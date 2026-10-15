@@ -285,3 +285,123 @@ Launcher 내부는 `timeout --signal=INT --kill-after=30s 900s bash scripts/isaa
 
 Focused commit은 `TIC-VLA-TEST`에만 반영하고 `origin/TIC-VLA-TEST`로 일반 push한다.
 코드·테스트·보고서·WORK_LOG만 포함하며 generated raw/derived/그림·모델은 제외한다.
+
+
+## 2026-10-15 후속 — C24 충돌 전 안전한 FRESH 수정안이 있었는가?
+
+**직전 실험의 C24 충돌 실행 3·4에서는 확인되지 않았다.** 첫 비바닥 callback
+이전의 모든 non-bootstrap handoff 76개(실행 3: 40개, 실행 4: 36개)를 saved-only로
+추가 검사했다. C24 근접 구간은 각각 8개/7개, 총 15개다. 기존 C10 선택 handoff의
+국소 진단을 C24에 그대로 적용한 결론이 아니다. 새로운 navigation/inference/Graph는 0회다.
+
+정확한 질문을 두 단계로 나누었다. (1) OLD remaining prediction이 C24와 간섭하는데
+동일 actual switch 시각의 FRESH remaining prediction은 robot footprint까지 clear한가?
+(2) 그런 FRESH가 있다면 actual B와의 가상 connector 및 실제 controller 추종을
+안전하게 검증할 수 있는가? 이번 기록은 첫 단계의 후보를 확보하지 못했다.
+
+### 전체 사전 접촉 handoff 검사
+
+- 두 native chunk 각각을 **자신의 observation pose**로 world에 투영했다. 원점은 원래 Hospital,
+  +Z up, XY m, yaw +X 기준 CCW rad, quaternion wxyz다. Native는 observation-body forward/left
+  `(30,2)`이며 native yaw/time은 없다. Nominal obs+0.1…3.0초 support만 남겼고 외삽하지 않았다.
+- 첫 nonfloor callback(0 impulse proximity 포함) **이전 switch**만 분석했다. 충돌 뒤 생성된
+  FRESH를 충돌 전 구조 가능성으로 소급하지 않는다. C24 근접 범위는 이전과 같은
+  `max_v*3 + robot_radius + norm(chair_half_footprint)`이며 그 밖의 pre-contact 쌍도 전부 보존했다.
+- 기존 보수적 robot disk 반경 60.698 cm, 저장된 wheelchair OBB, 구조물 AABB,
+  1 cm 이하 sampling, clearance lower bound >2 cm를 그대로 사용했다.
+- OLD의 C24 proxy 간섭에서 FRESH의 C24 proxy-clear로 바뀐 쌍은 **0개**다.
+  이 결과는 C24 중심면 통과 조건을 요구하지 않아도 같다. 완전한 우회 horizon을
+  요구해서 후보를 놓친 것으로만 설명할 수 없다.
+- Robot radius를 0으로 둔 **예측 중심선 진단**에서도 OLD 간섭→FRESH clear 전환은 0개다.
+  이 보조 진단은 robot-safe 판정이 아니며 radius를 줄여 후보를 선정하지 않았다.
+- 초기의 양수 clearance FRESH들은 C24 중심면에 아직 도달하지 않는 짧은 예측이다.
+  이를 C24 회피 성공안으로 부르지 않는다. C24 위험이 나타난 이후에는 FRESH도
+  clear한 우회로 바뀌지 않았다.
+
+아래 수치는 C24에 대한 **보수적 signed clearance 하한(cm)**이며 실제 penetration 깊이가 아니다.
+음수는 proxy가 겹치거나 안전성을 인증하지 못한다는 의미다. `미통과`는 horizon 내
+예측 중심면 통과가 없다는 뜻으로, 미래의 우회 방향을 임의 부여하지 않았다.
+
+| 실행 | handoff | switch s | OLD disk cm | FRESH disk cm | FRESH 중심선 cm | FRESH 중심면 side |
+| --- | --- | --- | --- | --- | --- | --- |
+| 3 | C33→C34 | 17.850 | 68.12 | 33.33 | 94.03 | 미통과 |
+| 3 | C34→C35 | 18.350 | 33.33 | 70.00 | 130.70 | 미통과 |
+| 3 | C35→C36 | 18.850 | 70.00 | 37.52 | 98.22 | 미통과 |
+| 3 | C36→C37 | 19.350 | 37.52 | -1.00 | 59.70 | 미통과 |
+| 3 | C37→C38 | 19.850 | -1.00 | -37.85 | 22.85 | 미통과 |
+| 3 | C38→C39 | 20.333 | -37.85 | -62.93 | -2.23 | 미통과 |
+| 3 | C39→C40 | 20.850 | -62.93 | -101.15 | -40.46 | 미통과 |
+| 3 | C40→C41 | 21.350 | -101.15 | -98.85 | -38.15 | LEFT |
+| 4 | C30→C31 | 16.383 | 152.22 | 115.66 | 176.36 | 미통과 |
+| 4 | C31→C32 | 16.883 | 115.66 | 79.13 | 139.83 | 미통과 |
+| 4 | C32→C33 | 17.383 | 79.13 | 41.26 | 101.96 | 미통과 |
+| 4 | C33→C34 | 17.883 | 41.26 | 2.86 | 63.55 | 미통과 |
+| 4 | C34→C35 | 18.383 | 2.86 | -32.45 | 28.24 | 미통과 |
+| 4 | C35→C36 | 18.883 | -32.45 | -64.36 | -3.67 | 미통과 |
+| 4 | C36→C37 | 19.383 | -64.36 | -63.00 | -2.30 | 미통과 |
+
+실행 3 C41은 중심면을 처음 지날 때 중심선이 휠체어 중심의 왼쪽 **6.29 cm**였다.
+C24 half-width는 **41.26 cm**이므로 `LEFT`라는 부호는 안전한 왼쪽 우회를 뜻하지 않는다.
+이 예측의 중심선 자체도 OBB 안으로 들어간다. 실행 4 C37도 예측 중심선이 OBB와
+겹쳤고 전체 horizon에서 중심면을 통과하지 않았다.
+
+### 실제 switch에서 무엇이 실행됐는가?
+
+| 실행 | OLD→FRESH | switch s | 첫 callback s | 첫 양의 impulse s | 위치 오차 cm | 실행 방향 오차 deg | 관측→switch OLD cm | 접촉 당시 명령 source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 3 | C40→C41 | 21.350001 | 21.550001 | 21.566668 | 1.253 | 1.634 | 8.010 | C41 |
+| 4 | C36→C37 | 19.383334 | 19.683334 | 19.700001 | 1.458 | 2.189 | 8.008 | C37 |
+
+위 두 handoff는 각각 첫 접촉 직전 마지막 전환이다. 표의 방향 오차는 switch 직전
+6 physics interval의 실제 XY 진행 방향과 FRESH valid tangent의 차이다.
+Body yaw와 tangent 차이는 각각 1.762°/1.869°이며 별도 개념이다.
+위치 오차는 nominal FRESH 예상 위치와 actual B의 차이로, 실제 robot 중심을 FRESH에
+re-anchor해서 만든 값이 아니다.
+
+실행 3에서는 C41 `(v,w)=(0.8,0.043395)`를 **21.350001초에 이미 적용**했고,
+0.20초 뒤 proximity, 0.216667초 뒤 양의 impulse가 기록됐다.
+실행 4에서는 C37 `(0.8,0.141735)`를 **19.383334초에 이미 적용**했고,
+0.30초 뒤 proximity, 0.316667초 뒤 양의 impulse가 기록됐다.
+두 경우 첫 callback/양의 impulse 시점 모두 active source는 해당 FRESH였으며
+pending inference request는 없었다. OLD를 계속 유지해서 FRESH 적용이 누락된 사례가 아니다.
+
+### 연결 가능성과 연구 결론
+
+명령 전환과 이후 실제 운동은 확인됐다. 그러나 현재 controller는 FRESH native 30점을
+시간순으로 끝까지 추종하지 않고 lookahead로 만든 단일 `(v,w)`를 다음 응답까지 실행한다.
+따라서 **FRESH command 적용 성공 != 전체 FRESH 경로의 안전한 실행 가능성**이다.
+
+마지막 두 쌍의 1.25–1.46 cm 위치 차이, 1.63–2.19° 진행 방향 차이는 수치적 불일치가
+있다는 증거지만, 안전한 FRESH를 연결하지 못해 충돌했다는 증거는 아니다. 마지막 두
+쌍에서는 FRESH 자체, B의 conservative disk, 가상 RAW connector가 모두 proxy-clear하지
+않다. 위험이 connector에만 새로 생긴 조건이 아니다.
+
+보수적 disk/OBB는 기존 무접촉 성공 경로에도 간섭을 보고했으므로 exact mesh 충돌로
+단정할 수 없다. 반대로 이번 실패 기록의 실제 양의 impulse는 별도로 확인됐다.
+현재 기록에서 **안전한 FRESH 후보와 그 연결의 물리적 실행 가능성은 검증되지 않았다.**
+안전한 대안이 원리적으로 존재하지 않는다는 증명도 아니다. Pose/tangent 차이를 작게
+만드는 것만으로 회피가 회복된다고 주장할 수 없으며, 모델 prediction과 controller
+tracking의 기여를 분리하려면 별도의 counterfactual 검증이 필요하다.
+
+따라서 이번 두 실패는 `OLD unsafe → FRESH safe → boundary connection failure`라는
+reconciliation 사례로 선정할 근거가 없다. 직전 `BASELINE_UNSTABLE` 판정도 그대로다.
+
+산출물: `outputs/e16-c24-precontact-audit-20261015-01/`. 각 `run-3.json`, `run-4.json`에
+모든 76쌍과 observation anchor, world prediction, clearance, timing, 실제 적용 구간을 보존했다.
+`contact-state-followup.json`은 접촉 당시 active command source를 실제 CSV에서 확인한 기록이다.
+`figures-v2/c24-precontact-cm.png`는 C24 전체 및 10×10 cm switch 확대 그림이다.
+첫 그림은 보존하고 범례 위치만 수정한 v2를 최종으로 직접 확인했다.
+
+새 unit tests 4개 + delay contract 25개 + 기존 handoff math 30개, 총 **59 PASS**.
+두 run의 모든 기존 파일 snapshot과 raw manifest, 90-call validator, source hash,
+좌표/시간/선택 범위, append-only 문서 및 diff 검증을 통과했다. 기존 runtime source는 수정하지 않았다.
+분석 시작 SHA는 `1fd84de97dfdd702dc049e9fa08df92b1889f0fc`이며 실행 당시 Git revision은
+각 원본 metadata 그대로다. 생성된 데이터와 그림은 Git에서 제외했다.
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m tools.e16_wheelchair_delay.c24_precontact --out outputs/e16-c24-precontact-audit-20261015-01
+PYTHONDONTWRITEBYTECODE=1 python3 -m tools.e16_wheelchair_delay.c24_precontact_plot --out outputs/e16-c24-precontact-audit-20261015-01 --figure-subdir figures-v2
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_c24_precontact tests.test_e16_wheelchair_delay tests.test_e16_wheelchair_handoffs -v
+```
+
+위 output은 이미 존재하므로 재실행 시 새 output 이름을 써야 한다. 기존 output 덮어쓰기는 거부한다.
